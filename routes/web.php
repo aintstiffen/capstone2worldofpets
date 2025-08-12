@@ -1,0 +1,19 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DogController;
+
+
+Route::get('/', function () {
+    return view('homepage');
+});
+Route::get('/dogs', function () {
+    return view('dogs');
+})->name('dogs');
+Route::get('/cats', function () {
+    return view('cats');
+})->name('cats');
+Route::get('/assessment', function () {
+    return view('assessment');
+})->name('assessment');
+Route::get('/dogs', [DogController::class, 'index'])->name('dogs');
