@@ -7,7 +7,7 @@
             <nav class="hidden md:flex items-center gap-6 text-sm">
                 <a href="{{ route('dogs') }}" class="font-medium transition-colors hover:text-primary">Dogs</a>
                 <a href="{{ route('cats') }}" class="font-medium transition-colors hover:text-primary">Cats</a>
-                <a href="/assessment" class="font-medium transition-colors hover:text-primary">Personality Assessment</a>
+                <a href="{{ route('assessment') }}" class="font-medium transition-colors hover:text-primary">Personality Assessment</a>
                 <a href="/compare" class="font-medium transition-colors hover:text-primary">Compare Breeds</a>
             </nav>
             <div class="flex items-center gap-2">
