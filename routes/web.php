@@ -19,3 +19,4 @@ Route::get('/assessment', function () {
 })->name('assessment');
 Route::get('/dogs', [DogController::class, 'index'])->name('dogs');
 Route::get('/cats', [CatController::class, 'index'])->name('cats');
+Route::get('/dogs/{id}', [DogController::class, 'show'])->name('dogs.show');

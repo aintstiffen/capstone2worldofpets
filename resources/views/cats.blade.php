@@ -62,18 +62,6 @@
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t bg-muted/40">
-        <div class="container flex flex-col gap-4 py-10 md:flex-row md:gap-8">
-            <div class="flex-1 space-y-4">
-                <div class="flex items-center gap-2 font-bold text-xl">
-                    <span class="text-primary">World of Pets</span>
-                </div>
-                <p class="text-sm text-muted-foreground">
-                    Educational platform for dog and cat breeds in the Philippines.
-                </p>
-            </div>
-        </div>
-    </footer>
+
 </div>
 @endsection

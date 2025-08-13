@@ -17,4 +17,9 @@ class DogController extends Controller
 
         return view('dogs', compact('pets'));
     }
+    public function show($id)
+    {
+        $pet = Pet::findOrFail($id); // Or Pet::where('slug', $slug)->firstOrFail();
+        return view('dogs.show', compact('pet'));
+    }
 }
