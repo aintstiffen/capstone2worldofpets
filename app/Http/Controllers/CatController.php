@@ -16,4 +16,10 @@ class CatController extends Controller
 
         return view('cats', compact('petss'));
     }
+
+    public function show($id)
+    {
+        $pet = Pet::findOrFail($id); // Or Pet::where('slug', $slug)->firstOrFail();
+        return view('cats.show', compact('pet'));
+    }
 }

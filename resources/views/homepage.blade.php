@@ -32,8 +32,8 @@
                                     class="px-4 py-2 border border-black rounded-md bg-black text-white hover:bg-gray-700 hover:text-white transition">
                                     Take Personality Quiz
                                 </a>
-                                <a href="/compare" class="px-4 py-2 border rounded-md border-gray-300">
-                                    Compare Breeds
+                                <a href="/dogs" class="px-4 py-2 border rounded-md border-gray-300">
+                                    Explore Breeds
                                 </a>
                             </div>
                         </div>

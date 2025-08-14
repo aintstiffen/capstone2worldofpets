@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DogController;
 use App\Http\Controllers\CatController;
 
-
 Route::get('/', function () {
     return view('homepage');
 });
@@ -20,3 +19,4 @@ Route::get('/assessment', function () {
 Route::get('/dogs', [DogController::class, 'index'])->name('dogs');
 Route::get('/cats', [CatController::class, 'index'])->name('cats');
 Route::get('/dogs/{id}', [DogController::class, 'show'])->name('dogs.show');
+Route::get('/cats/{id}', [CatController::class, 'show'])->name('cats.show');
