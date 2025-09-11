@@ -22,9 +22,9 @@
                     <div class="text-center">
                         <h2 class="text-3xl font-bold mb-6">Pet Personality Matcher</h2>
                         <p class="mb-8">Find the perfect pet match based on your personality and preferences</p>
-                        <button class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition" 
+                        <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
                             @click="currentStage = 'petType'">
-                            Start Assessment
+                            Take Personality Assessment
                         </button>
                     </div>
                 </template>
@@ -200,9 +200,9 @@
                                             <span>•</span>
                                             <span x-text="preferences.hairLength.charAt(0).toUpperCase() + preferences.hairLength.slice(1) + ' Hair'"></span>
                                         </div>
-                                        <p class="text-sm text-gray-700" x-text="breed.description"></p>
+                                        <p class="text-sm text-gray-700 h-20 overflow-hidden" x-text="breed.description.length > 100 ? breed.description.substring(0, 100) + '...' : breed.description"></p>
                                         <div class="mt-3 pt-3 border-t">
-                                            <div class="text-sm font-medium mb-1">Personality Traits:</div>
+                                            <div class="text-sm font-medium mb-1">Your Personality Traits:</div>
                                             <div class="flex flex-wrap gap-2">
                                                 <template x-for="(trait, i) in breed.traits" :key="i">
                                                     <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded" 
@@ -213,8 +213,8 @@
                                         
                                         <!-- Add link to view more details -->
                                         <div class="mt-4 text-center">
-                                            <a :href="'/' + petType + 's/' + breed.id" 
-                                               class="text-blue-600 hover:text-blue-800 underline">
+                                            <a :href="'/' + petType + 's/' + breed.slug" 
+                                               class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2">
                                                View Details
                                             </a>
                                         </div>
@@ -226,18 +226,18 @@
                         <div class="text-center mb-4">
                             <!-- Only show save button if results aren't already saved -->
                             <button x-show="!resultsSaved && !hasSavedResults" class="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-4" 
-                                @click="saveResults">Save My Results</button>
+                                @click="saveResults">Save Results</button>
                                 
                             <!-- Show "Saved!" indicator only when user just saved results, not when returning to page -->
-                            <span x-show="resultsSaved && !hasSavedResults" class="inline-block px-6 py-2 bg-gray-100 text-green-700 rounded mr-4">
+                            <span x-show="resultsSaved && !hasSavedResults" class="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
                                 Results Saved
                             </span>
                             
-                            <button class="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" 
-                                @click="restart">Start Over</button>
+                            <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
+                                @click="restart">Retake Personality Breed Assessment</button>
                         </div>
                         
                         <!-- Only show the "Your results have been saved" message when user just saved results, not when returning -->
@@ -669,6 +669,7 @@
                         preferences: this.preferences,
                         recommendedBreeds: this.recommendedBreeds.map(breed => ({
                             id: breed.id,
+                            slug: breed.slug,
                             name: breed.name,
                             // Include these additional properties to make sure they're preserved
                             image: breed.image,

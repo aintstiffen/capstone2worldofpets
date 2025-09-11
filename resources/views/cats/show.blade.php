@@ -71,55 +71,58 @@
                                     $feature = $hotspot['feature'];
                                     $color = $featureColors[$feature] ?? 'gray';
                                     
-                                    // Find matching fact if it exists
+                                    // Find matching fact if it exists in the database
                                     $fact = null;
                                     if(!empty($funFacts)) {
                                         foreach($funFacts as $funFact) {
-                                            if($funFact['feature'] === $feature) {
+                                            if(isset($funFact['feature']) && $funFact['feature'] === $feature) {
                                                 $fact = $funFact['fact'];
                                                 break;
                                             }
                                         }
                                     }
                                     
-                                    // Default facts if none are provided
+                                    // Default facts if none are provided in the database
                                     if(!$fact) {
-                                        if($feature === 'ears') {
-                                            if($pet->name === 'Scottish Fold') {
-                                                $fact = 'Their folded ears are caused by a natural dominant gene mutation that affects cartilage.';
-                                            } elseif($pet->name === 'Maine Coon') {
-                                                $fact = 'Their tufted ears help protect from cold weather and snow.';
-                                            } else {
-                                                $fact = 'Their ears contain 32 muscles, allowing for precise movements to locate sounds.';
-                                            }
-                                        } elseif($feature === 'eyes') {
-                                            if($pet->name === 'Siamese') {
-                                                $fact = 'Their striking blue eyes are caused by a form of partial albinism.';
-                                            } elseif($pet->name === 'Sphynx') {
-                                                $fact = 'Their large eyes help compensate for having no fur to gather sensory information.';
-                                            } else {
-                                                $fact = 'Cats have a reflective layer behind their retinas called the tapetum lucidum, allowing them to see in one-sixth the light humans need.';
-                                            }
-                                        } elseif($feature === 'tail') {
-                                            if($pet->name === 'Manx') {
-                                                $fact = 'Their tailless trait is caused by a natural genetic mutation.';
-                                            } elseif($pet->name === 'Japanese Bobtail') {
-                                                $fact = 'Their short "bunny" tail consists of one or more curves, kinks, or angles.';
-                                            } else {
-                                                $fact = 'A cat\'s tail contains about 10% of the bones in their body and helps with balance.';
-                                            }
-                                        } elseif($feature === 'paws') {
-                                            if($pet->name === 'Polydactyl') {
-                                                $fact = 'They have extra toes, sometimes giving the appearance of "mittens" or "snowshoes".';
-                                            } elseif($pet->name === 'Sphynx') {
-                                                $fact = 'Without fur, their paw pads leave sweat marks, as this is where cats primarily sweat.';
-                                            } else {
-                                                $fact = 'Cats walk directly on their toes (digitigrade), which helps with hunting stealth.';
-                                            }
-                                        } elseif($feature === 'nose') {
-                                            $fact = 'A cat\'s nose print is unique, like a human fingerprint, with no two alike.';
-                                        } elseif($feature === 'coat') {
-                                            $fact = 'Their coat has specialized papillae that help with grooming and sensory perception.';
+                                        $defaultFacts = [
+                                            'ears' => [
+                                                'Scottish Fold' => 'Their folded ears are caused by a natural dominant gene mutation that affects cartilage.',
+                                                'Maine Coon' => 'Their tufted ears help protect from cold weather and snow.',
+                                                'default' => 'Their ears contain 32 muscles, allowing for precise movements to locate sounds.'
+                                            ],
+                                            'eyes' => [
+                                                'Siamese' => 'Their striking blue eyes are caused by a form of partial albinism.',
+                                                'Sphynx' => 'Their large eyes help compensate for having no fur to gather sensory information.',
+                                                'default' => 'Cats have a reflective layer behind their retinas called the tapetum lucidum, allowing them to see in one-sixth the light humans need.'
+                                            ],
+                                            'tail' => [
+                                                'Manx' => 'Their tailless trait is caused by a natural genetic mutation.',
+                                                'Japanese Bobtail' => 'Their short "bunny" tail consists of one or more curves, kinks, or angles.',
+                                                'default' => 'A cat\'s tail contains about 10% of the bones in their body and helps with balance.'
+                                            ],
+                                            'paws' => [
+                                                'Polydactyl' => 'They have extra toes, sometimes giving the appearance of "mittens" or "snowshoes".',
+                                                'Sphynx' => 'Without fur, their paw pads leave sweat marks, as this is where cats primarily sweat.',
+                                                'default' => 'Cats walk directly on their toes (digitigrade), which helps with hunting stealth.'
+                                            ],
+                                            'nose' => [
+                                                'default' => 'A cat\'s nose print is unique, like a human fingerprint, with no two alike.'
+                                            ],
+                                            'coat' => [
+                                                'default' => 'Their coat has specialized papillae that help with grooming and sensory perception.'
+                                            ]
+                                        ];
+                                        
+                                        // Check if we have a breed-specific fact
+                                        if (isset($defaultFacts[$feature][$pet->name])) {
+                                            $fact = $defaultFacts[$feature][$pet->name];
+                                        } 
+                                        // Otherwise use the default fact for this feature
+                                        elseif (isset($defaultFacts[$feature]['default'])) {
+                                            $fact = $defaultFacts[$feature]['default'];
+                                        }
+                                        else {
+                                            $fact = 'Interesting facts about this ' . $feature . '.';
                                         }
                                     }
                                 @endphp

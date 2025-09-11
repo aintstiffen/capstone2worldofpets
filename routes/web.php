@@ -18,5 +18,5 @@ Route::get('/assessment', [AssessmentController::class, 'index'])->name('assessm
 Route::post('/assessment/save', [AssessmentController::class, 'saveResults'])->name('assessment.save');
 Route::get('/dogs', [DogController::class, 'index'])->name('dogs');
 Route::get('/cats', [CatController::class, 'index'])->name('cats');
-Route::get('/dogs/{id}', [DogController::class, 'show'])->name('dogs.show');
-Route::get('/cats/{id}', [CatController::class, 'show'])->name('cats.show');
+Route::get('/dogs/{slug}', [DogController::class, 'show'])->name('dogs.show');
+Route::get('/cats/{slug}', [CatController::class, 'show'])->name('cats.show');

@@ -8,18 +8,15 @@ class CatController extends Controller
 {
       public function index()
     {
-        // If you have a column that marks dogs (e.g. `type` or `category`), filter:
-        $petss = Pet::where('category', 'cat')->orderBy('id', 'desc')->paginate(12);
-
-        // If no type column, use all pets:
-        // $pets = Pet::paginate(12);
+        // Get all cat breeds without pagination
+        $petss = Pet::where('category', 'cat')->orderBy('id', 'desc')->get();
 
         return view('cats', compact('petss'));
     }
 
-    public function show($id)
+    public function show($slug)
     {
-        $pet = Pet::findOrFail($id); // Or Pet::where('slug', $slug)->firstOrFail();
+        $pet = Pet::where('slug', $slug)->where('category', 'cat')->firstOrFail();
         return view('cats.show', compact('pet'));
     }
 }

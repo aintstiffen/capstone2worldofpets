@@ -31,29 +31,54 @@ class PetResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->minLength(2)
+                    ->maxLength(100)
                     ->reactive()
                     ->afterStateUpdated(function ($state, callable $set) {
                         // auto-fill slug while typing (editable)
                         $set('slug', Str::slug($state));
                     })
-                    ->maxLength(255),
+                    ->placeholder('Enter pet breed name')
+                    ->label('Breed Name'),
 
                 Forms\Components\TextInput::make('slug')
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->maxLength(255),
+                    ->maxLength(100)
+                    ->placeholder('breed-name-slug')
+                    ->helperText('URL-friendly version of the name'),
 
                 Forms\Components\Select::make('category')
                     ->options([
                         'dog' => 'Dog',
                         'cat' => 'Cat',
                     ])
-                    ->required(),
+                    ->required()
+                    ->label('Pet Type'),
 
-                Forms\Components\TextInput::make('size')->maxLength(255),
-                Forms\Components\TextInput::make('temperament')->maxLength(255),
-                Forms\Components\TextInput::make('lifespan')->maxLength(255),
-                Forms\Components\TextInput::make('energy')->maxLength(255),
+                Forms\Components\TextInput::make('size')
+                    ->required()
+                    ->placeholder('Small, Medium, Large')
+                    ->helperText('Use consistent sizing: Small, Small to Medium, Medium, Medium to Large, Large')
+                    ->maxLength(100),
+                    
+                Forms\Components\TextInput::make('temperament')
+                    ->required()
+                    ->placeholder('Friendly, Intelligent, Active')
+                    ->helperText('List key traits separated by commas')
+                    ->maxLength(255),
+                    
+                Forms\Components\TextInput::make('lifespan')
+                    ->required()
+                    ->placeholder('10-15')
+                    ->helperText('Average lifespan in years (range)')
+                    ->maxLength(50),
+                    
+                Forms\Components\TextInput::make('energy')
+                    ->required()
+                    ->placeholder('High, Medium, Low')
+                    ->helperText('Overall energy level')
+                    ->maxLength(100),
 
                 Forms\Components\Select::make('friendliness')
                     ->options([
@@ -99,16 +124,25 @@ class PetResource extends Resource
 
                 Forms\Components\FileUpload::make('image')
                     ->image()
+                    ->required()
                     ->disk('public')
                     ->directory('pets')
                     ->maxSize(2048) // KB (2MB)
                     ->imagePreviewHeight('150')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                     ->loadingIndicatorPosition('left')
                     ->uploadProgressIndicatorPosition('left')
                     ->panelAspectRatio('4:3')
-                    ->imageResizeMode('cover'),
+                    ->imageResizeMode('cover')
+                    ->helperText('Upload a clear, high-quality image. Maximum size: 2MB'),
 
-                Forms\Components\Textarea::make('description')->rows(4),
+                Forms\Components\Textarea::make('description')
+                    ->required()
+                    ->minLength(50)
+                    ->maxLength(1000)
+                    ->rows(4)
+                    ->placeholder('Provide a comprehensive description of this pet breed')
+                    ->helperText('Include origin, history, common uses, and distinguishing characteristics'),
                 
                 // Hotspot Editor Section
                 Forms\Components\Section::make('Interactive Hotspots')
@@ -126,13 +160,15 @@ class PetResource extends Resource
                                         'nose' => 'Nose',
                                         'coat' => 'Coat/Fur',
                                     ])
-                                    ->required(),
+                                    ->required()
+                                    ->helperText('Each feature can only have one hotspot'),
                                 Forms\Components\TextInput::make('position_x')
                                     ->label('X Position (%)')
                                     ->helperText('Horizontal position (0-100%)')
                                     ->numeric()
                                     ->minValue(0)
                                     ->maxValue(100)
+                                    ->step(1)
                                     ->required(),
                                 Forms\Components\TextInput::make('position_y')
                                     ->label('Y Position (%)')
@@ -140,16 +176,23 @@ class PetResource extends Resource
                                     ->numeric()
                                     ->minValue(0)
                                     ->maxValue(100)
+                                    ->step(1)
                                     ->required(),
                                 Forms\Components\TextInput::make('width')
                                     ->label('Width (px)')
                                     ->numeric()
                                     ->default(40)
+                                    ->minValue(20)
+                                    ->maxValue(100)
+                                    ->step(1)
                                     ->required(),
                                 Forms\Components\TextInput::make('height')
                                     ->label('Height (px)')
                                     ->numeric()
                                     ->default(40)
+                                    ->minValue(20)
+                                    ->maxValue(100)
+                                    ->step(1)
                                     ->required(),
                             ])
                             ->itemLabel(fn (array $state): ?string => $state['feature'] ?? null),
@@ -170,10 +213,15 @@ class PetResource extends Resource
                                         'nose' => 'Nose',
                                         'coat' => 'Coat/Fur',
                                     ])
-                                    ->required(),
+                                    ->required()
+                                    ->helperText('Each feature can only have one fun fact'),
                                 Forms\Components\Textarea::make('fact')
                                     ->label('Fun Fact')
                                     ->required()
+                                    ->placeholder('Share an interesting fact about this feature')
+                                    ->helperText('Keep facts concise, informative, and under 200 characters')
+                                    ->minLength(10)
+                                    ->maxLength(200)
                                     ->rows(3),
                             ])
                             ->itemLabel(fn (array $state): ?string => $state['feature'] ?? null),

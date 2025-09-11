@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pet;
+use App\Models\Assessment;
+use App\Http\Requests\SaveAssessmentRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
@@ -96,6 +98,7 @@ class AssessmentController extends Controller
             
             return [
                 'id' => $pet->id,
+                'slug' => $pet->slug,
                 'name' => $pet->name,
                 'size' => $mappedSize,
                 'hairLength' => $hairLength,
@@ -180,6 +183,7 @@ class AssessmentController extends Controller
             
             return [
                 'id' => $pet->id,
+                'slug' => $pet->slug,
                 'name' => $pet->name,
                 'size' => $mappedSize,
                 'hairLength' => $hairLength,
@@ -209,6 +213,7 @@ class AssessmentController extends Controller
                         // Update with full breed information
                         $savedResults['recommendedBreeds'][$index] = [
                             'id' => $petInfo->id,
+                            'slug' => $petInfo->slug,
                             'name' => $petInfo->name,
                             'size' => $savedResults['preferences']['size'] ?? 'medium',
                             'hairLength' => $savedResults['preferences']['hairLength'] ?? 'short',
@@ -227,7 +232,7 @@ class AssessmentController extends Controller
         }
 
         // Debug the saved results before passing to the view
-        \Log::debug('Passing saved results to view:', [
+        Log::debug('Passing saved results to view:', [
             'petType' => $savedResults['petType'] ?? null,
             'hasPreferences' => !empty($savedResults['preferences']),
             'breedCount' => count($savedResults['recommendedBreeds'] ?? [])
@@ -259,22 +264,19 @@ class AssessmentController extends Controller
         ]);
     }
     
-    public function saveResults(Request $request)
+    public function saveResults(SaveAssessmentRequest $request)
     {
         // Handle reset case - clear session and return success
         if ($request->input('petType') === null) {
-            \Log::debug('Clearing assessment results from session');
+            Log::debug('Clearing assessment results from session');
             Session::forget('assessment_results');
             return response()->json(['success' => true, 'message' => 'Assessment data cleared']);
         }
         
-        $results = $request->validate([
-            'petType' => 'required|in:dog,cat',
-            'preferences' => 'required|array',
-            'recommendedBreeds' => 'required|array',
-        ]);
+        // The validation is handled by SaveAssessmentRequest class
+        $results = $request->validated();
         
-        \Log::debug('Saving assessment results', [
+        Log::debug('Saving assessment results', [
             'petType' => $results['petType'],
             'breedCount' => count($results['recommendedBreeds'])
         ]);
@@ -315,6 +317,7 @@ class AssessmentController extends Controller
                 // Store complete breed info
                 $fullBreedInfo[] = [
                     'id' => $petInfo->id,
+                    'slug' => $petInfo->slug,
                     'name' => $petInfo->name,
                     'size' => $sizeMap[$petInfo->size] ?? 'medium',
                     'hairLength' => $hairLength,
@@ -348,6 +351,25 @@ class AssessmentController extends Controller
         
         // Add flash message that will be available on the next request
         Session::flash('assessment_saved', true);
+        
+        // Also save to database for statistics
+        try {
+            // Get personality scores from request if available
+            $personalityScores = $request->input('personalityScores', []);
+            
+            Assessment::create([
+                'user_id' => auth()->check() ? auth()->id() : null,
+                'pet_type' => $results['petType'],
+                'preferences' => $results['preferences'],
+                'results' => $fullBreedInfo,
+                'personality_scores' => $personalityScores,
+            ]);
+            
+            Log::info('Assessment saved to database');
+        } catch (\Exception $e) {
+            Log::error('Failed to save assessment to database: ' . $e->getMessage());
+            // Don't fail the request, as we've already saved to session
+        }
         
         return response()->json([
             'success' => true, 

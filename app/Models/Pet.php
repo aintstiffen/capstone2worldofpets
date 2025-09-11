@@ -39,6 +39,16 @@ class Pet extends Model
             if (empty($breed->slug) && !empty($breed->name)) {
                 $breed->slug = Str::slug($breed->name);
             }
+            
+            // Validate hotspots for unique features
+            if (!empty($breed->hotspots) && is_array($breed->hotspots)) {
+                $breed->hotspots = self::validateUniqueFeatures($breed->hotspots);
+            }
+            
+            // Validate fun_facts for unique features
+            if (!empty($breed->fun_facts) && is_array($breed->fun_facts)) {
+                $breed->fun_facts = self::validateUniqueFeatures($breed->fun_facts);
+            }
         });
 
         static::updating(function ($breed) {
@@ -46,6 +56,37 @@ class Pet extends Model
             if (empty($breed->slug) && !empty($breed->name)) {
                 $breed->slug = Str::slug($breed->name);
             }
+            
+            // Validate hotspots for unique features
+            if (!empty($breed->hotspots) && is_array($breed->hotspots)) {
+                $breed->hotspots = self::validateUniqueFeatures($breed->hotspots);
+            }
+            
+            // Validate fun_facts for unique features
+            if (!empty($breed->fun_facts) && is_array($breed->fun_facts)) {
+                $breed->fun_facts = self::validateUniqueFeatures($breed->fun_facts);
+            }
         });
+    }
+    
+    /**
+     * Ensure that features are unique in arrays like hotspots and fun_facts
+     * 
+     * @param array $items Array of items with 'feature' key
+     * @return array Filtered array with only unique features
+     */
+    protected static function validateUniqueFeatures(array $items): array
+    {
+        $uniqueFeatures = [];
+        $result = [];
+        
+        foreach ($items as $item) {
+            if (isset($item['feature']) && !in_array($item['feature'], $uniqueFeatures)) {
+                $uniqueFeatures[] = $item['feature'];
+                $result[] = $item;
+            }
+        }
+        
+        return $result;
     }
 }

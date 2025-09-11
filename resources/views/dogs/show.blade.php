@@ -71,55 +71,58 @@
                                     $feature = $hotspot['feature'];
                                     $color = $featureColors[$feature] ?? 'gray';
                                     
-                                    // Find matching fact if it exists
+                                    // Find matching fact if it exists in the database
                                     $fact = null;
                                     if(!empty($funFacts)) {
                                         foreach($funFacts as $funFact) {
-                                            if($funFact['feature'] === $feature) {
+                                            if(isset($funFact['feature']) && $funFact['feature'] === $feature) {
                                                 $fact = $funFact['fact'];
                                                 break;
                                             }
                                         }
                                     }
                                     
-                                    // Default facts if none are provided
+                                    // Default facts if none are provided in the database
                                     if(!$fact) {
-                                        if($feature === 'ears') {
-                                            if($pet->name === 'Golden Retriever') {
-                                                $fact = 'Their floppy ears help protect the ear canal from water and debris.';
-                                            } elseif($pet->name === 'German Shepherd') {
-                                                $fact = 'Their erect ears can rotate independently to locate sounds with precision.';
-                                            } else {
-                                                $fact = 'The ear shape is perfectly designed for their natural environment.';
-                                            }
-                                        } elseif($feature === 'eyes') {
-                                            if($pet->name === 'Labrador Retriever') {
-                                                $fact = 'Their eyes may sometimes appear red due to a reflective layer that helps them see better in dim light.';
-                                            } elseif($pet->name === 'Husky') {
-                                                $fact = 'They often have striking blue eyes due to a genetic trait that reduces melanin in the iris.';
-                                            } else {
-                                                $fact = 'Their eyes are specially adapted for their lifestyle and environment.';
-                                            }
-                                        } elseif($feature === 'tail') {
-                                            if($pet->name === 'Border Collie') {
-                                                $fact = 'Their tail acts as a rudder when making sharp turns while herding.';
-                                            } elseif($pet->name === 'Beagle') {
-                                                $fact = 'The white-tipped tail helped hunters spot them in tall grass.';
-                                            } else {
-                                                $fact = 'The tail helps with balance and is an important communication tool.';
-                                            }
-                                        } elseif($feature === 'paws') {
-                                            if($pet->name === 'Newfoundland') {
-                                                $fact = 'Their webbed feet make them excellent swimmers.';
-                                            } elseif($pet->name === 'Greyhound') {
-                                                $fact = 'Their padded feet absorb shock during high-speed runs.';
-                                            } else {
-                                                $fact = 'Their paw pads contain sweat glands that help regulate temperature.';
-                                            }
-                                        } elseif($feature === 'nose') {
-                                            $fact = 'Their nose contains over 300 million scent receptors, compared to about 5-6 million in humans.';
-                                        } elseif($feature === 'coat') {
-                                            $fact = 'Their coat has two layers: a soft undercoat for insulation and a water-resistant outer layer.';
+                                        $defaultFacts = [
+                                            'ears' => [
+                                                'Golden Retriever' => 'Their floppy ears help protect the ear canal from water and debris.',
+                                                'German Shepherd' => 'Their erect ears can rotate independently to locate sounds with precision.',
+                                                'default' => 'The ear shape is perfectly designed for their natural environment.'
+                                            ],
+                                            'eyes' => [
+                                                'Labrador Retriever' => 'Their eyes may sometimes appear red due to a reflective layer that helps them see better in dim light.',
+                                                'Husky' => 'They often have striking blue eyes due to a genetic trait that reduces melanin in the iris.',
+                                                'default' => 'Their eyes are specially adapted for their lifestyle and environment.'
+                                            ],
+                                            'tail' => [
+                                                'Border Collie' => 'Their tail acts as a rudder when making sharp turns while herding.',
+                                                'Beagle' => 'The white-tipped tail helped hunters spot them in tall grass.',
+                                                'default' => 'The tail helps with balance and is an important communication tool.'
+                                            ],
+                                            'paws' => [
+                                                'Newfoundland' => 'Their webbed feet make them excellent swimmers.',
+                                                'Greyhound' => 'Their padded feet absorb shock during high-speed runs.',
+                                                'default' => 'Their paw pads contain sweat glands that help regulate temperature.'
+                                            ],
+                                            'nose' => [
+                                                'default' => 'Their nose contains over 300 million scent receptors, compared to about 5-6 million in humans.'
+                                            ],
+                                            'coat' => [
+                                                'default' => 'Their coat has two layers: a soft undercoat for insulation and a water-resistant outer layer.'
+                                            ]
+                                        ];
+                                        
+                                        // Check if we have a breed-specific fact
+                                        if (isset($defaultFacts[$feature][$pet->name])) {
+                                            $fact = $defaultFacts[$feature][$pet->name];
+                                        } 
+                                        // Otherwise use the default fact for this feature
+                                        elseif (isset($defaultFacts[$feature]['default'])) {
+                                            $fact = $defaultFacts[$feature]['default'];
+                                        }
+                                        else {
+                                            $fact = 'Interesting facts about this ' . $feature . '.';
                                         }
                                     }
                                 @endphp

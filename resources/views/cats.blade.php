@@ -22,7 +22,7 @@
 
                    @if(isset($petss) && $petss->count() > 0)
                         @foreach($petss as $pets)
-                        <a href="{{ route('cats.show', $pets->id) }}" class="group">
+                        <a href="{{ route('cats.show', $pets->slug) }}" class="group">
                             <div class="overflow-hidden border rounded-lg transition-all hover:shadow-lg">
                                 <div class="aspect-square relative">
                                     <img src="{{ $pets->image ? asset('storage/' . $pets->image) : '/placeholder.svg?height=600&width=600' }}"
