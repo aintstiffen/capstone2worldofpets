@@ -14,6 +14,18 @@
         </div>
         @endif
         
+        <!-- Notification banner for returning users with saved results -->
+        <div class="bg-blue-100 p-4 my-4 rounded text-center" 
+             x-data="{ show: false }" 
+             x-init="setTimeout(() => { 
+                 show = {{ isset($savedResults) && $savedResults != '{"petType":null,"preferences":null,"recommendedBreeds":[]}' ? 'true' : 'false' }}; 
+             }, 500)" 
+             x-show="show" 
+             x-transition>
+            <h3 class="font-bold text-blue-800">Welcome back!</h3>
+            <p class="text-blue-700">We've loaded your previously saved assessment results.</p>
+        </div>
+        
         <!-- Main Content -->
         <main class="flex-1">
             <div class="container py-8 max-w-3xl mx-auto">
@@ -225,11 +237,11 @@
 
                         <div class="text-center mb-4">
                             <!-- Only show save button if results aren't already saved -->
-                            <button x-show="!resultsSaved && !hasSavedResults" class="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-4" 
+                            <button x-show="!resultsSaved" class="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-4" 
                                 @click="saveResults">Save My Results</button>
                                 
-                            <!-- Show "Saved!" indicator only when user just saved results, not when returning to page -->
-                            <span x-show="resultsSaved && !hasSavedResults" class="inline-block px-6 py-2 bg-gray-100 text-green-700 rounded mr-4">
+                            <!-- Show "Saved!" indicator if results are saved -->
+                            <span x-show="resultsSaved" class="inline-block px-6 py-2 bg-gray-100 text-green-700 rounded mr-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
@@ -240,9 +252,8 @@
                                 @click="restart">Start Over</button>
                         </div>
                         
-                        <!-- Only show the "Your results have been saved" message when user just saved results, not when returning -->
                         <div class="mt-4 p-4 bg-green-100 text-green-800 rounded-lg" 
-                            x-show="resultsSaved && !hasSavedResults"
+                            x-show="resultsSaved"
                             x-transition:enter="transition ease-out duration-300"
                             x-transition:enter-start="opacity-0 transform translate-y-2"
                             x-transition:enter-end="opacity-100 transform translate-y-0">
@@ -266,67 +277,26 @@
             try {
                 // Check if the variable exists and is valid JSON
                 if (typeof '{!! addslashes($savedResults) !!}' === 'string') {
-                    const savedResultsJson = '{!! addslashes($savedResults) !!}';
-                    console.log('Raw saved results from server:', savedResultsJson);
-                    
-                    savedResults = JSON.parse(savedResultsJson);
-                    // Only consider saved results valid if they have the proper data
-                    hasSavedResults = savedResults && 
-                                      savedResults.petType !== null && 
-                                      savedResults.preferences && 
+                    savedResults = JSON.parse('{!! addslashes($savedResults) !!}');
+                    hasSavedResults = savedResults && savedResults.petType !== null && 
                                       savedResults.recommendedBreeds && 
                                       savedResults.recommendedBreeds.length > 0;
-                    
-                    // Check if there are saved results in URL parameters (for when returning from another page)
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const resetParam = urlParams.get('reset');
-                    
-                    // If reset=true in URL, clear saved results state
-                    if (resetParam === 'true') {
-                        hasSavedResults = false;
-                        savedResults = { petType: null, preferences: null, recommendedBreeds: [] };
-                        // Remove the parameter to avoid loops
-                        window.history.replaceState({}, document.title, window.location.pathname);
-                    }
                     
                     // Log the saved results for debugging
                     console.log('Saved results found:', hasSavedResults);
                     if (hasSavedResults) {
                         console.log('Pet type:', savedResults.petType);
                         console.log('Preferences:', savedResults.preferences);
-                        console.log('Recommended breeds count:', savedResults.recommendedBreeds.length);
-                        
-                        // Print the first breed to verify we have complete data
-                        if (savedResults.recommendedBreeds.length > 0) {
-                            console.log('First breed sample:', {
-                                name: savedResults.recommendedBreeds[0].name,
-                                id: savedResults.recommendedBreeds[0].id,
-                                image: savedResults.recommendedBreeds[0].image ? 'Has image' : 'No image'
-                            });
-                        }
+                        console.log('Recommended breeds:', savedResults.recommendedBreeds.length);
                     }
                 }
             } catch (e) {
                 console.error('Error parsing saved results:', e);
             }
             
-            // Create a function to check if pet type is valid
-            const isValidPetType = (type) => type === 'dog' || type === 'cat';
-            
-            // Make sure we have valid saved results with proper pet type
-            const hasValidSavedResults = hasSavedResults && 
-                isValidPetType(savedResults.petType) && 
-                savedResults.recommendedBreeds && 
-                savedResults.recommendedBreeds.length > 0;
-            
-            if (hasSavedResults && !hasValidSavedResults) {
-                console.warn('Invalid or incomplete saved results detected', savedResults);
-            }
-            
             return {
-                // Only start with results if we have valid saved results
-                currentStage: hasValidSavedResults ? 'results' : 'intro', // intro, petType, hairLength, size, personality, results
-                petType: hasValidSavedResults ? savedResults.petType : null,
+                currentStage: hasSavedResults ? 'results' : 'intro', // intro, petType, hairLength, size, personality, results
+                petType: hasSavedResults ? savedResults.petType : null,
                 preferences: hasSavedResults ? savedResults.preferences : {
                     hairLength: null, // short, long
                     size: null, // small, medium, large
@@ -334,8 +304,7 @@
                 currentQuestion: 0,
                 personalityAnswers: {},
                 attemptedNext: false,
-                resultsSaved: false, // Initially false, only true when user manually saves results
-                hasSavedResults: hasSavedResults, // True when returning with saved results
+                resultsSaved: hasSavedResults,
                 recommendedBreeds: hasSavedResults ? savedResults.recommendedBreeds : [],
                 personalityDimensions: {
                     honestyHumility: { score: 0, max: 25 },
@@ -565,41 +534,9 @@
                     let dogBreeds = [];
                     let catBreeds = [];
                     
-                    // IMPORTANT: If the saved pet type doesn't match the current pet type,
-                    // we need to force a recalculation by clearing saved results
-                    if (hasSavedResults && savedResults.petType !== this.petType) {
-                        console.log("Pet type changed from", savedResults.petType, "to", this.petType, "- clearing saved results");
-                        hasSavedResults = false;
-                        this.hasSavedResults = false;
-                        
-                        // Clear saved results from the session via AJAX
-                        fetch('{{ route('assessment.save') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                            },
-                            body: JSON.stringify({
-                                petType: this.petType,
-                                preferences: this.preferences,
-                                recommendedBreeds: []
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('Old results cleared due to pet type change:', data);
-                        })
-                        .catch(error => {
-                            console.error('Error clearing old results:', error);
-                        });
-                    }
-                    
                     // If we're coming back to the page with saved results and we're in the results stage,
-                    // use the saved recommended breeds instead of calculating them again,
-                    // but only if the pet type matches (to prevent showing dog breeds when cats are selected)
-                    if (hasSavedResults && this.currentStage === 'results' && 
-                        savedResults.recommendedBreeds.length > 0 && 
-                        savedResults.petType === this.petType) {
+                    // use the saved recommended breeds instead of calculating them again
+                    if (hasSavedResults && this.currentStage === 'results' && savedResults.recommendedBreeds.length > 0) {
                         console.log("Using saved breed recommendations");
                         this.recommendedBreeds = savedResults.recommendedBreeds;
                         return; // Exit early, we already have results
@@ -622,9 +559,7 @@
                     }
 
                     // Select the breed database based on pet type
-                    // IMPORTANT: Always respect the current pet type selection
                     const breeds = this.petType === 'dog' ? dogBreeds : catBreeds;
-                    console.log(`Using ${this.petType} breeds: ${breeds.length} available`);
                     
                     // Filter by preferences
                     let filteredBreeds = breeds.filter(breed => 
@@ -690,8 +625,6 @@
                     .then(data => {
                         if (data.success) {
                             this.resultsSaved = true;
-                            // We're explicitly not setting hasSavedResults to distinguish between
-                            // just-saved results and results loaded from a previous session
                             
                             // Add a notification that the results were saved
                             const notification = document.createElement('div');
@@ -722,38 +655,10 @@
                     this.attemptedNext = false;
                     this.recommendedBreeds = [];
                     this.resultsSaved = false;
-                    this.hasSavedResults = false; // Reset the saved results flag
                     
                     // Reset personality scores
                     Object.keys(this.personalityDimensions).forEach(dim => {
                         this.personalityDimensions[dim].score = 0;
-                    });
-                    
-                    console.log('Clearing saved assessment data and reloading page');
-                    
-                    // Clear saved results from the session via AJAX
-                    fetch('{{ route('assessment.save') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({
-                            petType: null,
-                            preferences: null,
-                            recommendedBreeds: []
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Assessment data cleared:', data);
-                        // Force a hard reload with the reset parameter to ensure clean state
-                        window.location.href = '{{ route('assessment') }}?reset=true&t=' + new Date().getTime();
-                    })
-                    .catch(error => {
-                        console.error('Error clearing assessment data:', error);
-                        // Even if there's an error, try to reload with reset param
-                        window.location.href = '{{ route('assessment') }}?reset=true&t=' + new Date().getTime();
                     });
                 }
             };

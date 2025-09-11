@@ -19,5 +19,12 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+        
+        // Run the seeders
+        $this->call([
+            TempPetBreedsSeeder::class, // Cat breeds
+            DogBreedsSeeder::class,    // Dog breeds
+            PetHotspotSeeder::class,   // Add hotspots to specific breeds
+        ]);
     }
 }

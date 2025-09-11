@@ -28,6 +28,8 @@ class Pet extends Model
 
     protected $casts = [
         'colors' => 'array',
+        'hotspots' => 'array',
+        'fun_facts' => 'array',
     ];
 
     // auto-generate slug if not provided

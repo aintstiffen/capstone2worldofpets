@@ -102,9 +102,82 @@ class PetResource extends Resource
                     ->disk('public')
                     ->directory('pets')
                     ->maxSize(2048) // KB (2MB)
-                    ->imagePreviewHeight('150'),
+                    ->imagePreviewHeight('150')
+                    ->loadingIndicatorPosition('left')
+                    ->uploadProgressIndicatorPosition('left')
+                    ->panelAspectRatio('4:3')
+                    ->imageResizeMode('cover'),
 
                 Forms\Components\Textarea::make('description')->rows(4),
+                
+                // Hotspot Editor Section
+                Forms\Components\Section::make('Interactive Hotspots')
+                    ->description('Define positions for interactive tooltips on the pet image')
+                    ->collapsed()
+                    ->schema([
+                        Forms\Components\Repeater::make('hotspots')
+                            ->schema([
+                                Forms\Components\Select::make('feature')
+                                    ->options([
+                                        'ears' => 'Ears',
+                                        'eyes' => 'Eyes',
+                                        'tail' => 'Tail',
+                                        'paws' => 'Paws',
+                                        'nose' => 'Nose',
+                                        'coat' => 'Coat/Fur',
+                                    ])
+                                    ->required(),
+                                Forms\Components\TextInput::make('position_x')
+                                    ->label('X Position (%)')
+                                    ->helperText('Horizontal position (0-100%)')
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->maxValue(100)
+                                    ->required(),
+                                Forms\Components\TextInput::make('position_y')
+                                    ->label('Y Position (%)')
+                                    ->helperText('Vertical position (0-100%)')
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->maxValue(100)
+                                    ->required(),
+                                Forms\Components\TextInput::make('width')
+                                    ->label('Width (px)')
+                                    ->numeric()
+                                    ->default(40)
+                                    ->required(),
+                                Forms\Components\TextInput::make('height')
+                                    ->label('Height (px)')
+                                    ->numeric()
+                                    ->default(40)
+                                    ->required(),
+                            ])
+                            ->itemLabel(fn (array $state): ?string => $state['feature'] ?? null),
+                    ]),
+                    
+                Forms\Components\Section::make('Fun Facts')
+                    ->description('Add interesting facts about this breed\'s features')
+                    ->collapsed()
+                    ->schema([
+                        Forms\Components\Repeater::make('fun_facts')
+                            ->schema([
+                                Forms\Components\Select::make('feature')
+                                    ->options([
+                                        'ears' => 'Ears',
+                                        'eyes' => 'Eyes',
+                                        'tail' => 'Tail',
+                                        'paws' => 'Paws',
+                                        'nose' => 'Nose',
+                                        'coat' => 'Coat/Fur',
+                                    ])
+                                    ->required(),
+                                Forms\Components\Textarea::make('fact')
+                                    ->label('Fun Fact')
+                                    ->required()
+                                    ->rows(3),
+                            ])
+                            ->itemLabel(fn (array $state): ?string => $state['feature'] ?? null),
+                    ]),
             ]);
     }
 

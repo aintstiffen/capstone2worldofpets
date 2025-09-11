@@ -25,8 +25,8 @@
                         <a href="{{ route('cats.show', $pets->id) }}" class="group">
                             <div class="overflow-hidden border rounded-lg transition-all hover:shadow-lg">
                                 <div class="aspect-square relative">
-                                    <img src="{{ asset('storage/' . $pets->image) }} ?? '/placeholder.svg?height=300&width=300' }}" 
-                                         alt="{{ $pets->name }}" 
+                                    <img src="{{ $pets->image ? asset('storage/' . $pets->image) : '/placeholder.svg?height=600&width=600' }}"
+                                         alt="{{ $pets->name }}"
                                          class="object-cover w-full h-full transition-transform group-hover:scale-105">
                                 </div>
                                 <div class="p-4">
