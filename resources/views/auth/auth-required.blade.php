@@ -3,23 +3,38 @@
 @section('title', 'Authentication Required - World of Pets')
 
 @section('content')
-<div class="container mx-auto px-4 py-12">
-    <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="bg-blue-600 text-white py-4 px-6">
-            <h1 class="text-xl font-bold">{{ __('Authentication Required') }}</h1>
+<div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
+    <div class="w-full sm:max-w-md lg:max-w-lg mt-6 px-6 py-8 bg-white shadow-lg overflow-hidden sm:rounded-lg">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ __('Authentication Required') }}</h1>
+            <p class="text-sm text-gray-600">Please sign in to continue</p>
         </div>
 
-        <div class="p-6">
-            <p class="text-gray-700 mb-6">{{ __('You need to be logged in to access the pet personality assessment. This helps us save your results and provide personalized recommendations.') }}</p>
-            
-            <div class="flex flex-col sm:flex-row gap-4 mt-6">
-                <a href="{{ route('login') }}" class="inline-block px-6 py-3 bg-blue-600 text-white font-medium rounded-md text-center hover:bg-blue-700 transition-colors">
-                    {{ __('Login') }}
-                </a>
-                <a href="{{ route('register') }}" class="inline-block px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-md text-center hover:bg-gray-50 transition-colors">
-                    {{ __('Create an Account') }}
-                </a>
-            </div>
+        <!-- Content -->
+        <div class="text-center mb-8">
+            <p class="text-gray-700 leading-relaxed">
+                {{ __('You need to be logged in to access the pet personality assessment. This helps us save your results and provide personalized recommendations.') }}
+            </p>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="flex flex-col space-y-4">
+            <a href="{{ route('login') }}" 
+               class="w-full text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-6 py-3 text-center transition duration-150">
+                {{ __('Sign In') }}
+            </a>
+            <a href="{{ route('register') }}" 
+               class="w-full text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-gray-200 font-medium rounded-lg text-sm px-6 py-3 text-center transition duration-150">
+                {{ __('Create an Account') }}
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center">
+            <a href="{{ url()->previous() }}" class="text-sm text-blue-600 hover:text-blue-800 underline">
+                ← Go back
+            </a>
         </div>
     </div>
 </div>

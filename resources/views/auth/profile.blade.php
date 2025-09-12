@@ -61,12 +61,10 @@
                             
                             <div>
                                 <label for="email" class="block font-medium text-gray-700 mb-1">Email</label>
-                                <input id="email" name="email" type="email" value="{{ old('email', auth()->user()->email) }}" 
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required autocomplete="username" />
-                                @error('email')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                <input id="email" name="email" type="email" value="{{ auth()->user()->email }}" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                                    readonly disabled />
+                                <p class="mt-1 text-sm text-gray-500">Email address cannot be changed</p>
                             </div>
                             
                             <div>
@@ -151,7 +149,7 @@
                     </div>
                 @else
                     <p class="text-gray-500">You haven't completed any pet personality assessments yet.</p>
-                    <a href="{{ route('assessment') }}" class="mt-2 inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                    <a href="{{ route('assessment') }}" class="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2 mt-2">
                         Take Assessment
                     </a>
                 @endif

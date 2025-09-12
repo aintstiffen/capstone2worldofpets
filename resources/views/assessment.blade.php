@@ -29,13 +29,6 @@
                                 Start New Assessment
                             </button>
                             
-                            @if(Session::has('assessment_results'))
-                                <a href="#results" class="text-[#24292F] bg-white border border-[#24292F] hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
-                                   @click.prevent="currentStage = 'results'">
-                                    View Your Results
-                                </a>
-                            @endif
-                            
                             @auth
                                 @if(auth()->user()->assessments->count() > 0)
                                     <a href="{{ route('profile.edit') }}" class="text-blue-600 bg-white border border-blue-600 hover:bg-blue-50 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center">
