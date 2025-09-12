@@ -22,10 +22,28 @@
                     <div class="text-center">
                         <h2 class="text-3xl font-bold mb-6">Pet Personality Matcher</h2>
                         <p class="mb-8">Find the perfect pet match based on your personality and preferences</p>
-                        <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
-                            @click="currentStage = 'petType'">
-                            Take Personality Assessment
-                        </button>
+                        
+                        <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
+                            <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30" 
+                                @click="currentStage = 'petType'">
+                                Start New Assessment
+                            </button>
+                            
+                            @if(Session::has('assessment_results'))
+                                <a href="#results" class="text-[#24292F] bg-white border border-[#24292F] hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
+                                   @click.prevent="currentStage = 'results'">
+                                    View Your Results
+                                </a>
+                            @endif
+                            
+                            @auth
+                                @if(auth()->user()->assessments->count() > 0)
+                                    <a href="{{ route('profile.edit') }}" class="text-blue-600 bg-white border border-blue-600 hover:bg-blue-50 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center">
+                                        View All Your Assessments
+                                    </a>
+                                @endif
+                            @endauth
+                        </div>
                     </div>
                 </template>
 
@@ -70,8 +88,8 @@
                                 <p class="text-center font-medium">Long Hair</p>
                             </button>
                         </div>
-                        <button class="mt-4 px-4 py-2 border rounded text-gray-600" 
-                            @click="currentStage = 'petType'">← Back</button>
+                        <button class="mt-5 text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
+                            @click="currentStage = 'petType'">Back</button>
                     </div>
                 </template>
 
@@ -102,8 +120,8 @@
                                 <p class="text-center font-medium">Large</p>
                             </button>
                         </div>
-                        <button class="mt-4 px-4 py-2 border rounded text-gray-600" 
-                            @click="currentStage = 'hairLength'">← Back</button>
+                        <button class="mt-5 text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
+                            @click="currentStage = 'hairLength'">Back</button>
                     </div>
                 </template>
 
@@ -155,19 +173,19 @@
                         </div>
 
                         <div class="flex justify-between">
-                            <button class="px-4 py-2 border rounded text-gray-600" 
+                            <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
                                 @click="prevQuestion" x-show="currentQuestion > 0 || currentStage !== 'personality'">
-                                ← Back
+                                Back
                             </button>
-                            <button class="px-4 py-2 border rounded text-gray-600" 
+                            <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
                                 @click="currentStage = 'size'" x-show="currentQuestion === 0">
-                                ← Back to Preferences
+                                Back to Preferences
                             </button>
                             <div class="relative" x-data="{ showTooltip: false }">
-                                <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" 
+                                <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
                                     @click="personalityAnswers[currentQuestion] ? nextQuestion() : showTooltip = true"
                                     @mouseleave="showTooltip = false">
-                                    <span x-show="currentQuestion < personalityQuestions.length - 1">Next →</span>
+                                    <span x-show="currentQuestion < personalityQuestions.length - 1">Next</span>
                                     <span x-show="currentQuestion === personalityQuestions.length - 1">See Results</span>
                                 </button>
                                 <!-- Validation tooltip -->
@@ -224,17 +242,24 @@
                         </div>
 
                         <div class="text-center mb-4">
-                            <!-- Only show save button if results aren't already saved -->
-                            <button x-show="!resultsSaved && !hasSavedResults" class="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-4" 
-                                @click="saveResults">Save Results</button>
-                                
-                            <!-- Show "Saved!" indicator only when user just saved results, not when returning to page -->
-                            <span x-show="resultsSaved && !hasSavedResults" class="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                                Results Saved
-                            </span>
+                            @auth
+                                <!-- Only show save button if results aren't already saved and user is logged in -->
+                                <button x-show="!resultsSaved && !hasSavedResults" class="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-4" 
+                                    @click="saveResults">Save Results</button>
+                                    
+                                <!-- Show "Saved!" indicator only when user just saved results, not when returning to page -->
+                                <span x-show="resultsSaved && !hasSavedResults" class="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Results Saved
+                                </span>
+                            @else
+                                <!-- Show login button if user is not authenticated -->
+                                <a href="{{ route('login') }}" class="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mr-4 inline-block">
+                                    Login to Save Results
+                                </a>
+                            @endauth
                             
                             <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
                                 @click="restart">Retake Personality Breed Assessment</button>

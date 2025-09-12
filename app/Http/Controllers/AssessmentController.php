@@ -13,6 +13,26 @@ class AssessmentController extends Controller
 {
     public function index(Request $request)
     {
+        // Check if an assessment ID is specified and the user is logged in
+        if ($request->has('id') && auth()->check()) {
+            $assessmentId = $request->input('id');
+            $assessment = Assessment::where('id', $assessmentId)
+                ->where('user_id', auth()->id())
+                ->first();
+                
+            if ($assessment) {
+                // Load the assessment from the database into the session
+                Session::put('assessment_results', [
+                    'petType' => $assessment->pet_type,
+                    'preferences' => $assessment->preferences,
+                    'recommendedBreeds' => $assessment->results,
+                    'personality_scores' => $assessment->personality_scores ?? [],
+                ]);
+                
+                Log::info('Loaded assessment #' . $assessmentId . ' from database for user #' . auth()->id());
+            }
+        }
+        
         // Check if reset parameter is present and clear session data
         if ($request->has('reset')) {
             Log::debug('Reset parameter detected, clearing assessment results');
@@ -195,11 +215,36 @@ class AssessmentController extends Controller
         })->toArray();
 
         // Get any saved assessment results from the session
-        $savedResults = Session::get('assessment_results', [
-            'petType' => null,
-            'preferences' => null,
-            'recommendedBreeds' => []
-        ]);
+        $savedResults = Session::get('assessment_results');
+        
+        // If no saved results in session but user is logged in, check for their most recent assessment
+        if ((!$savedResults || empty($savedResults)) && auth()->check()) {
+            $latestAssessment = Assessment::where('user_id', auth()->id())
+                ->latest()
+                ->first();
+                
+            if ($latestAssessment) {
+                $savedResults = [
+                    'petType' => $latestAssessment->pet_type,
+                    'preferences' => $latestAssessment->preferences,
+                    'recommendedBreeds' => $latestAssessment->results,
+                    'personality_scores' => $latestAssessment->personality_scores ?? [],
+                ];
+                
+                // Save to session so it's available for the rest of the request
+                Session::put('assessment_results', $savedResults);
+                Log::info('Loaded latest assessment from database for user #' . auth()->id());
+            }
+        }
+        
+        // If we still don't have saved results, initialize with empty values
+        if (!$savedResults) {
+            $savedResults = [
+                'petType' => null,
+                'preferences' => null,
+                'recommendedBreeds' => []
+            ];
+        }
         
         // Check if we have saved results and need to enhance them with complete breed data
         if ($savedResults['petType'] && !empty($savedResults['recommendedBreeds'])) {

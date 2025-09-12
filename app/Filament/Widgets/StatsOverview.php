@@ -19,6 +19,14 @@ class StatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
+        // Count users and engagement metrics
+        $usersCount = User::count();
+        $activeUsersCount = User::whereDate('updated_at', '>=', now()->subDays(30))->count();
+        $usersWithAssessments = User::whereHas('assessments')->count();
+        $userEngagementRate = $usersCount > 0 ? round(($usersWithAssessments / $usersCount) * 100) : 0;
+        $verifiedUsersCount = User::whereNotNull('email_verified_at')->count();
+        $verificationRate = $usersCount > 0 ? round(($verifiedUsersCount / $usersCount) * 100) : 0;
+
         // Count dogs and cats
         $dogsCount = Pet::where('category', 'dog')->count();
         $catsCount = Pet::where('category', 'cat')->count();
@@ -34,6 +42,12 @@ class StatsOverview extends BaseWidget
             // Calculate percentages for chart
             $dogPercent = $assessmentCount > 0 ? round(($dogAssessments / $assessmentCount) * 100) : 0;
             $catPercent = $assessmentCount > 0 ? round(($catAssessments / $assessmentCount) * 100) : 0;
+            
+            // Calculate average assessments per user
+            $assessmentsPerUser = $usersWithAssessments > 0 
+                ? round(Assessment::count() / $usersWithAssessments, 1) 
+                : 0;
+                
         } catch (\Exception $e) {
             // Fallback to session-based counting if the table doesn't exist yet
             $assessmentCount = DB::table('sessions')
@@ -43,12 +57,33 @@ class StatsOverview extends BaseWidget
             $catAssessments = 0;
             $dogPercent = 0;
             $catPercent = 0;
+            $assessmentsPerUser = 0;
         }
         
         // Get recent trend data (last week vs current count)
         $weekAgoCount = $assessmentCount > 0 ? max(0, $assessmentCount - rand(1, 5)) : 0; // Simulated past data
 
         return [
+            // User statistics
+            Stat::make('Total Users', $usersCount)
+                ->description("$activeUsersCount active in last 30 days")
+                ->descriptionIcon('heroicon-m-user-group')
+                ->chart([$activeUsersCount, $usersCount - $activeUsersCount])
+                ->color('primary'),
+                
+            Stat::make('User Engagement', "$userEngagementRate%")
+                ->description("$usersWithAssessments users with assessments")
+                ->descriptionIcon('heroicon-m-chart-bar')
+                ->chart([$usersWithAssessments, $usersCount - $usersWithAssessments])
+                ->color('warning'),
+                
+            Stat::make('Email Verification', "$verificationRate%")
+                ->description("$verifiedUsersCount verified users")
+                ->descriptionIcon('heroicon-m-envelope-open')
+                ->chart([$verifiedUsersCount, $usersCount - $verifiedUsersCount])
+                ->color('info'),
+                
+            // Pet statistics
             Stat::make('Total Pet Breeds', $totalPets)
                 ->description("$dogsCount Dogs + $catsCount Cats")
                 ->descriptionIcon('heroicon-m-academic-cap')
