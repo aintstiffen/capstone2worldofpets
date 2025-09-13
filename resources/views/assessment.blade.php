@@ -249,7 +249,7 @@
                                 </span>
                             @else
                                 <!-- Show login button if user is not authenticated -->
-                                <a href="{{ route('login') }}" class="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mr-4 inline-block">
+                                <a href="{{ route('login') }}" class="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-semibold rounded-lg text-base px-6 py-2.5 h-[46px] flex items-center justify-center mr-4 inline-flex transition duration-150">
                                     Login to Save Results
                                 </a>
                             @endauth

@@ -27,6 +27,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->authGuard('admin')
             ->brandName('World of Pets Admin')
             ->favicon(asset('favicon.ico'))
             ->colors([
@@ -49,6 +50,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->middleware([
                 EncryptCookies::class,
+                \App\Http\Middleware\SetAdminGuard::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
                 AuthenticateSession::class,

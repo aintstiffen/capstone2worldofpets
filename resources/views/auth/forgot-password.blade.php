@@ -41,7 +41,7 @@
 
             <div class="flex flex-col space-y-4">
                 <button type="submit" 
-                        class="w-full text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-6 py-3 text-center transition duration-150">
+                        class="w-full text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-semibold rounded-lg text-base px-6 py-2.5 text-center transition duration-150 h-[46px] flex items-center justify-center">
                     {{ __('Email Password Reset Link') }}
                 </button>
             </div>

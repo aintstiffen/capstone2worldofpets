@@ -3,8 +3,8 @@
 @section('title', 'Register - World of Pets')
 
 @section('content')
-<div class="mb-10 min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-    <div class="w-full sm:max-w-md lg:max-w-lg mt-6 px-6 py-8 bg-white shadow-lg overflow-hidden sm:rounded-lg">
+<div class="mb-10 min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 pb-12 bg-gray-100">
+    <div class="w-full sm:max-w-md lg:max-w-lg mt-6 mb-8 px-6 py-8 bg-white shadow-lg overflow-hidden sm:rounded-lg">
         <!-- Header -->
         <div class="text-center mb-6">
             <h1 class="text-2xl font-bold text-gray-900 mb-2">Create Account</h1>
@@ -79,7 +79,7 @@
 
             <div class="flex flex-col space-y-4">
                 <button type="submit" 
-                        class="w-full text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-6 py-3 text-center transition duration-150">
+                        class="w-full text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-semibold rounded-lg text-base px-6 py-2.5 text-center transition duration-150 h-[46px] flex items-center justify-center">
                     Create Account
                 </button>
             </div>
