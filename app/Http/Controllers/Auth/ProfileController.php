@@ -79,9 +79,11 @@ class ProfileController extends Controller
                 \Log::info('No profile picture file in request');
             }
 
-            // Update other fields
-            $user->name = $validated['name'];
-            $user->email = $validated['email'];
+            // Update user information
+            $user->forceFill([
+                'name' => $validated['name'],
+                'email' => $validated['email']
+            ]);
 
             if ($user->isDirty('email')) {
                 $user->email_verified_at = null;
@@ -89,6 +91,12 @@ class ProfileController extends Controller
 
             // Save all changes and verify
             $saved = $user->save();
+            
+            \Log::info('Name update attempt', [
+                'old_name' => $user->getOriginal('name'),
+                'new_name' => $validated['name'],
+                'save_result' => $saved
+            ]);
             
             // Verify the save
             \Log::info('Profile update completed', [

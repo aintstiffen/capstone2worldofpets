@@ -28,10 +28,7 @@
                             </div>
                         @endif
                         
-                        <form method="post" action="{{ route('profile.update') }}" class="space-y-4" enctype="multipart/form-data">
-                            @csrf
-                            @method('patch')
-                            
+                        <div class="space-y-4">
                             <div class="flex flex-col items-center mb-6">
                                 <div class="w-32 h-32 rounded-lg overflow-hidden mb-4 shadow-lg bg-white p-2">
                                     <img src="{{ auth()->user()->getProfilePictureUrl() }}" 
@@ -42,26 +39,23 @@
                             
                             <div>
                                 <label for="name" class="block font-medium text-gray-700 mb-1">Name</label>
-                                <input id="name" name="name" type="text" value="{{ old('name', auth()->user()->name) }}" 
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    required autocomplete="name" />
-                                @error('name')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                <input id="name" type="text" value="{{ auth()->user()->name }}" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                                    disabled readonly />
+                                <p class="mt-1 text-sm text-gray-500">Name cannot be changed for security reasons.</p>
+                            </div>
                             </div>
                             
                             <div>
                                 <label for="email" class="block font-medium text-gray-700 mb-1">Email</label>
-                                <input id="email" name="email" type="email" value="{{ auth()->user()->email }}" 
+                                <input id="email" type="email" value="{{ auth()->user()->email }}" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
-                                    readonly disabled />
-                                <p class="mt-1 text-sm text-gray-500">Email address cannot be changed</p>
+                                    disabled readonly />
+                                <p class="mt-1 text-sm text-gray-500">Email address cannot be changed for security reasons.</p>
                             </div>
                             
                             <div>
-                                <button type="submit" class="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2">
-                                    Save
-                                </button>
+                                
                             </div>
                         </form>
                     </div>
