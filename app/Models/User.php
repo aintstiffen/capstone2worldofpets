@@ -12,8 +12,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
+    /**     * The attributes that are mass assignable.
      *
      * @var list<string>
      */
@@ -23,6 +22,30 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'profile_picture',
     ];
+
+    /**
+     * Get the URL for the user's profile picture
+     *
+     * @return string
+     */
+    public function getProfilePictureUrl()
+    {
+        // Use seed based on user ID to keep the same avatar for the same user
+        $seed = md5($this->id . $this->name);
+        
+        // Create an array of available pet avatar styles
+        $styles = [
+            'https://api.dicebear.com/7.x/bottts/svg?seed=',  // Robot style
+            'https://api.dicebear.com/7.x/adventurer/svg?seed=', // Adventure style
+            'https://api.dicebear.com/7.x/fun-emoji/svg?seed=', // Fun emoji style
+        ];
+        
+        // Use the first characters of the seed to pick a style
+        $styleIndex = hexdec(substr($seed, 0, 2)) % count($styles);
+        
+        // Return the URL with the seed
+        return $styles[$styleIndex] . $seed;
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -55,16 +78,4 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Assessment::class);
     }
     
-    /**
-     * Get profile picture URL or default avatar if none exists
-     */
-    public function getProfilePictureUrl()
-    {
-        if ($this->profile_picture) {
-            return asset('storage/' . $this->profile_picture);
-        }
-        
-        // Return default avatar image
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
-    }
 }

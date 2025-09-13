@@ -28,6 +28,11 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = $request->user();
+        
+        \Log::info('Profile update requested', [
+            'has_file' => $request->hasFile('profile_picture'),
+            'all_data' => $request->all()
+        ]);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -47,28 +52,50 @@ class ProfileController extends Controller
                 \Log::info('Added missing profile_picture column to users table during profile update');
             }
             
-            $user->fill([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-            ]);
-
-            if ($user->isDirty('email')) {
-                $user->email_verified_at = null;
-            }
-
-            // Handle profile picture upload
+            // Handle profile picture upload first
             if ($request->hasFile('profile_picture')) {
+                \Log::info('Profile picture file detected');
+                
                 // Delete old profile picture if it exists
                 if ($user->profile_picture && file_exists(public_path('storage/' . $user->profile_picture))) {
                     unlink(public_path('storage/' . $user->profile_picture));
                 }
                 
-                // Store new profile picture
-                $profilePicPath = $request->file('profile_picture')->store('profile-pictures', 'public');
-                $user->profile_picture = $profilePicPath;
+                try {
+                    // Store new profile picture with original filename
+                    $file = $request->file('profile_picture');
+                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $profilePicPath = $file->storeAs('profile-pictures', $filename, 'public');
+                    \Log::info('Profile picture stored at: ' . $profilePicPath);
+                    
+                    // Set the profile picture path directly and force the update
+                    $user->forceFill(['profile_picture' => $profilePicPath]);
+                    \Log::info('Profile picture path set in user model: ' . $user->profile_picture);
+                } catch (\Exception $e) {
+                    \Log::error('Error storing profile picture: ' . $e->getMessage());
+                    throw $e;
+                }
+            } else {
+                \Log::info('No profile picture file in request');
             }
 
-            $user->save();
+            // Update other fields
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
+
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
+            }
+
+            // Save all changes and verify
+            $saved = $user->save();
+            
+            // Verify the save
+            \Log::info('Profile update completed', [
+                'save_success' => $saved,
+                'profile_picture_after_save' => $user->fresh()->profile_picture,
+                'user_id' => $user->id
+            ]);
 
             return Redirect::route('profile.edit')->with('status', 'profile-updated');
         } catch (\Exception $e) {

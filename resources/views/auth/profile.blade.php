@@ -33,19 +33,10 @@
                             @method('patch')
                             
                             <div class="flex flex-col items-center mb-6">
-                                <div class="w-32 h-32 rounded-full overflow-hidden mb-4">
-                                    <img src="{{ auth()->user()->getProfilePictureUrl() }}" alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
-                                </div>
-                                
-                                <div class="w-full">
-                                    <label for="profile_picture" class="block font-medium text-gray-700 mb-1">Profile Picture</label>
-                                    <input id="profile_picture" name="profile_picture" type="file" 
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                        accept="image/*" />
-                                    @error('profile_picture')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                    <p class="mt-1 text-sm text-gray-500">JPG, PNG or GIF (max. 2MB)</p>
+                                <div class="w-32 h-32 rounded-lg overflow-hidden mb-4 shadow-lg bg-white p-2">
+                                    <img src="{{ auth()->user()->getProfilePictureUrl() }}" 
+                                         alt="{{ auth()->user()->name }}'s avatar" 
+                                         class="w-full h-full object-contain">
                                 </div>
                             </div>
                             
