@@ -9,6 +9,20 @@ Route::get('/', function () {
     return view('homepage');
 });
 
+// Test route for pet facts
+Route::get('/test-dog-facts', function () {
+    return response()->file(public_path('dog-facts-test.html'));
+});
+
+Route::get('/test-pet-facts', function () {
+    return response()->file(public_path('pet-facts-test.html'));
+});
+
+// Handle GET requests to logout (redirect them properly)
+Route::get('/logout', function () {
+    return redirect()->route('login')->with('error', 'Please use the logout button to log out properly.');
+});
+
 // Include authentication routes
 require __DIR__.'/auth.php';
 Route::get('/dogs', function () {

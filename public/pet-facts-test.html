@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Facts Test</title>
+    <link rel="stylesheet" href="/css/pet-facts.css">
+</head>
+<body>
+    <div style="max-width: 800px; margin: 50px auto; padding: 20px; font-family: Arial, sans-serif;">
+        <h1>Pet Facts API Integration Test</h1>
+        
+        <p>This page demonstrates the Pet Facts toast notification functionality.</p>
+        
+        <div style="margin: 30px 0;">
+            <button id="showRandomFactBtn" style="padding: 10px 20px; background-color: #3490dc; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Show Random Pet Fact
+            </button>
+            
+            <button id="showDogFactBtn" style="padding: 10px 20px; background-color: #3490dc; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+                Show Dog Fact
+            </button>
+            
+            <button id="showCatFactBtn" style="padding: 10px 20px; background-color: #9561e2; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+                Show Cat Fact
+            </button>
+            
+            <button id="resetStorageBtn" style="padding: 10px 20px; background-color: #e3342f; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+                Reset Storage
+            </button>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 4px;">
+            <h3>How it works:</h3>
+            <ul>
+                <li>A random pet fact (dog or cat) appears automatically on the first visit each day</li>
+                <li>Facts are randomly selected from either:
+                    <ul>
+                        <li><a href="https://dogapi.dog/" target="_blank">Dog API</a> (for dog facts)</li>
+                        <li><a href="https://catfact.ninja/" target="_blank">Cat Fact API</a> (for cat facts)</li>
+                    </ul>
+                </li>
+                <li>The fact is stored in localStorage so it only shows once per day</li>
+                <li>Click buttons above to test different toast notifications manually</li>
+                <li>Click "Reset Storage" to clear localStorage and simulate a first visit</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="/js/pet-facts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Button to manually show a random pet fact
+            document.getElementById('showRandomFactBtn').addEventListener('click', function() {
+                fetchRandomPetFact();
+            });
+            
+            // Button to manually show a dog fact
+            document.getElementById('showDogFactBtn').addEventListener('click', function() {
+                fetchRandomDogFact();
+            });
+            
+            // Button to manually show a cat fact
+            document.getElementById('showCatFactBtn').addEventListener('click', function() {
+                fetchRandomCatFact();
+            });
+            
+            // Button to reset storage (simulate first visit)
+            document.getElementById('resetStorageBtn').addEventListener('click', function() {
+                localStorage.removeItem('petFactLastShown');
+                alert('Storage has been reset. Refresh the page to simulate first visit!');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -12,6 +12,10 @@
         
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         
+        <!-- Pet Facts API Integration -->
+        <link rel="stylesheet" href="{{ asset('css/pet-facts.css') }}">
+        <script src="{{ asset('js/pet-facts.js') }}"></script>
+        
         @stack('styles')
     </head>
 
