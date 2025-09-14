@@ -61,7 +61,7 @@
                             <select 
                                 x-model="breed1"
                                 class="appearance-none w-full px-4 py-4 pr-12 text-base border-2 border-gray-200 rounded-xl shadow-sm bg-white hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 text-gray-700 font-medium cursor-pointer">
-                                <option value="" class="text-gray-500">� Choose your first breed...</option>
+                                <option value="" class="text-gray-500">🔎 Choose your first breed...</option>
                                 <template x-for="breed in breeds" :key="breed.id">
                                     <option :value="breed.id" x-text="breed.name" class="py-2 text-gray-800"></option>
                                 </template>
@@ -86,7 +86,7 @@
                             <select 
                                 x-model="breed2"
                                 class="appearance-none w-full px-4 py-4 pr-12 text-base border-2 border-gray-200 rounded-xl shadow-sm bg-white hover:border-green-300 focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-200 text-gray-700 font-medium cursor-pointer">
-                                <option value="" class="text-gray-500">� Choose your second breed...</option>
+                                <option value="" class="text-gray-500">🔎 Choose your second breed...</option>
                                 <template x-for="breed in breeds" :key="breed.id">
                                     <option :value="breed.id" x-text="breed.name" class="py-2 text-gray-800"></option>
                                 </template>
@@ -119,6 +119,43 @@
             <div x-show="animalType && !loading && !error && breeds.length === 0" x-transition class="text-center py-8">
                 <p class="text-gray-600">No breeds found for the selected animal type.</p>
             </div>
+
+            <!-- Recent Comparisons -->
+            <template x-if="getRecentComparisons().length > 0">
+                <div class="mt-8 bg-gray-50 rounded-lg p-6 border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Recent Comparisons</h3>
+                        <button @click="clearRecentComparisons(); refreshRecentComparisons()" class="text-sm text-red-600 hover:text-red-700 underline">
+                            Clear All
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <template x-for="recent in getRecentComparisons().slice(0, 6)" :key="recent.id">
+                            <div class="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer" 
+                                 @click="loadRecentComparison(recent)">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <span class="text-sm font-medium text-gray-600 capitalize" x-text="recent.animalType"></span>
+                                    <span class="text-xs text-gray-400" x-text="new Date(recent.timestamp).toLocaleDateString()"></span>
+                                </div>
+                                <div class="flex items-center justify-center space-x-2">
+                                    <!-- Breed 1 -->
+                                    <div class="text-center">
+                                        <img :src="recent.breed1Image" :alt="recent.breed1Name" class="w-12 h-12 object-cover rounded-lg mx-auto mb-1" onerror="this.style.display='none'">
+                                        <p class="text-xs text-gray-700 truncate" x-text="recent.breed1Name"></p>
+                                    </div>
+                                    <!-- VS -->
+                                    <div class="text-xs font-bold text-gray-500 px-2">VS</div>
+                                    <!-- Breed 2 -->
+                                    <div class="text-center">
+                                        <img :src="recent.breed2Image" :alt="recent.breed2Name" class="w-12 h-12 object-cover rounded-lg mx-auto mb-1" onerror="this.style.display='none'">
+                                        <p class="text-xs text-gray-700 truncate" x-text="recent.breed2Name"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
 
             <!-- Comparison Results -->
             <template x-if="comparison && !loading">
@@ -304,6 +341,21 @@ function compareData() {
         comparison: null,
         loading: false,
         error: null,
+        recentComparisons: [],
+
+        init() {
+            // Load recent comparisons into reactive data
+            this.refreshRecentComparisons();
+            
+            // Initialize with any URL parameters for loading recent comparisons
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('type') && urlParams.get('breed1') && urlParams.get('breed2')) {
+                this.animalType = urlParams.get('type');
+                this.breed1 = urlParams.get('breed1');
+                this.breed2 = urlParams.get('breed2');
+                this.loadBreeds();
+            }
+        },
 
         async setAnimalType(type) {
             this.animalType = type;
@@ -349,12 +401,85 @@ function compareData() {
                 
                 if (!response.ok) throw new Error('Failed to compare breeds');
                 this.comparison = await response.json();
+                
+                // Save comparison to localStorage
+                this.saveComparisonToLocal();
             } catch (e) {
                 this.error = 'Failed to compare breeds. Please try again.';
                 console.error(e);
             }
             
             this.loading = false;
+        },
+        
+        saveComparisonToLocal() {
+            if (!this.comparison) return;
+            
+            const comparisonData = {
+                id: Date.now(), // Simple unique ID
+                animalType: this.animalType,
+                breed1: this.breed1,
+                breed2: this.breed2,
+                breed1Name: this.comparison.breed1.info.name,
+                breed2Name: this.comparison.breed2.info.name,
+                breed1Image: this.comparison.breed1.image,
+                breed2Image: this.comparison.breed2.image,
+                comparisonData: this.comparison,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Get existing comparisons or initialize empty array
+            let recentComparisons = JSON.parse(localStorage.getItem('recentComparisons') || '[]');
+            
+            // Add new comparison to the beginning
+            recentComparisons.unshift(comparisonData);
+            
+            // Keep only last 10 comparisons
+            recentComparisons = recentComparisons.slice(0, 10);
+            
+            // Save back to localStorage
+            localStorage.setItem('recentComparisons', JSON.stringify(recentComparisons));
+            
+            // Refresh reactive data
+            this.refreshRecentComparisons();
+        },
+        
+        getRecentComparisons() {
+            return this.recentComparisons;
+        },
+        
+        refreshRecentComparisons() {
+            this.recentComparisons = JSON.parse(localStorage.getItem('recentComparisons') || '[]');
+        },
+        
+        async loadBreeds() {
+            if (!this.animalType) return;
+            
+            this.loading = true;
+            try {
+                const response = await fetch(`/compare/breeds/${this.animalType}`);
+                if (!response.ok) throw new Error('Failed to load breeds');
+                this.breeds = await response.json();
+            } catch (e) {
+                this.error = 'Failed to load breeds. Please try again.';
+                console.error(e);
+            }
+            this.loading = false;
+        },
+        
+        loadRecentComparison(comparisonData) {
+            this.animalType = comparisonData.animalType;
+            this.breed1 = comparisonData.breed1;
+            this.breed2 = comparisonData.breed2;
+            this.comparison = comparisonData.comparisonData;
+            
+            // Load breeds for the selected animal type
+            this.loadBreeds();
+        },
+        
+        clearRecentComparisons() {
+            localStorage.removeItem('recentComparisons');
+            this.refreshRecentComparisons();
         }
     }
 }
