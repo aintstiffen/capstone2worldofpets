@@ -39,10 +39,12 @@
                         </div>
                         <div class="mx-auto lg:ml-auto flex justify-center">
                             <div class="grid grid-cols-2 gap-4">
-                                <img src="/placeholder.svg?height=300&width=250" alt="Golden Retriever"
-                                    class="rounded-lg object-cover shadow-lg" width="250" height="300" />
-                                <img src="/placeholder.svg?height=300&width=250" alt="Persian Cat"
-                                    class="rounded-lg object-cover shadow-lg" width="250" height="300" />
+                                <img src="https://imgs.search.brave.com/gTfFhk4oO_E73T8H6y_CNtbv_pzei0JoILJIucuWfCA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/YnJpdGFubmljYS5j/b20vMzMvMTM2MTMz/LTAwNC0zMzg1RjZG/NS9nb2xkZW4tcmV0/cmlldmVyLmpwZw"
+                                    alt="Golden Retriever" class="rounded-lg object-cover shadow-lg" width="250"
+                                    height="300" />
+                                <img src="https://imgs.search.brave.com/6ylsIeMVYccyeHoDEgMwELzufk_vLNFuml9acMm3fTc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9yZW5k/ZXIuZmluZWFydGFt/ZXJpY2EuY29tL2lt/YWdlcy9pbWFnZXMt/cHJvZmlsZS1mbG93/LzQwMC9pbWFnZXMt/bWVkaXVtLWxhcmdl/LTUvcGVyc2lhbi1j/YXQtc2lsdmVyc2Fs/dHBob3RvanNlbm9z/aWFpbi5qcGc"
+                                    alt="Persian Cat" class="rounded-lg object-cover shadow-lg" width="250"
+                                    height="300" />
                             </div>
                         </div>
                     </div>
@@ -135,16 +137,58 @@
                         </div>
                         <div class="mx-auto lg:ml-auto flex justify-center">
                             <div class="relative">
-                                <img src="/placeholder.svg?height=400&width=500"
+                                <img src="https://imgs.search.brave.com/7ad6u7NSwUDebItDOPca4slPF88rKp790UGkd9rpgC0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudW5zcGxhc2gu/Y29tL3Bob3RvLTE1/MzcyMDQ2OTY0ODYt/OTY3ZjFiNzE5OGM4/P2ZtPWpwZyZxPTYw/Jnc9MzAwMCZpeGxp/Yj1yYi00LjEuMCZp/eGlkPU0zd3hNakEz/ZkRCOE1IeHpaV0Z5/WTJoOE0zeDhiR0Zp/Y21Ga2IzSjhaVzU4/TUh4OE1IeDhmREE9"
                                     alt="Labrador Retriever with interactive hotspots"
                                     class="rounded-lg object-cover shadow-lg" width="500" height="400" />
-                                <div
-                                    class="absolute top-1/4 left-1/4 h-8 w-8 rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse">
+
+                                <!-- Ears Hotspot -->
+                                <div class="absolute rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse group"
+                                    style="top: 200px; left: 70px; height: 2rem; width: 2rem;">
                                     <span class="text-xs font-bold text-primary">Ears</span>
+                                    <!-- Tooltip -->
+                                    <div
+                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block bg-white border border-primary rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
+                                        <span class="font-semibold text-primary">Fun Fact:</span>
+                                        Labradors have floppy ears that help protect their inner ear from debris and water.
+                                        Their keen hearing makes them excellent retrievers!
+                                    </div>
                                 </div>
-                                <div
-                                    class="absolute top-1/2 right-1/3 h-8 w-8 rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse">
+
+                                <!-- Tail Hotspot -->
+                                <div class="absolute rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse group"
+                                    style="top: 440px; left: 450px; height: 2rem; width: 2rem;">
                                     <span class="text-xs font-bold text-primary">Tail</span>
+                                    <!-- Tooltip -->
+                                    <div
+                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block bg-white border border-primary rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
+                                        <span class="font-semibold text-primary">Fun Fact:</span>
+                                        A Labrador's "otter tail" is thick and strong, helping them swim efficiently. It
+                                        acts like a rudder in the water!
+                                    </div>
+                                </div>
+
+                                <!-- Furr Hotspot -->
+                                <div class="absolute rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse group"
+                                    style="top: 420px; left: 300px; height: 2rem; width: 2rem;">
+                                    <span class="text-xs font-bold text-primary">Furr</span>
+                                    <div
+                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block bg-white border border-primary rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
+                                        <span class="font-semibold text-primary">Fun Fact:</span>
+                                        Labrador Retrievers have a double coat that repels water and keeps them warm while
+                                        swimming—even in cold weather!
+                                    </div>
+                                </div>
+
+                                <!-- Mouth Hotspot -->
+                                <div class="absolute rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse group"
+                                    style="top: 330px; left: 200px; height: 2rem; width: 2rem;">
+                                    <span class="text-xs font-bold text-primary">Mouth</span>
+                                    <div
+                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block bg-white border border-primary rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
+                                        <span class="font-semibold text-primary">Fun Fact:</span>
+                                        Labradors have a "soft mouth," meaning they can carry objects gently without
+                                        damaging them—a trait prized in retrieving!
+                                    </div>
                                 </div>
                             </div>
                         </div>
