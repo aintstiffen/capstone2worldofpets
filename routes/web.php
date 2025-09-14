@@ -37,3 +37,8 @@ Route::get('/dogs', [DogController::class, 'index'])->name('dogs');
 Route::get('/cats', [CatController::class, 'index'])->name('cats');
 Route::get('/dogs/{slug}', [DogController::class, 'show'])->name('dogs.show');
 Route::get('/cats/{slug}', [CatController::class, 'show'])->name('cats.show');
+
+// Compare routes
+Route::get('/compare', [\App\Http\Controllers\CompareController::class, 'index'])->name('compare');
+Route::get('/compare/breeds/{type}', [\App\Http\Controllers\CompareController::class, 'getBreeds'])->name('compare.breeds');
+Route::post('/compare', [\App\Http\Controllers\CompareController::class, 'compare'])->name('compare.submit');

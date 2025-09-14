@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'cat_api' => [
+        'key' => env('CAT_API_KEY'),
+        'base_url' => 'https://api.thecatapi.com/v1',
+    ],
+
+    'dog_api' => [
+        'key' => env('DOG_API_KEY'),
+        'base_url' => 'https://api.thedogapi.com/v1',
+    ],
+
 ];
