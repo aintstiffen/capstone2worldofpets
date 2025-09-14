@@ -14,7 +14,7 @@
         <!-- Content -->
         <div class="text-center mb-8">
             <p class="text-gray-700 leading-relaxed">
-                {{ __('You need to be logged in to access the pet personality assessment. This helps us save your results and provide personalized recommendations.') }}
+                {{ __('You need to be logged in to access this page. This helps us save your results and provide personalized recommendations.') }}
             </p>
         </div>
         
