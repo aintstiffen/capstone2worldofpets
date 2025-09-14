@@ -7,30 +7,7 @@
         @endphp
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <!-- Card 1: Verification Status -->
-            <div class="bg-white rounded-xl shadow p-4">
-                <h3 class="text-base font-medium text-gray-700 mb-2">Verification Status</h3>
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-sm text-gray-500">Verified Users</p>
-                        <p class="text-2xl font-bold text-green-600">{{ $metrics['verifiedUsers'] }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Unverified Users</p>
-                        <p class="text-2xl font-bold text-red-500">{{ $metrics['unverifiedUsers'] }}</p>
-                    </div>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                    @php 
-                        $total = $metrics['verifiedUsers'] + $metrics['unverifiedUsers'];
-                        $percentage = $total > 0 ? ($metrics['verifiedUsers'] / $total) * 100 : 0; 
-                    @endphp
-                    <div class="bg-green-600 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
-                </div>
-                <p class="text-xs text-gray-500 mt-1">{{ number_format($percentage, 1) }}% verified</p>
-            </div>
-            
-            <!-- Card 2: Assessment Completion -->
+            <!-- Card 1: Assessment Completion -->
             <div class="bg-white rounded-xl shadow p-4">
                 <h3 class="text-base font-medium text-gray-700 mb-2">Assessment Completion</h3>
                 <div class="flex justify-between items-center">
@@ -108,7 +85,6 @@
                             <th class="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                             <th class="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assessments</th>
                             <th class="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registered</th>
-                            <th class="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -118,17 +94,10 @@
                                 <td class="py-2 px-4 whitespace-nowrap">{{ $user->email }}</td>
                                 <td class="py-2 px-4 whitespace-nowrap">{{ $user->assessments_count }}</td>
                                 <td class="py-2 px-4 whitespace-nowrap">{{ $user->created_at->format('M j, Y') }}</td>
-                                <td class="py-2 px-4 whitespace-nowrap">
-                                    @if($user->email_verified_at)
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Verified</span>
-                                    @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Unverified</span>
-                                    @endif
-                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="py-4 px-4 text-center text-sm text-gray-500">No active users found</td>
+                                <td colspan="4" class="py-4 px-4 text-center text-sm text-gray-500">No active users found</td>
                             </tr>
                         @endforelse
                     </tbody>

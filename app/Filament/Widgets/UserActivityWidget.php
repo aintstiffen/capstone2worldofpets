@@ -27,10 +27,6 @@ class UserActivityWidget extends Widget
             $registrationTrend[$date] = $count;
         }
         
-        // User verification status
-        $verifiedUsers = User::whereNotNull('email_verified_at')->count();
-        $unverifiedUsers = User::whereNull('email_verified_at')->count();
-        
         // User assessment completion rate
         $usersWithAssessments = User::whereHas('assessments')->count();
         $usersWithoutAssessments = User::whereDoesntHave('assessments')->count();
@@ -47,8 +43,6 @@ class UserActivityWidget extends Widget
         
         return [
             'registrationTrend' => $registrationTrend,
-            'verifiedUsers' => $verifiedUsers,
-            'unverifiedUsers' => $unverifiedUsers,
             'usersWithAssessments' => $usersWithAssessments,
             'usersWithoutAssessments' => $usersWithoutAssessments,
             'activeUsers' => $activeUsers,

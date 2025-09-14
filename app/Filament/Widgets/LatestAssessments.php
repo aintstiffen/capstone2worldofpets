@@ -37,14 +37,6 @@ class LatestAssessments extends BaseWidget
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('User')
                     ->default('Guest'),
-                Tables\Columns\TextColumn::make('results')
-                    ->label('Top Match')
-                    ->formatStateUsing(function ($state) {
-                        if (is_array($state) && count($state) > 0) {
-                            return $state[0]['name'] ?? 'N/A';
-                        }
-                        return 'N/A';
-                    }),
             ]);
     }
 }

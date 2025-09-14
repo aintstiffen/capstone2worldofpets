@@ -428,8 +428,9 @@ function compareData() {
                 timestamp: new Date().toISOString()
             };
             
-            // Get existing comparisons or initialize empty array
-            let recentComparisons = JSON.parse(localStorage.getItem('recentComparisons') || '[]');
+            // Get existing comparisons or initialize empty array (user-specific)
+            const storageKey = this.getUserStorageKey();
+            let recentComparisons = JSON.parse(localStorage.getItem(storageKey) || '[]');
             
             // Add new comparison to the beginning
             recentComparisons.unshift(comparisonData);
@@ -437,8 +438,8 @@ function compareData() {
             // Keep only last 10 comparisons
             recentComparisons = recentComparisons.slice(0, 10);
             
-            // Save back to localStorage
-            localStorage.setItem('recentComparisons', JSON.stringify(recentComparisons));
+            // Save back to localStorage (user-specific)
+            localStorage.setItem(storageKey, JSON.stringify(recentComparisons));
             
             // Refresh reactive data
             this.refreshRecentComparisons();
@@ -449,7 +450,8 @@ function compareData() {
         },
         
         refreshRecentComparisons() {
-            this.recentComparisons = JSON.parse(localStorage.getItem('recentComparisons') || '[]');
+            const storageKey = this.getUserStorageKey();
+            this.recentComparisons = JSON.parse(localStorage.getItem(storageKey) || '[]');
         },
         
         async loadBreeds() {
@@ -478,8 +480,16 @@ function compareData() {
         },
         
         clearRecentComparisons() {
-            localStorage.removeItem('recentComparisons');
+            const storageKey = this.getUserStorageKey();
+            localStorage.removeItem(storageKey);
             this.refreshRecentComparisons();
+        },
+        
+        getUserStorageKey() {
+            // Get user ID from meta tag or default to 'guest'
+            const userIdMeta = document.querySelector('meta[name="user-id"]');
+            const userId = userIdMeta ? userIdMeta.content : 'guest';
+            return `recentComparisons_${userId}`;
         }
     }
 }

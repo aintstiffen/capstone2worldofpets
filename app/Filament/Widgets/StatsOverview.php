@@ -24,8 +24,7 @@ class StatsOverview extends BaseWidget
         $activeUsersCount = User::whereDate('updated_at', '>=', now()->subDays(30))->count();
         $usersWithAssessments = User::whereHas('assessments')->count();
         $userEngagementRate = $usersCount > 0 ? round(($usersWithAssessments / $usersCount) * 100) : 0;
-        $verifiedUsersCount = User::whereNotNull('email_verified_at')->count();
-        $verificationRate = $usersCount > 0 ? round(($verifiedUsersCount / $usersCount) * 100) : 0;
+
 
         // Count dogs and cats
         $dogsCount = Pet::where('category', 'dog')->count();
@@ -76,12 +75,6 @@ class StatsOverview extends BaseWidget
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->chart([$usersWithAssessments, $usersCount - $usersWithAssessments])
                 ->color('warning'),
-                
-            Stat::make('Email Verification', "$verificationRate%")
-                ->description("$verifiedUsersCount verified users")
-                ->descriptionIcon('heroicon-m-envelope-open')
-                ->chart([$verifiedUsersCount, $usersCount - $verifiedUsersCount])
-                ->color('info'),
                 
             // Pet statistics
             Stat::make('Total Pet Breeds', $totalPets)
