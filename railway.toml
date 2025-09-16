@@ -1,10 +1,9 @@
 [build]
-builder = "nixpacks"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
-
-[nixpacks]
 phpExtensions = ["ctype", "curl", "dom", "fileinfo", "filter", "hash", "mbstring", "openssl", "pcre", "pdo", "session", "tokenizer", "xml", "intl", "zip"]
