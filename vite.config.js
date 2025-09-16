@@ -7,7 +7,8 @@ export default defineConfig({
         host: true,
         hmr: {
             host: 'petsofworld.test',
-        }
+        },
+        https: process.env.APP_ENV === 'production',
     },
     plugins: [
         laravel({

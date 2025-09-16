@@ -15,8 +15,8 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         
         <!-- Pet Facts API Integration -->
-        <link rel="stylesheet" href="{{ asset('css/pet-facts.css') }}">
-        <script src="{{ asset('js/pet-facts.js') }}"></script>
+        <link rel="stylesheet" href="{{ config('app.env') === 'production' ? secure_asset('css/pet-facts.css') : asset('css/pet-facts.css') }}">
+        <script src="{{ config('app.env') === 'production' ? secure_asset('js/pet-facts.js') : asset('js/pet-facts.js') }}"></script>
         
         @stack('styles')
     </head>
