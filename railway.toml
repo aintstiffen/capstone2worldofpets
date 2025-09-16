@@ -1,9 +1,7 @@
 [build]
 builder = "nixpacks"
-buildCommand = "install-php-extensions ctype curl dom fileinfo filter hash mbstring openssl pcre pdo session tokenizer xml intl zip && composer install --optimize-autoloader --no-dev --no-scripts --no-interaction"
 
 [deploy]
-startCommand = "php artisan migrate --force && php artisan optimize && php artisan serve --host=0.0.0.0 --port=$PORT"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"

@@ -1,0 +1,29 @@
+[nixpacks]
+php-version = "8.2"
+php-extensions = ["intl", "zip"]
+
+[phases.setup]
+nixPkgs = ["icu", "zlib", "libzip", "pkg-config"]
+
+[phases.install]
+cmds = [
+  "apt-get update",
+  "apt-get install -y libicu-dev libzip-dev"
+]
+
+[phases.build]
+cmds = [
+  "docker-php-ext-configure intl",
+  "docker-php-ext-install intl zip",
+  "php -m",
+  "composer install --optimize-autoloader --no-dev --no-interaction"
+]
+
+[phases.setup-php-ini]
+cmds = [
+  "echo 'extension=intl.so' > $PHP_INI_DIR/conf.d/ext-intl.ini",
+  "echo 'extension=zip.so' > $PHP_INI_DIR/conf.d/ext-zip.ini"
+]
+
+[start]
+cmd = "php artisan migrate --force && php artisan optimize && php artisan serve --host=0.0.0.0 --port=$PORT"

@@ -1,0 +1,22 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "php artisan serve --host=0.0.0.0 --port=$PORT"
+
+[nixpacks]
+php-version = "8.2"
+php-extensions = ["intl", "zip"]
+
+[phases.setup]
+nixPkgs = ["icu", "zlib", "libzip", "pkg-config"]
+
+[phases.build]
+cmds = [
+  "apt-get update",
+  "apt-get install -y libicu-dev libzip-dev",
+  "docker-php-ext-configure intl",
+  "docker-php-ext-install intl zip",
+  "php -m",
+  "composer install --optimize-autoloader --no-dev --no-scripts --no-interaction"
+]
