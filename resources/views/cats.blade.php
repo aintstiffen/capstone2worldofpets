@@ -7,7 +7,7 @@
     <!-- Hero Section -->
     <main class="flex-1">
         <section class="w-full py-12 md:py-24 lg:py-32 bg-muted/30">
-            <div class="container px-4 md:px-6 text-center">
+            <div class="container mx-auto px-4 md:px-6 text-center">
                 <h1 class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Cat Breeds</h1>
                 <p class="max-w-[900px] mx-auto text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                     Explore detailed profiles of the most popular cat breeds in the Philippines.
@@ -17,7 +17,7 @@
 
         <!-- Dog Breed Cards -->
         <section class="w-full py-12 md:py-24 lg:py-32">
-            <div class="container px-4 md:px-6">
+            <div class="container mx-auto px-4 md:px-6">
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 
                    @if(isset($petss) && $petss->count() > 0)

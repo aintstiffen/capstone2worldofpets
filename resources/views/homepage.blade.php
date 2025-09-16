@@ -9,7 +9,7 @@
         <main class="flex-1">
             {{-- Hero Section --}}
             <section class="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-white to-muted/30">
-                <div class="container px-4 md:px-6">
+                <div class="container mx-auto px-4 md:px-6">
                     <div class="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
                         <div class="space-y-4">
                             <h1 class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
@@ -20,31 +20,29 @@
                                 pet match with our personality assessment tool.
                             </p>
                             <div class="flex flex-col gap-2 min-[400px]:flex-row">
-                                <a href="/assessment"
-                                    class="inline-flex items-center gap-1 px-4 py-2 bg-primary text-white rounded-md">
+                                <a href="{{ route('assessment') }}"
+                                    class="inline-flex items-center justify-center gap-1 px-5 py-2.5 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors">
                                     Take Personality Quiz
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                     </svg>
                                 </a>
-                                <a href="{{ route('assessment') }}"
-                                    class="px-4 py-2 border border-black rounded-md bg-black text-white hover:bg-gray-700 hover:text-white transition">
-                                    Take Personality Quiz
-                                </a>
-                                <a href="/dogs" class="px-4 py-2 border rounded-md border-gray-300">
+                                <a href="/dogs" class="inline-flex items-center justify-center px-5 py-2.5 border rounded-md border-gray-300 hover:bg-gray-50 transition-colors">
                                     Explore Breeds
                                 </a>
                             </div>
                         </div>
-                        <div class="mx-auto lg:ml-auto flex justify-center">
-                            <div class="grid grid-cols-2 gap-4">
-                                <img src="https://imgs.search.brave.com/gTfFhk4oO_E73T8H6y_CNtbv_pzei0JoILJIucuWfCA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/YnJpdGFubmljYS5j/b20vMzMvMTM2MTMz/LTAwNC0zMzg1RjZG/NS9nb2xkZW4tcmV0/cmlldmVyLmpwZw"
-                                    alt="Golden Retriever" class="rounded-lg object-cover shadow-lg" width="250"
-                                    height="300" />
-                                <img src="https://imgs.search.brave.com/6ylsIeMVYccyeHoDEgMwELzufk_vLNFuml9acMm3fTc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9yZW5k/ZXIuZmluZWFydGFt/ZXJpY2EuY29tL2lt/YWdlcy9pbWFnZXMt/cHJvZmlsZS1mbG93/LzQwMC9pbWFnZXMt/bWVkaXVtLWxhcmdl/LTUvcGVyc2lhbi1j/YXQtc2lsdmVyc2Fs/dHBob3RvanNlbm9z/aWFpbi5qcGc"
-                                    alt="Persian Cat" class="rounded-lg object-cover shadow-lg" width="250"
-                                    height="300" />
+                        <div class="mx-auto lg:ml-auto flex justify-center w-full">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-lg">
+                                <div class="h-64 sm:h-72 md:h-80 overflow-hidden rounded-lg shadow-lg">
+                                    <img src="https://imgs.search.brave.com/gTfFhk4oO_E73T8H6y_CNtbv_pzei0JoILJIucuWfCA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/YnJpdGFubmljYS5j/b20vMzMvMTM2MTMz/LTAwNC0zMzg1RjZG/NS9nb2xkZW4tcmV0/cmlldmVyLmpwZw"
+                                         alt="Golden Retriever" class="w-full h-full object-cover transition-transform hover:scale-105 duration-500" />
+                                </div>
+                                <div class="h-64 sm:h-72 md:h-80 overflow-hidden rounded-lg shadow-lg">
+                                    <img src="https://imgs.search.brave.com/6ylsIeMVYccyeHoDEgMwELzufk_vLNFuml9acMm3fTc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9yZW5k/ZXIuZmluZWFydGFt/ZXJpY2EuY29tL2lt/YWdlcy9pbWFnZXMt/cHJvZmlsZS1mbG93/LzQwMC9pbWFnZXMt/bWVkaXVtLWxhcmdl/LTUvcGVyc2lhbi1j/YXQtc2lsdmVyc2Fs/dHBob3RvanNlbm9z/aWFpbi5qcGc"
+                                         alt="Persian Cat" class="w-full h-full object-cover transition-transform hover:scale-105 duration-500" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -53,7 +51,7 @@
 
             {{-- Features Section --}}
             <section class="w-full py-12 md:py-24 lg:py-32">
-                <div class="container px-4 md:px-6">
+                <div class="container mx-auto px-4 md:px-6">
                     <div class="flex flex-col items-center justify-center space-y-4 text-center">
                         <div class="space-y-2">
                             <h2 class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Our Features</h2>
@@ -123,31 +121,33 @@
 
             {{-- Fun Facts Section --}}
             <section class="w-full py-12 md:py-24 lg:py-32 bg-muted/30">
-                <div class="container px-4 md:px-6">
-                    <div class="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
+                                <div class="container mx-auto px-4 md:px-6">
+                    <div class="grid gap-6 lg:grid-cols-3 items-center justify-center">
                         <div class="space-y-4">
                             <h2 class="text-3xl font-bold tracking-tighter sm:text-4xl">Fun Facts Feature</h2>
                             <p class="text-muted-foreground md:text-xl">
-                                Hover over different parts of a breed image to discover interesting facts about specific
+                                <span class="md:inline hidden">Hover over</span>
+                                <span class="md:hidden">Tap on</span>
+                                different parts of a breed image to discover interesting facts about specific
                                 features.
                             </p>
-                            <a href="/dogs/labrador-retriever" class="px-4 py-2 bg-primary text-white rounded-md">
+                            <a href="/dogs/labrador-retriever" class="inline-block px-4 py-2 bg-primary text-white rounded-md">
                                 Try It Now
                             </a>
                         </div>
-                        <div class="mx-auto lg:ml-auto flex justify-center">
-                            <div class="relative">
+                        <div class="mx-auto lg:ml-auto flex justify-center w-full max-w-md lg:max-w-none">
+                            <div class="relative w-full">
                                 <img src="https://imgs.search.brave.com/7ad6u7NSwUDebItDOPca4slPF88rKp790UGkd9rpgC0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudW5zcGxhc2gu/Y29tL3Bob3RvLTE1/MzcyMDQ2OTY0ODYt/OTY3ZjFiNzE5OGM4/P2ZtPWpwZyZxPTYw/Jnc9MzAwMCZpeGxp/Yj1yYi00LjEuMCZp/eGlkPU0zd3hNakEz/ZkRCOE1IeHpaV0Z5/WTJoOE0zeDhiR0Zp/Y21Ga2IzSjhaVzU4/TUh4OE1IeDhmREE9"
                                     alt="Labrador Retriever with interactive hotspots"
-                                    class="rounded-lg object-cover shadow-lg" width="500" height="400" />
+                                    class="rounded-lg object-cover shadow-lg w-full h-auto max-w-md mx-auto" />
 
                                 <!-- Ears Hotspot -->
-                                <div class="absolute rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse group"
-                                    style="top: 200px; left: 70px; height: 2rem; width: 2rem;">
+                                <div class="absolute rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse group cursor-pointer"
+                                    style="top: 25%; left: 15%; height: 2rem; width: 2rem;">
                                     <span class="text-xs font-bold text-primary">Ears</span>
                                     <!-- Tooltip -->
                                     <div
-                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block bg-white border border-primary rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
+                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block md:group-hover:block bg-white border border-primary rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
                                         <span class="font-semibold text-primary">Fun Fact:</span>
                                         Labradors have floppy ears that help protect their inner ear from debris and water.
                                         Their keen hearing makes them excellent retrievers!
@@ -155,12 +155,12 @@
                                 </div>
 
                                 <!-- Tail Hotspot -->
-                                <div class="absolute rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse group"
-                                    style="top: 440px; left: 450px; height: 2rem; width: 2rem;">
+                                <div class="absolute rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse group cursor-pointer"
+                                    style="bottom: 10%; right: 15%; height: 2rem; width: 2rem;">
                                     <span class="text-xs font-bold text-primary">Tail</span>
                                     <!-- Tooltip -->
                                     <div
-                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block bg-white border border-primary rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
+                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block md:group-hover:block bg-white border border-primary rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
                                         <span class="font-semibold text-primary">Fun Fact:</span>
                                         A Labrador's "otter tail" is thick and strong, helping them swim efficiently. It
                                         acts like a rudder in the water!
@@ -168,11 +168,11 @@
                                 </div>
 
                                 <!-- Furr Hotspot -->
-                                <div class="absolute rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse group"
-                                    style="top: 420px; left: 300px; height: 2rem; width: 2rem;">
+                                <div class="absolute rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse group cursor-pointer"
+                                    style="bottom: 20%; right: 40%; height: 2rem; width: 2rem;">
                                     <span class="text-xs font-bold text-primary">Furr</span>
                                     <div
-                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block bg-white border border-primary rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
+                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block md:group-hover:block bg-white border border-primary rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
                                         <span class="font-semibold text-primary">Fun Fact:</span>
                                         Labrador Retrievers have a double coat that repels water and keeps them warm while
                                         swimming—even in cold weather!
@@ -180,11 +180,11 @@
                                 </div>
 
                                 <!-- Mouth Hotspot -->
-                                <div class="absolute rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse group"
-                                    style="top: 330px; left: 200px; height: 2rem; width: 2rem;">
+                                <div class="absolute rounded-full border-2 border-primary bg-white/80 flex items-center justify-center animate-pulse group cursor-pointer"
+                                    style="top: 50%; left: 30%; height: 2rem; width: 2rem;">
                                     <span class="text-xs font-bold text-primary">Mouth</span>
                                     <div
-                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block bg-white border border-primary rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
+                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block md:group-hover:block bg-white border border-primary rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
                                         <span class="font-semibold text-primary">Fun Fact:</span>
                                         Labradors have a "soft mouth," meaning they can carry objects gently without
                                         damaging them—a trait prized in retrieving!

@@ -24,7 +24,7 @@
 
     {{-- Main --}}
     <main class="flex-1">
-        <div class="container px-4 py-6 md:px-6 md:py-12">
+        <div class="container mx-auto px-4 py-6 md:px-6 md:py-12">
 
 
             <div class="grid gap-6 lg:grid-cols-2 lg:gap-12">
