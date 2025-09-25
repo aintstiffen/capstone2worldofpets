@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel as FilamentPanel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class Admin extends Authenticatable
+class Admin extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable;
 
@@ -42,5 +44,14 @@ class Admin extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Allow all admins to access any Filament panel for now.
+     * You can later add role/permission checks here.
+     */
+    public function canAccessPanel(FilamentPanel $panel): bool
+    {
+        return true;
     }
 }
