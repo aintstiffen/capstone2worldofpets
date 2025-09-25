@@ -23,8 +23,7 @@
         <script src="{{ asset('js/mobile-interactions.js') }}"></script>
         <script src="{{ asset('js/navigation.js') }}"></script>
         
-    @stack('styles')
-
+        @stack('styles')
     </head>
 
     <body class="font-sans antialiased bg-gray-50 text-gray-900">
@@ -34,7 +33,7 @@
         @yield('content')
         @include('footer.footer')
         
-    @stack('scripts')
+        @stack('scripts')
     </body>
 
     </html>
