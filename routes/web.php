@@ -9,6 +9,16 @@ Route::get('/', function () {
     return view('homepage');
 });
 
+// Health check route for Railway
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'OK',
+        'timestamp' => now(),
+        'environment' => app()->environment(),
+        'database' => 'connected'
+    ]);
+});
+
 // Test route for pet facts
 Route::get('/test-dog-facts', function () {
     return response()->file(public_path('dog-facts-test.html'));
