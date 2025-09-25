@@ -1,0 +1,5 @@
+worldofpets.bond {
+	root * /c/Users/stiffen/Herd/sites/petsofworld/public
+	php_fastcgi 127.0.0.1:9000
+	file_server
+}
