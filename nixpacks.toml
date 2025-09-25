@@ -27,4 +27,5 @@ cmds = [
 ]
 
 [start]
-cmd = "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
+# Ensure we explicitly use production environment and keep single foreground process (artisan serve)
+cmd = "export APP_ENV=production && php artisan migrate --force && php artisan config:cache && php artisan serve --host=0.0.0.0 --port=$PORT"
