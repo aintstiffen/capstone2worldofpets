@@ -131,4 +131,10 @@ class Pet extends Model
 
         return null;
     }
+    public function getImageUrl()
+{
+    return $this->image
+        ? Storage::disk('b2')->temporaryUrl($this->image, now()->addMinutes(30))
+        : null;
+}
 }
