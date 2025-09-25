@@ -125,8 +125,9 @@ class PetResource extends Resource
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->required()
-                    ->disk('public')
+                    ->disk('r2')
                     ->directory('pets')
+                    ->visibility('public')
                     ->maxSize(2048) // KB (2MB)
                     ->imagePreviewHeight('150')
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
@@ -134,7 +135,7 @@ class PetResource extends Resource
                     ->uploadProgressIndicatorPosition('left')
                     ->panelAspectRatio('4:3')
                     ->imageResizeMode('cover')
-                    ->helperText('Upload a clear, high-quality image. Maximum size: 2MB'),
+                    ->helperText('Stored in Cloudflare R2. Max size: 2MB'),
 
                 Forms\Components\Textarea::make('description')
                     ->required()
@@ -235,10 +236,10 @@ class PetResource extends Resource
             ->columns([
                 ImageColumn::make('image')
                 ->label('Photo')
-                ->disk('public') // Storage disk used
-                ->height(40)     // Thumbnail height
-                ->width(40)      // Thumbnail width
-                ->circular(),    // Optional: makes it round
+                ->disk('r2') // Cloudflare R2 storage disk
+                ->height(40)
+                ->width(40)
+                ->circular(),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category')->sortable(),
                 Tables\Columns\TextColumn::make('size')->sortable(),

@@ -59,6 +59,20 @@ return [
             'throw' => false,
             'report' => false,
         ],
+        // Cloudflare R2 (S3 compatible)
+        'r2' => [
+            'driver' => 's3',
+            'key' => env('R2_ACCESS_KEY_ID'),
+            'secret' => env('R2_SECRET_ACCESS_KEY'),
+            'region' => env('R2_REGION', 'auto'), // R2 uses 'auto'
+            'bucket' => env('R2_BUCKET'),
+            'endpoint' => env('R2_ENDPOINT'), // e.g. https://<accountid>.r2.cloudflarestorage.com
+            'use_path_style_endpoint' => true, // required for R2
+            'url' => env('R2_PUBLIC_URL'), // optional: custom domain / CDN mapped to the bucket
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
 
     ],
 
