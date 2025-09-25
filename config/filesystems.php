@@ -70,7 +70,7 @@ return [
             'use_path_style_endpoint' => true, // required for R2
             'url' => env('R2_PUBLIC_URL'), // optional: custom domain / CDN mapped to the bucket
             'visibility' => 'public',
-            'throw' => false,
+            'throw' => true, // set to true temporarily to see upload errors; set back to false in production
             'report' => false,
         ],
 
