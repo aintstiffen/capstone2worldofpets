@@ -237,7 +237,7 @@ class PetResource extends Resource
             ->columns([
                 ImageColumn::make('image')
                 ->label('Photo')
-                ->disk('r2') // Cloudflare R2 storage disk
+                ->disk('backblaze') // Backblaze B2 storage disk
                 ->height(40)
                 ->width(40)
                 ->circular(),

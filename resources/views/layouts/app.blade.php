@@ -24,6 +24,10 @@
         <script src="{{ asset('js/navigation.js') }}"></script>
         
         @stack('styles')
+        <!-- Inside <head> -->
+@livewireStyles
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
     </head>
 
     <body class="font-sans antialiased bg-gray-50 text-gray-900">
@@ -34,6 +38,8 @@
         @include('footer.footer')
         
         @stack('scripts')
+        <!-- Before </body> -->
+@livewireScripts
     </body>
 
     </html>

@@ -66,9 +66,11 @@ return [
             'secret' => env('BACKBLAZE_SECRET'),
             'region' => 'us-east-005',
             'bucket' => env('BACKBLAZE_BUCKET'),
-            'endpoint' => env('BACKBLAZE_ENDPOINT'),
-            'visibility' => 'private',
+            'endpoint' => env('BACKBLAZE_ENDPOINT'), // e.g. https://s3.us-east-005.backblazeb2.com
+            'visibility' => env('BACKBLAZE_VISIBILITY', 'private'),
             'use_path_style_endpoint' => true,
+            'throw' => true, // enable during debugging, set false later
+            'url' => env('BACKBLAZE_PUBLIC_URL'), // optional CDN / custom domain
         ],
 
     ],
