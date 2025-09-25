@@ -25,20 +25,32 @@ Route::get('/logout', function () {
 
 // Include authentication routes
 require __DIR__.'/auth.php';
-Route::get('/dogs', function () {
-    return view('dogs');
-})->name('dogs');
-Route::get('/cats', function () {
-    return view('cats');
-})->name('cats');
-Route::get('/assessment', [AssessmentController::class, 'index'])->name('assessment')->middleware(\App\Http\Middleware\CustomRedirectIfUnauthenticated::class);
-Route::post('/assessment/save', [AssessmentController::class, 'saveResults'])->name('assessment.save')->middleware('auth');
+
+// Pet routes
 Route::get('/dogs', [DogController::class, 'index'])->name('dogs');
 Route::get('/cats', [CatController::class, 'index'])->name('cats');
 Route::get('/dogs/{slug}', [DogController::class, 'show'])->name('dogs.show');
 Route::get('/cats/{slug}', [CatController::class, 'show'])->name('cats.show');
 
+// Assessment routes
+Route::get('/assessment', [AssessmentController::class, 'index'])->name('assessment')->middleware(\App\Http\Middleware\CustomRedirectIfUnauthenticated::class);
+Route::post('/assessment/save', [AssessmentController::class, 'saveResults'])->name('assessment.save')->middleware('auth');
+
 // Compare routes (Authentication required)
 Route::get('/compare', [\App\Http\Controllers\CompareController::class, 'index'])->name('compare')->middleware(\App\Http\Middleware\CustomRedirectIfUnauthenticated::class);
 Route::get('/compare/breeds/{type}', [\App\Http\Controllers\CompareController::class, 'getBreeds'])->name('compare.breeds')->middleware('auth');
 Route::post('/compare', [\App\Http\Controllers\CompareController::class, 'compare'])->name('compare.submit')->middleware('auth');
+
+// System information route
+Route::get('/system-info', function () {
+    return [
+        'admin_user_count' => \App\Models\Admin::count(),
+        'php_version' => phpversion(),
+        'laravel_version' => app()->version(),
+        'filament_version' => \Composer\InstalledVersions::getVersion('filament/filament'),
+        'environment' => app()->environment(),
+        'admin_panel_id' => config('filament.default_panel_id', 'admin'),
+        'cache_driver' => config('cache.default'),
+        'session_driver' => config('session.driver'),
+    ];
+});
