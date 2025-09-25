@@ -106,14 +106,15 @@ class Pet extends Model
             return $this->image;
         }
 
-        // Backblaze disk (S3 compatible). We named disk 'backblaze'.
-        if (Storage::disk('backblaze')->exists($this->image)) {
-            $endpoint = rtrim(config('filesystems.disks.backblaze.url') ?: config('filesystems.disks.backblaze.endpoint'), '/');
-            $bucket = config('filesystems.disks.backblaze.bucket');
-            // If disk visibility is private, caller should generate signed URL elsewhere; return path-style for now.
-            if (config('filesystems.disks.backblaze.url')) {
+        // Try R2 first, fallback to default/public
+        if (Storage::disk('r2')->exists($this->image)) {
+            $endpoint = rtrim(config('filesystems.disks.r2.url') ?: config('filesystems.disks.r2.endpoint'), '/');
+            $bucket = config('filesystems.disks.r2.bucket');
+            // If custom public URL provided we assume path-style already handled
+            if (config('filesystems.disks.r2.url')) {
                 return $endpoint . '/' . ltrim($this->image, '/');
             }
+            // Default path-style endpoint
             return $endpoint . '/' . $bucket . '/' . ltrim($this->image, '/');
         }
 
@@ -130,5 +131,4 @@ class Pet extends Model
 
         return null;
     }
-    // (Deprecated helper removed; use $pet->image_url)
 }

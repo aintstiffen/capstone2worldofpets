@@ -60,17 +60,18 @@ return [
             'report' => false,
         ],
         // Cloudflare R2 (S3 compatible)
-        'backblaze' => [
+        'r2' => [
             'driver' => 's3',
-            'key' => env('BACKBLAZE_KEY'),
-            'secret' => env('BACKBLAZE_SECRET'),
-            'region' => 'us-east-005',
-            'bucket' => env('BACKBLAZE_BUCKET'),
-            'endpoint' => env('BACKBLAZE_ENDPOINT'), // e.g. https://s3.us-east-005.backblazeb2.com
-            'visibility' => env('BACKBLAZE_VISIBILITY', 'private'),
-            'use_path_style_endpoint' => true,
-            'throw' => true, // enable during debugging, set false later
-            'url' => env('BACKBLAZE_PUBLIC_URL'), // optional CDN / custom domain
+            'key' => env('R2_ACCESS_KEY_ID'),
+            'secret' => env('R2_SECRET_ACCESS_KEY'),
+            'region' => env('R2_REGION', 'auto'), // R2 uses 'auto'
+            'bucket' => env('R2_BUCKET'),
+            'endpoint' => env('R2_ENDPOINT'), // e.g. https://<accountid>.r2.cloudflarestorage.com
+            'use_path_style_endpoint' => true, // required for R2
+            'url' => env('R2_PUBLIC_URL'), // optional: custom domain / CDN mapped to the bucket
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
         ],
 
     ],

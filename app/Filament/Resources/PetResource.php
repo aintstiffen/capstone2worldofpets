@@ -125,7 +125,7 @@ class PetResource extends Resource
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->required()
-                    ->disk('backblaze')
+                    ->disk('r2')
                     ->directory('pets')
                     ->visibility('public')
                     ->maxSize(2048) // KB (2MB)
@@ -135,7 +135,7 @@ class PetResource extends Resource
                     ->uploadProgressIndicatorPosition('left')
                     ->panelAspectRatio('4:3')
                     ->imageResizeMode('cover')
-                    ->helperText('Stored in Backblaze B2. Max size: 2MB'),
+                    ->helperText('Stored in Cloudflare R2. Max size: 2MB'),
 
 
                 Forms\Components\Textarea::make('description')
@@ -237,7 +237,7 @@ class PetResource extends Resource
             ->columns([
                 ImageColumn::make('image')
                 ->label('Photo')
-                ->disk('backblaze') // Backblaze B2 storage disk
+                ->disk('r2') // Cloudflare R2 storage disk
                 ->height(40)
                 ->width(40)
                 ->circular(),

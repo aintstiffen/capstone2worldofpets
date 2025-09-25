@@ -46,8 +46,22 @@ class Admin extends Authenticatable implements FilamentUser
             'password' => 'hashed',
         ];
     }
+    public function profilePhotoUrl(): ?string
+    {
+        if (! $this->profile_photo_path) {
+            return null;
+        }
 
- 
+        // Prefer R2 public base URL if configured, else fallback to endpoint + bucket
+        $base = config('filesystems.disks.r2.url');
+        if ($base) {
+            return rtrim($base, '/').'/'.ltrim($this->profile_photo_path, '/');
+        }
+        $endpoint = rtrim(config('filesystems.disks.r2.endpoint'), '/');
+        $bucket = config('filesystems.disks.r2.bucket');
+        return $endpoint.'/'.$bucket.'/'.$this->profile_photo_path;
+    }
+
     public function canAccessPanel(FilamentPanel $panel): bool
     {
         return true;
