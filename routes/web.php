@@ -15,7 +15,7 @@ Route::get('/health', function () {
         'status' => 'OK',
         'timestamp' => now(),
         'environment' => app()->environment(),
-        'database' => 'connected'
+        'database' => function() { try { \DB::connection()->getPdo(); return 'connected'; } catch (\Throwable $e) { return 'error: '.$e->getMessage(); } },
     ]);
 });
 
