@@ -125,29 +125,12 @@ class PetResource extends Resource
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->required()
-                    ->disk('public') // Use public disk for temporary uploads
-                    ->directory('livewire-tmp') // Explicitly use livewire-tmp directory
-                    ->maxSize(5120) // KB (5MB) - increased for better quality
+                    ->disk('public')
+                    ->directory('livewire-tmp')
+                    ->maxSize(5120)
                     ->imagePreviewHeight('200')
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
-                    ->loadingIndicatorPosition('left')
-                    ->uploadProgressIndicatorPosition('left')
-                    ->panelAspectRatio('4:3')
-                    ->imageResizeMode('cover')
-                    ->imageResizeTargetWidth('800')
-                    ->imageResizeTargetHeight('600')
-                    ->helperText('Upload a clear, high-quality image. Maximum size: 5MB')
-                    ->storeFileNamesIn('original_filename') // Store original filename for debugging
-                    ->live()
-                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                        // Log upload for debugging
-                        if ($state) {
-                            \Log::info('Image uploaded to temporary storage', [
-                                'file' => $state,
-                                'path' => storage_path('app/public/pet-images/' . $state)
-                            ]);
-                        }
-                    }),
+                    ->helperText('Upload a clear, high-quality image. Maximum size: 5MB'),
                 Forms\Components\View::make('filament.current-image-preview')
                     ->visible(fn ($record) => filled($record?->image))
                     ->label('Current Stored Image'),

@@ -68,5 +68,6 @@ class Kernel extends HttpKernel
         'custom.auth' => \App\Http\Middleware\CustomRedirectIfUnauthenticated::class,
         'filament.auth' => \Filament\Http\Middleware\Authenticate::class,
         'secure.upload' => \App\Http\Middleware\SecureFileUpload::class,
+        'debug.upload' => \App\Http\Middleware\DebugUpload::class,
     ];
 }
