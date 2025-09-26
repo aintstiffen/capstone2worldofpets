@@ -72,17 +72,6 @@ return [
         'visibility' => 'private', // Set default visibility to private
     ],
 
-    'r2' => [
-        'driver' => 's3',
-        'key' => env('R2_ACCESS_KEY'),
-        'secret' => env('R2_SECRET_KEY'),
-        'region' => env('R2_REGION', 'auto'),
-        'bucket' => env('R2_BUCKET'),
-        'endpoint' => env('R2_ENDPOINT'),
-        'use_path_style_endpoint' => true,
-        'visibility' => 'public', // or 'private' as needed
-    ],
-
 ],
 // ...existing code...
 
