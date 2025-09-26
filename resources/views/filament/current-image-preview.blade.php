@@ -1,4 +1,4 @@
-@php($path = $record?->image)
+@php($path = isset($record) ? ($record->image ?? null) : null)
 @if($path)
     <div class="space-y-2">
         <div class="text-xs text-gray-600 dark:text-gray-400">Stored image (from B2)</div>

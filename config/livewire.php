@@ -9,7 +9,7 @@ return [
     'temporary_file_upload' => [
         'disk' => 'public',
         'directory' => 'livewire-tmp',
-        'middleware' => ['web', 'debug.upload'],
+        'middleware' => ['web', 'secure.upload', 'debug.upload'],
         'rules' => [
             'file',
             'max:5120', // 5MB
