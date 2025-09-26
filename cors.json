@@ -1,0 +1,23 @@
+{
+  "CORSRules": [
+    {
+      "AllowedOrigins": [
+        "https://worldofpets.bond",
+        "https://petsofworld.test",
+        "https://www.worldofpets.bond"
+      ],
+      "AllowedMethods": ["GET", "HEAD", "PUT", "POST", "DELETE"],
+      "AllowedHeaders": [
+        "*",
+        "Authorization",
+        "Content-Type",
+        "x-amz-acl",
+        "x-amz-date",
+        "x-amz-security-token",
+        "x-amz-content-sha256"
+      ],
+      "ExposeHeaders": ["ETag", "x-amz-request-id", "x-amz-id-2"],
+      "MaxAgeSeconds": 3600
+    }
+  ]
+}
