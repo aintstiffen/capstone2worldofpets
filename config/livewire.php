@@ -5,17 +5,17 @@ return [
     'view_path' => resource_path('views/livewire'),
     'layout' => null,
 
-    // Temporary upload configuration for B2 Backblaze storage
     'temporary_file_upload' => [
-        'disk' => 'public',
+        'disk' => 'local',   // must be local
         'directory' => 'livewire-tmp',
-        'middleware' => ['web', 'secure.upload', 'debug.upload'],
+        'middleware' => ['web'], // remove custom middlewares unless you added them intentionally
         'rules' => [
             'file',
             'max:5120', // 5MB
             'mimes:jpeg,png,gif,webp',
         ],
     ],
+
 
     'features' => [
         // 'ignore_csrf' => env('LIVEWIRE_IGNORE_CSRF', false),
