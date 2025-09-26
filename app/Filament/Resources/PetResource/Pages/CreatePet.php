@@ -6,6 +6,7 @@ use App\Filament\Resources\PetResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CreatePet extends CreateRecord
 {
@@ -19,7 +20,7 @@ class CreatePet extends CreateRecord
             $publicDisk = Storage::disk('public');
             if ($publicDisk->exists($tempPath)) {
                 $filename = basename($tempPath);
-                $finalPath = 'image/' . $filename; // destination path in B2
+                $finalPath = 'image/' . Str::uuid() . '-' . $filename; // destination path in B2 with uuid prefix
                 $stream = $publicDisk->readStream($tempPath);
                 if ($stream) {
                     Storage::disk('b2')->put($finalPath, stream_get_contents($stream), [

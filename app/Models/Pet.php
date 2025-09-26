@@ -67,6 +67,18 @@ class Pet extends Model
                 $breed->fun_facts = self::validateUniqueFeatures($breed->fun_facts);
             }
         });
+
+        static::deleting(function ($breed) {
+            // Remove associated image from B2 when deleting record
+            if (!empty($breed->image)) {
+                try {
+                    \Illuminate\Support\Facades\Storage::disk('b2')->delete($breed->image);
+                } catch (\Throwable $e) {
+                    // Swallow errors; optionally log
+                    \Log::warning('Failed deleting B2 image for pet ID '.$breed->id.': '.$e->getMessage());
+                }
+            }
+        });
     }
     
     /**
