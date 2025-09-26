@@ -78,3 +78,8 @@ Route::get('/b2/image/{path}', function (string $path) {
         ->header('Content-Type', $mime)
         ->header('Cache-Control', 'public, max-age=300');
 })->where('path', '.*')->name('b2.image');
+
+// Fallback: prevent noisy exception when bots or accidental GET hit Livewire's POST-only upload route
+Route::get('livewire/upload-file', function () {
+    return response()->json(['message' => 'Not found'], 404);
+});

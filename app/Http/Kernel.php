@@ -67,5 +67,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'custom.auth' => \App\Http\Middleware\CustomRedirectIfUnauthenticated::class,
         'filament.auth' => \Filament\Http\Middleware\Authenticate::class,
+        'secure.upload' => \App\Http\Middleware\SecureFileUpload::class,
     ];
 }
