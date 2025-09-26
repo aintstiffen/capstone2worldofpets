@@ -132,7 +132,7 @@ class PetResource extends Resource
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
                     ->helperText('Upload a clear, high-quality image. Maximum size: 5MB'),
                 Forms\Components\View::make('filament.current-image-preview')
-                    ->visible(fn ($record) => filled($record?->image))
+                    ->visible(fn ($record = null) => $record && filled($record?->image))
                     ->label('Current Stored Image'),
 
                 Forms\Components\Textarea::make('description')
