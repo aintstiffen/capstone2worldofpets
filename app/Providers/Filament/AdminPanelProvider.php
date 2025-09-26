@@ -29,7 +29,8 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->authGuard('admin')
             ->brandName('World of Pets Admin')
-            ->favicon(asset('favicon.ico'))
+            // Ensure favicon uses correct scheme (prevent mixed content in https environments)
+            ->favicon(str_replace('http://', 'https://', asset('favicon.ico')))
             ->colors([
                 'primary' => Color::Amber,
             ])

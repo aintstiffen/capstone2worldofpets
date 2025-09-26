@@ -15,8 +15,8 @@ class CreatePet extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // If an image was uploaded to the public disk, transfer it to B2
-        if (!empty($data['image'])) {
-            $tempPath = $data['image']; // e.g. tmp-pets/filename.jpg
+        if (!empty($data['image']) && is_string($data['image']) && str_starts_with($data['image'], 'livewire-tmp/')) {
+            $tempPath = $data['image']; // e.g. livewire-tmp/filename.jpg
             $publicDisk = Storage::disk('public');
             if ($publicDisk->exists($tempPath)) {
                 $filename = basename($tempPath);
