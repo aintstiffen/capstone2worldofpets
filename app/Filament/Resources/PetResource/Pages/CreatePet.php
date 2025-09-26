@@ -5,8 +5,35 @@ namespace App\Filament\Resources\PetResource\Pages;
 use App\Filament\Resources\PetResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Facades\Storage;
 
 class CreatePet extends CreateRecord
 {
     protected static string $resource = PetResource::class;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        // If an image was uploaded to the public disk, transfer it to B2
+        if (!empty($data['image'])) {
+            $tempPath = $data['image']; // e.g. tmp-pets/filename.jpg
+            $publicDisk = Storage::disk('public');
+            if ($publicDisk->exists($tempPath)) {
+                $filename = basename($tempPath);
+                $finalPath = 'image/' . $filename; // destination path in B2
+                $stream = $publicDisk->readStream($tempPath);
+                if ($stream) {
+                    Storage::disk('b2')->put($finalPath, stream_get_contents($stream), [
+                        'visibility' => 'private',
+                    ]);
+                    if (is_resource($stream)) {
+                        fclose($stream);
+                    }
+                    // Optionally delete local temp file
+                    $publicDisk->delete($tempPath);
+                    $data['image'] = $finalPath;
+                }
+            }
+        }
+        return $data;
+    }
 }

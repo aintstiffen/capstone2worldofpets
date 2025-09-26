@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DogController;
 use App\Http\Controllers\CatController;
 use App\Http\Controllers\AssessmentController;
+use Illuminate\Support\Facades\Storage;
 
 Route::get('/', function () {
     return view('homepage');
@@ -64,3 +65,16 @@ Route::get('/system-info', function () {
         'session_driver' => config('session.driver'),
     ];
 });
+
+// Proxy route to serve private B2 images (avoids browser-side CORS with presigned URLs in UI tables)
+Route::get('/b2/image/{path}', function (string $path) {
+    $disk = Storage::disk('b2');
+    $fullPath = request()->route('path');
+    if (! $disk->exists($fullPath)) {
+        abort(404);
+    }
+    $mime = Storage::mimeType($fullPath) ?? 'application/octet-stream';
+    return response($disk->get($fullPath), 200)
+        ->header('Content-Type', $mime)
+        ->header('Cache-Control', 'public, max-age=300');
+})->where('path', '.*')->name('b2.image');

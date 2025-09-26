@@ -125,9 +125,9 @@ class PetResource extends Resource
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->required()
-                    // Store images on Backblaze B2 (previously r2)
-                    ->disk('b2')
-                    ->directory('image')
+                    // First store locally to avoid presigned S3 credential issues; moved to B2 on save
+                    ->disk('public')
+                    ->directory('tmp-pets')
                     ->maxSize(2048) // KB (2MB)
                     ->imagePreviewHeight('150')
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
@@ -238,8 +238,9 @@ class PetResource extends Resource
                 ImageColumn::make('image')
                 ->label('Photo')
                 ->getStateUsing(fn ($record) => $record->image)
+                // Use internal proxy route to avoid CORS issues with private B2 objects
                 ->url(fn ($record) => is_string($record->image) && $record->image !== ''
-                    ? \Illuminate\Support\Facades\Storage::disk('b2')->temporaryUrl($record->image, now()->addMinutes(30))
+                    ? route('b2.image', ['path' => $record->image])
                     : null)
                 ->height(40)
                 ->width(40)

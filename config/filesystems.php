@@ -65,9 +65,18 @@ return [
         'driver' => 's3',
         'key' => env('B2_ACCESS_KEY'),
         'secret' => env('B2_SECRET_KEY'),
-        'region' => 'auto',
+        // Backblaze B2 S3 compatible region. Allow override; default to us-east-005.
+        'region' => env('B2_REGION', 'us-east-005'),
         'bucket' => env('B2_BUCKET'),
-        'endpoint' => env('B2_ENDPOINT'),
+        // Ensure endpoint has a scheme; the AWS client requires a full URI. If user sets
+        // B2_ENDPOINT without http(s) (e.g. s3.us-east-005.backblazeb2.com) we prefix https://
+        'endpoint' => (function () {
+            $endpoint = env('B2_ENDPOINT');
+            if ($endpoint && ! str_starts_with($endpoint, 'http://') && ! str_starts_with($endpoint, 'https://')) {
+                $endpoint = 'https://' . $endpoint;
+            }
+            return $endpoint;
+        })(),
         'use_path_style_endpoint' => true,
         'visibility' => 'private', // Set default visibility to private
     ],
