@@ -73,8 +73,10 @@ Route::get('/b2/image/{path}', function (string $path) {
     if (! $disk->exists($fullPath)) {
         abort(404);
     }
-    $mime = Storage::mimeType($fullPath) ?? 'application/octet-stream';
-    return response($disk->get($fullPath), 200)
+    $contents = $disk->get($fullPath);
+    $finfo = function_exists('finfo_buffer') ? new \finfo(FILEINFO_MIME_TYPE) : null;
+    $mime = $finfo ? ($finfo->buffer($contents) ?: 'application/octet-stream') : 'application/octet-stream';
+    return response($contents, 200)
         ->header('Content-Type', $mime)
         ->header('Cache-Control', 'public, max-age=300');
 })->where('path', '.*')->name('b2.image');
