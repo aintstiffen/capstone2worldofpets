@@ -136,7 +136,6 @@ class PetResource extends Resource
                     ->imageResizeMode('cover')
                     ->imageResizeTargetWidth('800')
                     ->imageResizeTargetHeight('600')
-                    ->optimize('webp')
                     ->helperText('Upload a clear, high-quality image. Maximum size: 5MB')
                     ->storeFileNamesIn('original_filename') // Store original filename for debugging
                     ->live()
