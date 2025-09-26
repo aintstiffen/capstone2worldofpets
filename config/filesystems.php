@@ -60,6 +60,17 @@ return [
             'report' => false,
         ],
 
+        'b2' => [
+        'driver' => 's3',
+        'key' => env('B2_ACCESS_KEY'),
+        'secret' => env('B2_SECRET_KEY'),
+        'region' => 'auto',
+        'bucket' => env('B2_BUCKET'),
+        'endpoint' => env('B2_ENDPOINT'),
+        'use_path_style_endpoint' => true,
+        'visibility' => 'private', // Set default visibility to private
+    ],
+
     ],
 
     /*

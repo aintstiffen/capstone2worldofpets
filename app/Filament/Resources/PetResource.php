@@ -125,8 +125,8 @@ class PetResource extends Resource
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->required()
-                    ->disk('public')
-                    ->directory('pets')
+                    ->disk('r2')
+                    ->directory('image')
                     ->maxSize(2048) // KB (2MB)
                     ->imagePreviewHeight('150')
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
@@ -134,6 +134,7 @@ class PetResource extends Resource
                     ->uploadProgressIndicatorPosition('left')
                     ->panelAspectRatio('4:3')
                     ->imageResizeMode('cover')
+                    ->visibility('private')
                     ->helperText('Upload a clear, high-quality image. Maximum size: 2MB'),
 
                 Forms\Components\Textarea::make('description')
