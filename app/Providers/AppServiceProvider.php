@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\FilesystemAdapter;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,8 +24,15 @@ class AppServiceProvider extends ServiceProvider
         if(config('app.env') === 'production') {
             \URL::forceScheme('https');
         }
-        Storage::disk('b2')->buildTemporaryUrlsUsing(function ($path, $expiration, $options) {
-            return Storage::disk('b2')->temporaryUrl($path, $expiration, $options);
-        });
+        /** @var FilesystemAdapter $disk */
+        $disk = Storage::disk('b2');
+
+        // Only register if the adapter supports the builder method
+        if (method_exists($disk, 'buildTemporaryUrlsUsing')) {
+            $disk->buildTemporaryUrlsUsing(function (string $path, $expiration, array $options = []) use ($disk) {
+                // Use the same disk instance to generate the temporary URL
+                return $disk->temporaryUrl($path, $expiration, $options);
+            });
+        }
     }
 }
