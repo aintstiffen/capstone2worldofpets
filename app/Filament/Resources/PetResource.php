@@ -125,9 +125,9 @@ class PetResource extends Resource
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->required()
-                    // First store locally to avoid presigned S3 credential issues; moved to B2 on save
+                    // Temp local storage (public) then moved to B2 on save. Do NOT mark private here or the preview URL breaks.
                     ->disk('public')
-                    ->directory('tmp-pets')
+                    ->directory('livewire-tmp')
                     ->maxSize(2048) // KB (2MB)
                     ->imagePreviewHeight('150')
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
@@ -135,8 +135,10 @@ class PetResource extends Resource
                     ->uploadProgressIndicatorPosition('left')
                     ->panelAspectRatio('4:3')
                     ->imageResizeMode('cover')
-                    ->visibility('private')
                     ->helperText('Upload a clear, high-quality image. Maximum size: 2MB'),
+                Forms\Components\View::make('filament.current-image-preview')
+                    ->visible(fn ($record) => filled($record?->image))
+                    ->label('Current Stored Image'),
 
                 Forms\Components\Textarea::make('description')
                     ->required()
