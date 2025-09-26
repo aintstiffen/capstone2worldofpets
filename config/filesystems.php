@@ -61,32 +61,17 @@ return [
         'report' => false,
     ],
 
-    'b2' => [
+        'b2' => [
         'driver' => 's3',
         'key' => env('B2_ACCESS_KEY'),
         'secret' => env('B2_SECRET_KEY'),
-        // Backblaze B2 S3 compatible region. Allow override; default to us-east-005.
         'region' => env('B2_REGION', 'us-east-005'),
         'bucket' => env('B2_BUCKET'),
-        // Ensure endpoint is a fully-qualified URI understood by the AWS SDK.
-        'endpoint' => value(function () {
-            $endpoint = env('B2_ENDPOINT');
-
-            if (empty($endpoint)) {
-                return null;
-            }
-
-            $endpoint = trim($endpoint);
-
-            if (! preg_match('/^https?:\/\//i', $endpoint)) {
-                $endpoint = 'https://' . ltrim($endpoint, '/');
-            }
-
-            return rtrim($endpoint, '/');
-        }),
+        'endpoint' => env('B2_ENDPOINT', 'https://s3.us-east-005.backblazeb2.com'),
         'use_path_style_endpoint' => true,
-        'visibility' => 'private', // Set default visibility to private
+        'visibility' => 'private',
     ],
+
 
 ],
 // ...existing code...

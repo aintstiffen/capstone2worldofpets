@@ -5,6 +5,7 @@ use App\Http\Controllers\DogController;
 use App\Http\Controllers\CatController;
 use App\Http\Controllers\AssessmentController;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\PrivateFileController;
 
 Route::get('/', function () {
     return view('homepage');
@@ -152,3 +153,8 @@ Route::get('/test-livewire-upload', function () {
 Route::get('livewire/upload-file', function () {
     return response()->json(['message' => 'Not found'], 404);
 });
+
+
+Route::get('/uploads/{path}', [PrivateFileController::class, 'show'])
+    ->where('path', '.*')
+    ->name('uploads.show');

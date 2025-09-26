@@ -122,18 +122,17 @@ class PetResource extends Resource
 
                 Forms\Components\TagsInput::make('colors'),
 
-                Forms\Components\FileUpload::make('image')
-                    ->image()
-                    ->required()
-                    ->disk('b2')
-                    ->directory('livewire-tmp')
-                    ->maxSize(5120)
-                    ->imagePreviewHeight('200')
-                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
-                    ->helperText('Upload a clear, high-quality image. Maximum size: 5MB'),
-                Forms\Components\View::make('filament.current-image-preview')
-                    ->visible(fn ($record = null) => $record && filled($record?->image))
-                    ->label('Current Stored Image'),
+                // inside PetResource::form(...)
+            Forms\Components\FileUpload::make('image')
+                ->image()
+                ->required()
+                ->disk('b2')               // -> store directly on Backblaze B2
+                ->directory('pets')        // -> stored path will be like "pets/filename.jpg"
+                ->visibility('private')    // optional: explicitly mark private
+                ->maxSize(5120)
+                ->imagePreviewHeight('200')
+                ->acceptedFileTypes(['image/jpeg','image/png','image/gif','image/webp'])
+                ->helperText('Upload a clear image. Max 5MB'),
 
                 Forms\Components\Textarea::make('description')
                     ->required()
@@ -232,16 +231,14 @@ class PetResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('image')
-                ->label('Photo')
-                ->getStateUsing(fn ($record) => $record->image)
-                // Use internal proxy route to avoid CORS issues with private B2 objects
-                ->url(fn ($record) => is_string($record->image) && $record->image !== ''
-                    ? route('b2.image', ['path' => $record->image])
-                    : null)
-                ->height(40)
-                ->width(40)
-                ->circular(),
+            Tables\Columns\ImageColumn::make('image')
+            ->label('Image')
+            ->circular()
+            ->defaultImageUrl('/placeholder.svg?height=200&width=200')
+            ->url(fn ($record) =>
+                $record->image ? url('/uploads/' . $record->image) : null
+            )
+            ->extraImgAttributes(['loading' => 'lazy']),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category')->sortable(),
                 Tables\Columns\TextColumn::make('size')->sortable(),
