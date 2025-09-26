@@ -125,7 +125,7 @@ class PetResource extends Resource
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->required()
-                    ->disk('public')
+                    ->disk('b2')
                     ->directory('livewire-tmp')
                     ->maxSize(5120)
                     ->imagePreviewHeight('200')
