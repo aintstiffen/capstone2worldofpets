@@ -5,9 +5,9 @@ return [
     'view_path' => resource_path('views/livewire'),
     'layout' => null,
 
-    // Production-ready temporary file upload configuration
+    // Temporary upload configuration for B2 Backblaze storage
     'temporary_file_upload' => [
-        'disk' => env('LIVEWIRE_TMP_DISK', 'local'), // Use 'local' for better security in production
+        'disk' => 'public', // Use public disk for temporary uploads, then move to B2
         'directory' => 'livewire-tmp',
         'middleware' => ['web', 'filament.auth', 'secure.upload'],
         'preview_mimes' => [

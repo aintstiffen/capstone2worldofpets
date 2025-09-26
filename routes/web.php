@@ -79,6 +79,73 @@ Route::get('/b2/image/{path}', function (string $path) {
         ->header('Cache-Control', 'public, max-age=300');
 })->where('path', '.*')->name('b2.image');
 
+// Test routes for debugging B2 storage issues
+Route::get('/test-b2', function () {
+    try {
+        $b2Disk = Storage::disk('b2');
+        
+        // Test writing a simple file
+        $testContent = 'Test file content - ' . now();
+        $testPath = 'test/test-' . time() . '.txt';
+        
+        $writeSuccess = $b2Disk->put($testPath, $testContent);
+        
+        if ($writeSuccess) {
+            // Try to read it back
+            $readContent = $b2Disk->get($testPath);
+            
+            if ($readContent === $testContent) {
+                // Clean up test file
+                $b2Disk->delete($testPath);
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'B2 storage is working correctly',
+                    'test_path' => $testPath
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Could read from B2 but content mismatch',
+                    'expected' => $testContent,
+                    'actual' => $readContent
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to write to B2 storage'
+            ], 500);
+        }
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'B2 connection error: ' . $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
+Route::get('/test-livewire-upload', function () {
+    try {
+        // Test the public disk where Livewire temporarily stores files
+        $publicDisk = Storage::disk('public');
+        
+        return response()->json([
+            'status' => 'success',
+            'livewire_tmp_exists' => $publicDisk->exists('livewire-tmp'),
+            'livewire_tmp_files' => $publicDisk->allFiles('livewire-tmp'),
+            'public_disk_root' => $publicDisk->path(''),
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Livewire temp disk error: ' . $e->getMessage()
+        ], 500);
+    }
+});
+
 // Fallback: prevent noisy exception when bots or accidental GET hit Livewire's POST-only upload route
 Route::get('livewire/upload-file', function () {
     return response()->json(['message' => 'Not found'], 404);
