@@ -236,12 +236,14 @@ class PetResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('image')
-                    ->label('Photo')
-                    ->getStateUsing(fn ($record) => $record->image)
-                    ->url(fn ($record) => \Illuminate\Support\Facades\Storage::disk('b2')->temporaryUrl($record->image, now()->addMinutes(30)))
-                    ->height(40)
-                    ->width(40)
-                    ->circular(),
+                ->label('Photo')
+                ->getStateUsing(fn ($record) => $record->image)
+                ->url(fn ($record) => is_string($record->image) && $record->image !== ''
+                    ? \Illuminate\Support\Facades\Storage::disk('b2')->temporaryUrl($record->image, now()->addMinutes(30))
+                    : null)
+                ->height(40)
+                ->width(40)
+                ->circular(),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category')->sortable(),
                 Tables\Columns\TextColumn::make('size')->sortable(),
