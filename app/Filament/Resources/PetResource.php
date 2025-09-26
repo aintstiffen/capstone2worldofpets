@@ -125,7 +125,8 @@ class PetResource extends Resource
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->required()
-                    ->disk('r2')
+                    // Store images on Backblaze B2 (previously r2)
+                    ->disk('b2')
                     ->directory('image')
                     ->maxSize(2048) // KB (2MB)
                     ->imagePreviewHeight('150')
@@ -235,11 +236,12 @@ class PetResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('image')
-                ->label('Photo')
-                ->disk('public') // Storage disk used
-                ->height(40)     // Thumbnail height
-                ->width(40)      // Thumbnail width
-                ->circular(),    // Optional: makes it round
+                    ->label('Photo')
+                    ->getStateUsing(fn ($record) => $record->image)
+                    ->url(fn ($record) => \Illuminate\Support\Facades\Storage::disk('b2')->temporaryUrl($record->image, now()->addMinutes(30)))
+                    ->height(40)
+                    ->width(40)
+                    ->circular(),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category')->sortable(),
                 Tables\Columns\TextColumn::make('size')->sortable(),
