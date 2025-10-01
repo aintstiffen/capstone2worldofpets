@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Storage;
+
 class Pet extends Model
 {
     use HasFactory;
@@ -31,6 +33,17 @@ class Pet extends Model
         'hotspots' => 'array',
         'fun_facts' => 'array',
     ];
+
+    // Add accessor for image URL
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return null;
+        }
+        
+        // Use AWS_URL environment variable to build the URL
+        return env('AWS_URL') . '/' . $this->image;
+    }
 
     // auto-generate slug if not provided
     protected static function booted()
@@ -69,13 +82,14 @@ class Pet extends Model
         });
 
         static::deleting(function ($breed) {
-            // Remove associated image from B2 when deleting record
+            // Remove associated image from S3 when deleting record
             if (!empty($breed->image)) {
                 try {
-                    \Illuminate\Support\Facades\Storage::disk('b2')->delete($breed->image);
+                    // Changed from 'b2' to 's3'
+                    \Illuminate\Support\Facades\Storage::disk('s3')->delete($breed->image);
                 } catch (\Throwable $e) {
                     // Swallow errors; optionally log
-                    \Log::warning('Failed deleting B2 image for pet ID '.$breed->id.': '.$e->getMessage());
+                    \Log::warning('Failed deleting S3 image for pet ID '.$breed->id.': '.$e->getMessage());
                 }
             }
         });

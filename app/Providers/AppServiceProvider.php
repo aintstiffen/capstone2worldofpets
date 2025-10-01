@@ -28,52 +28,74 @@ class AppServiceProvider extends ServiceProvider
         // Configure Livewire file uploads to use proper authentication
         $this->configureLivewireUploads();
         
-        /** @var FilesystemAdapter $disk */
-        $disk = Storage::disk('b2');
-
-        // Only register if the adapter supports the builder method
-        if (method_exists($disk, 'buildTemporaryUrlsUsing')) {
-            $disk->buildTemporaryUrlsUsing(function (string $path, $expiration, array $options = []) use ($disk) {
-                // Use the same disk instance to generate the temporary URL
-                return $disk->temporaryUrl($path, $expiration, $options);
-            });
-        }
+        // Configure S3 storage
+        $this->configureS3Storage();
     }
 
     /**
-     * Configure Livewire file uploads to work with B2 storage.
+     * Configure Livewire file uploads to use proper authentication.
      */
     private function configureLivewireUploads(): void
     {
-        // For B2 storage, we need local temp storage for Livewire uploads
-        // The final files will be moved to B2 by Filament after processing
-        $tempDisk = Storage::disk('public'); // Always use local public disk for temp
+        // Ensure the temporary upload directory exists
+        $disk = Storage::disk(config('livewire.temporary_file_upload.disk'));
         $directory = config('livewire.temporary_file_upload.directory');
         
-        if (!$tempDisk->exists($directory)) {
+        if (!$disk->exists($directory)) {
             try {
-                $tempDisk->makeDirectory($directory);
+                $disk->makeDirectory($directory);
                 
-                // Add security files to prevent direct access
-                $tempDisk->put($directory . '/.htaccess', 
+                // Add security file to prevent direct access
+                $disk->put($directory . '/.htaccess', 
                     "Order Deny,Allow\nDeny from all\nAllow from 127.0.0.1"
                 );
                 
                 // Add index.php to prevent directory listing
-                $tempDisk->put($directory . '/index.php', '<?php // Silence is golden');
+                $disk->put($directory . '/index.php', '<?php // Silence is golden');
                 
             } catch (\Exception $e) {
                 \Log::error('Failed to create Livewire upload directory: ' . $e->getMessage());
             }
         }
+    }
+    
+    /**
+     * Configure S3 storage adapter with improved URL generation
+     */
+    private function configureS3Storage(): void
+    {
+        // Extend S3 driver to add a url() method if needed
+        Storage::extend('s3', function ($app, $config) {
+            $client = new \Aws\S3\S3Client([
+                'credentials' => [
+                    'key'    => $config['key'],
+                    'secret' => $config['secret'],
+                ],
+                'region' => $config['region'],
+                'version' => 'latest',
+                'endpoint' => $config['endpoint'] ?? null,
+                'use_path_style_endpoint' => $config['use_path_style_endpoint'] ?? false,
+            ]);
+
+            $adapter = new \League\Flysystem\AwsS3V3\AwsS3V3Adapter(
+                $client, 
+                $config['bucket'],
+                $config['root'] ?? '',
+                $config['options'] ?? []
+            );
+
+            return new \Illuminate\Filesystem\FilesystemAdapter(
+                new \League\Flysystem\Filesystem($adapter, $config),
+                $adapter,
+                $config
+            );
+        });
         
-        // Ensure B2 disk is properly configured
-        try {
-            $b2Disk = Storage::disk('b2');
-            // Test B2 connection (optional - comment out in production if causing issues)
-            // $b2Disk->exists('test-connection');
-        } catch (\Exception $e) {
-            \Log::error('B2 storage configuration error: ' . $e->getMessage());
-        }
+        // Log S3 configuration
+        \Log::info('S3 storage configured', [
+            'bucket' => config('filesystems.disks.s3.bucket'),
+            'region' => config('filesystems.disks.s3.region'),
+            'url' => config('filesystems.disks.s3.url'),
+        ]);
     }
 }

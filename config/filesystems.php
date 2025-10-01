@@ -57,21 +57,9 @@ return [
         'url' => env('AWS_URL'),
         'endpoint' => env('AWS_ENDPOINT'),
         'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-        'throw' => false,
-        'report' => false,
+        'throw' => true, // Make S3 operations throw exceptions for better error reporting
+        // Removed visibility setting since bucket has ACLs disabled
     ],
-
-        'b2' => [
-        'driver' => 's3',
-        'key' => env('B2_ACCESS_KEY'),
-        'secret' => env('B2_SECRET_KEY'),
-        'region' => env('B2_REGION', 'us-east-005'),
-        'bucket' => env('B2_BUCKET'),
-        'endpoint' => env('B2_ENDPOINT', 'https://s3.us-east-005.backblazeb2.com'),
-        'use_path_style_endpoint' => true,
-        'visibility' => 'private',
-    ],
-
 
 ],
 // ...existing code...

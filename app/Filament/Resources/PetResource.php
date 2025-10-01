@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 use Filament\Tables\Columns\ImageColumn;
+use Illuminate\Support\Facades\Storage;
 
 class PetResource extends Resource
 {
@@ -123,17 +124,30 @@ class PetResource extends Resource
                 Forms\Components\TagsInput::make('colors'),
 
                 // inside PetResource::form(...)
-            Forms\Components\FileUpload::make('image')
-                ->image()
-                ->required()
-                ->disk('b2')               // -> store directly on Backblaze B2
-                ->directory('pets')        // -> stored path will be like "pets/filename.jpg"
-                ->visibility('private')    // optional: explicitly mark private
-                ->maxSize(5120)
-                ->imagePreviewHeight('200')
-                ->acceptedFileTypes(['image/jpeg','image/png','image/gif','image/webp'])
-                ->helperText('Upload a clear image. Max 5MB'),
-
+                \App\Filament\Components\FileUpload::make('image')
+                    ->disk('s3')
+                    ->directory('pets')
+                    // Using our custom component with no visibility/ACL settings
+                    ->image()
+                    ->maxSize(1024)
+                    ->preserveFilenames() // Keep original filenames
+                    ->required()
+                    // Enhanced debugging
+                    ->afterStateUpdated(function ($state, $set) {
+                        \Log::info('FileUpload state updated', ['state' => $state]);
+                        if (!empty($state)) {
+                            try {
+                                // Verify the file exists on S3
+                                $exists = \Illuminate\Support\Facades\Storage::disk('s3')->exists($state);
+                                \Log::info('File on S3: ' . ($exists ? 'EXISTS' : 'MISSING'), [
+                                    'path' => $state,
+                                    'aws_url' => env('AWS_URL') . '/' . $state,
+                                ]);
+                            } catch (\Exception $e) {
+                                \Log::error('S3 file check failed: ' . $e->getMessage());
+                            }
+                        }
+                    }),
                 Forms\Components\Textarea::make('description')
                     ->required()
                     ->minLength(50)
@@ -231,14 +245,18 @@ class PetResource extends Resource
     {
         return $table
             ->columns([
-            Tables\Columns\ImageColumn::make('image')
-            ->label('Image')
-            ->circular()
-            ->defaultImageUrl('/placeholder.svg?height=200&width=200')
-            ->url(fn ($record) =>
-                $record->image ? url('/uploads/' . $record->image) : null
-            )
-            ->extraImgAttributes(['loading' => 'lazy']),
+            // In the table() method:
+                Tables\Columns\ImageColumn::make('image')
+                ->label('Image')
+                ->circular()
+                ->defaultImageUrl('/placeholder.svg?height=200&width=200')
+                // Use this approach to generate the full S3 URL:
+                ->getStateUsing(function ($record) {
+                    if (!$record->image) return null;
+                    // Use the AWS_URL from environment
+                    return env('AWS_URL') . '/' . $record->image;
+                })
+                ->extraImgAttributes(['loading' => 'lazy']),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category')->sortable(),
                 Tables\Columns\TextColumn::make('size')->sortable(),
@@ -277,4 +295,5 @@ class PetResource extends Resource
             'edit' => Pages\EditPet::route('/{record}/edit'),
         ];
     }
+    
 }
