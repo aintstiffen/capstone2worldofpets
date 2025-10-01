@@ -1,0 +1,246 @@
+@extends('layouts.app')
+
+@push('styles')
+<style>
+    .tooltip-hotspot {
+        transition: all 0.2s ease;
+    }
+    .tooltip-content {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.6; }
+        50% { transform: scale(1.05); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 0.6; }
+    }
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+</style>
+@endpush
+
+@section('content')
+
+
+    {{-- Main --}}
+    <main class="flex-1">
+        <div class="container mx-auto px-4 py-6 md:px-6 md:py-12">
+
+
+            <div class="grid gap-6 lg:grid-cols-2 lg:gap-12">
+                {{-- Left: Image & Info Cards --}}
+                <div class="space-y-4">
+                    <div class="relative" x-data="{ activeTooltip: null, showAllHotspots: false }">
+                        <div class="aspect-square rounded-lg overflow-hidden bg-gray-100">
+                            <img src="{{ $pet->image ? asset('storage/' . $pet->image) : '/placeholder.svg?height=600&width=600' }}"
+                                 alt="{{ $pet->name }}"
+                                 class="object-cover w-full h-full"
+                                 @mouseenter="showAllHotspots = true"
+                                 @mouseleave="showAllHotspots = false">
+                                 
+                            <!-- Interactive Tooltips -->
+                            <div class="absolute inset-0">
+                                @php
+                                    // Default feature colors
+                                    $featureColors = [
+                                        'ears' => 'blue',
+                                        'eyes' => 'green',
+                                        'tail' => 'amber',
+                                        'paws' => 'purple',
+                                        'nose' => 'pink',
+                                        'coat' => 'orange'
+                                    ];
+                                    
+                                    // Default hotspots if none are defined in the database
+                                    $defaultHotspots = [
+                                        ['feature' => 'ears', 'position_x' => 50, 'position_y' => 15, 'width' => 64, 'height' => 40],
+                                        ['feature' => 'eyes', 'position_x' => 50, 'position_y' => 30, 'width' => 64, 'height' => 32],
+                                        ['feature' => 'tail', 'position_x' => 85, 'position_y' => 70, 'width' => 40, 'height' => 48],
+                                        ['feature' => 'paws', 'position_x' => 30, 'position_y' => 85, 'width' => 32, 'height' => 32]
+                                    ];
+                                    
+                                    // Use the hotspots from the database if available, otherwise use defaults
+                                    $hotspots = $pet->hotspots ?? $defaultHotspots;
+                                    
+                                    // Get fun facts from database or use defaults
+                                    $funFacts = $pet->fun_facts ?? [];
+                                @endphp
+
+                                @foreach($hotspots as $hotspot)
+                                @php
+                                    $feature = $hotspot['feature'];
+                                    $color = $featureColors[$feature] ?? 'gray';
+                                    
+                                    // Find matching fact if it exists in the database
+                                    $fact = null;
+                                    if(!empty($funFacts)) {
+                                        foreach($funFacts as $funFact) {
+                                            if(isset($funFact['feature']) && $funFact['feature'] === $feature) {
+                                                $fact = $funFact['fact'];
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Default facts if none are provided in the database
+                                    if(!$fact) {
+                                        $defaultFacts = [
+                                            'ears' => [
+                                                'Golden Retriever' => 'Their floppy ears help protect the ear canal from water and debris.',
+                                                'German Shepherd' => 'Their erect ears can rotate independently to locate sounds with precision.',
+                                                'default' => 'The ear shape is perfectly designed for their natural environment.'
+                                            ],
+                                            'eyes' => [
+                                                'Labrador Retriever' => 'Their eyes may sometimes appear red due to a reflective layer that helps them see better in dim light.',
+                                                'Husky' => 'They often have striking blue eyes due to a genetic trait that reduces melanin in the iris.',
+                                                'default' => 'Their eyes are specially adapted for their lifestyle and environment.'
+                                            ],
+                                            'tail' => [
+                                                'Border Collie' => 'Their tail acts as a rudder when making sharp turns while herding.',
+                                                'Beagle' => 'The white-tipped tail helped hunters spot them in tall grass.',
+                                                'default' => 'The tail helps with balance and is an important communication tool.'
+                                            ],
+                                            'paws' => [
+                                                'Newfoundland' => 'Their webbed feet make them excellent swimmers.',
+                                                'Greyhound' => 'Their padded feet absorb shock during high-speed runs.',
+                                                'default' => 'Their paw pads contain sweat glands that help regulate temperature.'
+                                            ],
+                                            'nose' => [
+                                                'default' => 'Their nose contains over 300 million scent receptors, compared to about 5-6 million in humans.'
+                                            ],
+                                            'coat' => [
+                                                'default' => 'Their coat has two layers: a soft undercoat for insulation and a water-resistant outer layer.'
+                                            ]
+                                        ];
+                                        
+                                        // Check if we have a breed-specific fact
+                                        if (isset($defaultFacts[$feature][$pet->name])) {
+                                            $fact = $defaultFacts[$feature][$pet->name];
+                                        } 
+                                        // Otherwise use the default fact for this feature
+                                        elseif (isset($defaultFacts[$feature]['default'])) {
+                                            $fact = $defaultFacts[$feature]['default'];
+                                        }
+                                        else {
+                                            $fact = 'Interesting facts about this ' . $feature . '.';
+                                        }
+                                    }
+                                @endphp
+                                
+                                <!-- {{ $feature }} Tooltip -->
+                                <div class="absolute" 
+                                     style="top: {{ $hotspot['position_y'] }}%; left: {{ $hotspot['position_x'] }}%; transform: translate(-50%, -50%);"
+                                     @mouseenter="activeTooltip = '{{ $feature }}'"
+                                     @mouseleave="activeTooltip = null">
+                                    <div class="cursor-pointer rounded-full opacity-0 hover:opacity-100 border-2 border-{{ $color }}-500 hover:bg-{{ $color }}-500/20 tooltip-hotspot"
+                                         style="width: {{ $hotspot['width'] }}px; height: {{ $hotspot['height'] }}px;"
+                                         :class="{'opacity-50 pulse-animation': showAllHotspots, 'opacity-0': !showAllHotspots && activeTooltip !== '{{ $feature }}', 'opacity-100 bg-{{ $color }}-500/20': activeTooltip === '{{ $feature }}'}"></div>
+                                    <div x-show="activeTooltip === '{{ $feature }}'" 
+                                         x-transition:enter="transition ease-out duration-200"
+                                         x-transition:enter-start="opacity-0 scale-95"
+                                         x-transition:enter-end="opacity-100 scale-100"
+                                         class="absolute z-10 p-3 bg-white rounded-lg shadow-lg tooltip-content w-48 text-sm"
+                                         @if($hotspot['position_x'] < 30)
+                                             style="left: 100%; top: 0; margin-left: 8px;"
+                                         @elseif($hotspot['position_x'] > 70)
+                                             style="right: 100%; top: 0; margin-right: 8px;"
+                                         @elseif($hotspot['position_y'] < 30)
+                                             style="bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 8px;"
+                                         @else
+                                             style="top: 100%; left: 50%; transform: translateX(-50%); margin-top: 8px;"
+                                         @endif
+                                        >
+                                        <strong class="block mb-1 text-{{ $color }}-600">{{ $pet->name }}'s {{ ucfirst($feature) }}</strong>
+                                        <p>{{ $fact }}</p>
+                                    </div>
+                                </div>
+                                @endforeach
+                                
+                                <!-- Hint text for users -->
+                                <div class="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded"
+                                     x-transition:enter="transition ease-out duration-300"
+                                     x-transition:enter-start="opacity-0"
+                                     x-transition:enter-end="opacity-100"
+                                     x-show="showAllHotspots || activeTooltip !== null">
+                                    <span x-show="activeTooltip === null">Hover over colored areas for fun facts</span>
+                                    <span x-show="activeTooltip !== null">Interesting facts about this {{ $pet->name }}'s <span x-text="activeTooltip"></span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                        <div class="p-3 border rounded">
+                            <p class="text-sm text-gray-500">Size</p>
+                            <p class="text-base font-bold">{{ $pet->size }}</p>
+                        </div>
+                        <div class="p-3 border rounded">
+                            <p class="text-sm text-gray-500">Lifespan</p>
+                            <p class="text-base font-bold">{{ $pet->lifespan }} years</p>
+                        </div>
+                        <div class="p-3 border rounded">
+                            <p class="text-sm text-gray-500">Energy</p>
+                            <p class="text-base font-bold">{{ $pet->energy }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Right: Tabs & Details --}}
+                <div class="space-y-6">
+                    <div>
+                        <h1 class="text-3xl font-bold">{{ $pet->name }}</h1>
+                        <p class="text-gray-500">{{ $pet->temperament }}</p>
+                    </div>
+
+                    {{-- Overview --}}
+                    <div class="space-y-4 pt-4">
+                        <p>{{ $pet->description }}</p>
+                        @if($pet->colors)
+                            <div>
+                                <h3 class="font-medium mb-2">Common Colors</h3>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($pet->colors as $color)
+                                        <div class="px-3 py-1 bg-gray-100 rounded-full text-sm">{{ $color }}</div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Characteristics --}}
+                    <div class="space-y-4 pt-4">
+                        @php
+                            $characteristics = [
+                                'Friendliness' => $pet->friendliness,
+                                'Trainability' => $pet->trainability,
+                                'Exercise Needs' => $pet->exerciseNeeds,
+                                'Grooming' => $pet->grooming
+                            ];
+                        @endphp
+
+                        @foreach($characteristics as $label => $value)
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium">{{ $label }}</span>
+                                    <span class="text-sm text-gray-500">{{ $value }}/5</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-primary h-2.5 rounded-full" style="width: {{ ($value / 5) * 100 }}%"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Buttons --}}
+                    <div class="flex gap-4">
+                        <button class="px-4 py-2 border border-black rounded-md bg-black text-white hover:bg-gray-700 hover:text-white transition">Add to Comparison</button>
+                        <a href="{{ route('dogs') }}" class="px-4 py-2 border border-black rounded-md bg-black text-white hover:bg-gray-700 hover:text-white transition">
+                            Return to Dog Breeds
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+@endsection

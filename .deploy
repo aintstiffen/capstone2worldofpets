@@ -1,0 +1,14 @@
+#!/bin/bash
+# Install required system packages
+apt-get update
+apt-get install -y libicu-dev libzip-dev
+
+# Install and enable PHP extensions
+docker-php-ext-configure intl
+docker-php-ext-install intl zip
+
+# Show installed PHP extensions
+php -m
+
+# Proceed with the regular build and deploy process
+composer install --optimize-autoloader --no-dev --no-scripts --no-interaction

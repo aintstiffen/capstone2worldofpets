@@ -1,0 +1,31 @@
+/* Mobile-friendly responsive styles */
+
+/* Responsive adjustments for hotspots */
+@media (max-width: 768px) {
+    /* Make tooltips show above hotspots instead of below on mobile */
+    .group div[class*="mt-10"] {
+        margin-top: -6rem !important;
+        z-index: 20 !important;
+    }
+    
+    /* Ensure tooltips don't get cut off on small screens */
+    .group div[class*="w-56"] {
+        width: auto !important;
+        max-width: 16rem !important;
+        min-width: 12rem !important;
+    }
+    
+    /* Make tap targets larger on mobile for better usability */
+    .group[class*="rounded-full"] {
+        height: 2.5rem !important;
+        width: 2.5rem !important;
+    }
+}
+
+/* Touch-friendly styles */
+@media (hover: none) {
+    /* Override hover-only behavior for tooltips on touch devices */
+    .group:active div[class*="hidden group-hover:block"] {
+        display: block !important;
+    }
+}

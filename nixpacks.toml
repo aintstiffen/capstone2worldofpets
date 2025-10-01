@@ -1,0 +1,31 @@
+[nixpacks]
+php-version = "8.2"
+php-extensions = ["intl", "zip"]
+
+[nixpacks]
+php-version = "8.2"
+
+[phases.setup]
+nixPkgs = ["icu", "zlib", "libzip", "pkg-config"]
+
+[phases.install]
+cmds = [
+  "apt-get update",
+  "apt-get install -y libicu-dev libzip-dev"
+]
+
+[phases.build]
+cmds = [
+  "docker-php-ext-configure intl",
+  "docker-php-ext-install intl zip",
+  "composer install --no-dev --optimize-autoloader --no-interaction",
+  "php artisan key:generate --force || true",
+  "php artisan storage:link || true",
+  "php artisan config:cache",
+  "php artisan route:cache",
+  "php artisan view:cache"
+]
+
+[start]
+# Ensure we explicitly use production environment and keep single foreground process (artisan serve)
+cmd = "export APP_ENV=production && php artisan migrate --force && php artisan config:cache && php artisan serve --host=0.0.0.0 --port=$PORT"
