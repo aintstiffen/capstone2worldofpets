@@ -12,111 +12,127 @@ class FileUpload extends BaseFileUpload
     {
         parent::setUp();
 
-        // Override the file saving process to avoid using visibility settings
-        $this->saveUploadedFileUsing(function (TemporaryUploadedFile $file, callable $set): ?string {
-            try {
-                $directory = $this->getDirectory();
-                $diskName = $this->getDiskName();
-                
-                // Use our custom method that doesn't set ACLs
-                $filename = $this->getUploadedFileNameForStorage($file);
-                
-                // Store file without ACL settings
-                if (method_exists($file, 'storePubliclyAsWithoutAcl')) {
-                    $path = $file->storePubliclyAsWithoutAcl($directory, $filename, $diskName);
-                } else {
-                    $path = $file->storeAs($directory, $filename, $diskName);
-                }
-                
-                // Log successful upload
-                \Log::info('Custom FileUpload: Successfully uploaded file', [
-                    'path' => $path,
-                    'disk' => $diskName,
-                    'directory' => $directory
-                ]);
-                
-                return $path;
-            } catch (\Exception $e) {
-                // Log any errors
-                \Log::error('Custom FileUpload: Error uploading file', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-                throw $e;
-            }
+        // DB -> component (force array state for foreach)
+        $this->formatStateUsing(function ($state) {
+            $state = $this->normalizeToPath($state);
+            return $this->coerceStateForComponent($state);
         });
-        
-        // Override the method that gets file information including URLs
+
+        // Keep runtime state as array
+        $this->afterStateHydrated(function (self $component, $state) {
+            $component->state(
+                $component->coerceStateForComponent(
+                    $component->normalizeToPath($state)
+                )
+            );
+        });
+
+        // component -> DB (store scalar for single)
+        $this->dehydrateStateUsing(function ($state) {
+            $state = $this->normalizeToPath($state);
+
+            if (! $this->isMultiple()) {
+                if (is_array($state)) {
+                    return $state[0] ?? null;
+                }
+                return $state ?: null;
+            }
+
+            return is_array($state) ? $state : array_filter([$state]);
+        });
+
+        // Preview metadata / URL (don’t fail on exists/size)
         $this->getUploadedFileUsing(function (string $file, $storedFileNames): ?array {
-            try {
-                // If DB already stores a full URL, use it directly for preview
-                if (str_starts_with($file, 'http://') || str_starts_with($file, 'https://')) {
-                    $basename = basename(parse_url($file, PHP_URL_PATH) ?? 'file');
-                    $extension = pathinfo($basename, PATHINFO_EXTENSION);
-                    $mimeType = match (strtolower($extension)) {
-                        'jpg', 'jpeg' => 'image/jpeg',
-                        'png' => 'image/png',
-                        'gif' => 'image/gif',
-                        'webp' => 'image/webp',
-                        'pdf' => 'application/pdf',
-                        default => 'application/octet-stream',
-                    };
-
-                    return [
-                        'name' => $basename,
-                        'size' => null,
-                        'type' => $mimeType,
-                        'url' => $file,
-                    ];
-                }
-
-                $disk = $this->getDiskName();
-                $storage = \Illuminate\Support\Facades\Storage::disk($disk);
-
-                if (! $storage->exists($file)) {
-                    \Log::warning('File does not exist on disk: ' . $file);
-                    return null;
-                }
-
-                // Generate URL for the file
-                if ($disk === 's3') {
-                    $s3Url = config('filesystems.disks.s3.url');
-                    $bucket = config('filesystems.disks.s3.bucket');
-                    $region = config('filesystems.disks.s3.region');
-                    $url = $s3Url
-                        ? rtrim($s3Url, '/') . '/' . ltrim($file, '/')
-                        : "https://{$bucket}.s3.{$region}.amazonaws.com/" . ltrim($file, '/');
-                } else {
-                    $url = '/storage/' . ltrim($file, '/');
-                }
-
-                $fileName = ($this->isMultiple() ? ($storedFileNames[$file] ?? null) : $storedFileNames) ?? basename($file);
-
-                // Determine mime from extension
-                $extension = pathinfo($file, PATHINFO_EXTENSION);
-                $mimeType = match (strtolower($extension)) {
-                    'jpg', 'jpeg' => 'image/jpeg',
-                    'png' => 'image/png',
-                    'gif' => 'image/gif',
-                    'webp' => 'image/webp',
-                    'pdf' => 'application/pdf',
-                    default => 'application/octet-stream',
-                };
-
+            if (str_starts_with($file, 'http://') || str_starts_with($file, 'https://')) {
+                $basename = basename(parse_url($file, PHP_URL_PATH) ?? 'file');
+                $ext      = pathinfo($basename, PATHINFO_EXTENSION);
                 return [
-                    'name' => $fileName,
-                    'size' => $storage->size($file),
-                    'type' => $mimeType,
-                    'url' => $url,
+                    'name' => $basename,
+                    'size' => null,
+                    'type' => $this->guessMime($ext),
+                    'url'  => $file,
                 ];
-            } catch (\Exception $e) {
-                \Log::error('Custom FileUpload: Error generating file info', [
-                    'file' => $file,
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-                return null;
             }
+
+            $disk    = $this->getDiskName();
+            $storage = \Illuminate\Support\Facades\Storage::disk($disk);
+
+            $exists = false;
+            try {
+                // Flysystem v3 underlying call might throw – ignore if it does
+                $exists = $storage->exists($file);
+            } catch (\Throwable $e) {
+                \Log::warning('exists() failed (ignored) for preview', ['disk' => $disk, 'path' => $file, 'err' => $e->getMessage()]);
+            }
+
+            if ($disk === 's3') {
+                $s3Url = config('filesystems.disks.s3.url') ?: rtrim(env('AWS_URL', ''), '');
+                $url   = $s3Url
+                    ? rtrim($s3Url, '/') . '/' . ltrim($file, '/')
+                    : "https://" . config('filesystems.disks.s3.bucket') . ".s3." . config('filesystems.disks.s3.region') . ".amazonaws.com/" . ltrim($file, '/');
+            } else {
+                $url = '/storage/' . ltrim($file, '/');
+            }
+
+            $fileName = ($this->isMultiple() ? ($storedFileNames[$file] ?? null) : $storedFileNames) ?? basename($file);
+            $ext      = pathinfo($file, PATHINFO_EXTENSION);
+
+            $size = null;
+            if ($exists) {
+                try { $size = $storage->size($file); } catch (\Throwable $e) { /* ignore */ }
+            }
+
+            return [
+                'name' => $fileName,
+                'size' => $size,
+                'type' => $this->guessMime($ext),
+                'url'  => $url,
+            ];
         });
+    }
+
+    // Convert full URL -> relative key
+    protected function normalizeToPath($state)
+    {
+        if (empty($state)) return $state;
+
+        if (is_array($state)) {
+            return array_map(fn ($v) => $this->normalizeToPath($v), $state);
+        }
+
+        if (is_string($state) && (str_starts_with($state, 'http://') || str_starts_with($state, 'https://'))) {
+            $base = rtrim(config('filesystems.disks.s3.url') ?: env('AWS_URL', ''), '/');
+            if ($base && str_starts_with($state, $base . '/')) {
+                return ltrim(substr($state, strlen($base . '/')), '/');
+            }
+            $path = ltrim(parse_url($state, PHP_URL_PATH) ?: '', '/');
+            return $path ?: $state;
+        }
+
+        return $state;
+    }
+
+    // Always array for the component; scalar saved for single
+    protected function coerceStateForComponent($state): array
+    {
+        if ($this->isMultiple()) {
+            return is_array($state) ? $state : array_filter([$state]);
+        }
+        if (is_array($state)) return $state;
+        if ($state === null || $state === '') return [];
+        return [$state];
+    }
+
+    protected function guessMime(?string $ext): string
+    {
+        $ext = strtolower((string) $ext);
+        return match ($ext) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'png'         => 'image/png',
+            'gif'         => 'image/gif',
+            'webp'        => 'image/webp',
+            'pdf'         => 'application/pdf',
+            default       => 'application/octet-stream',
+        };
     }
 }

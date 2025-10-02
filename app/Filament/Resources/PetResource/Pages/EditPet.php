@@ -21,11 +21,12 @@ class EditPet extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        if (!empty($data['image']) && !str_starts_with($data['image'], 'http')) {
-            $base = rtrim(config('filesystems.disks.s3.url') ?: ("https://".config('filesystems.disks.s3.bucket').".s3.".config('filesystems.disks.s3.region').".amazonaws.com"), '/');
-            $data['image'] = $base.'/'.ltrim($data['image'], '/');
+         if (!empty($data['image']) && is_string($data['image'])) {
+            $base = rtrim(config('filesystems.disks.s3.url') ?: env('AWS_URL', ''), '/') . '/';
+            if (str_starts_with($data['image'], 'http')) {
+                $data['image'] = ltrim(str_replace($base, '', $data['image']), '/');
+            }
         }
-
         return $data;
     }
 }

@@ -90,7 +90,7 @@ class Pet extends Model
             if (!empty($breed->image)) {
                 try {
                     // Changed from 'b2' to 's3'
-                    \Illuminate\Support\Facades\Storage::disk('s3')->delete($breed->image);
+                    Storage::disk('s3')->delete($breed->image);
                 } catch (\Throwable $e) {
                     // Swallow errors; optionally log
                     \Log::warning('Failed deleting S3 image for pet ID '.$breed->id.': '.$e->getMessage());
