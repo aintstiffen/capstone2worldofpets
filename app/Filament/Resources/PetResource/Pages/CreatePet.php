@@ -14,9 +14,12 @@ class CreatePet extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // S3/B2 storage configuration has been removed
-        // The file upload now uses the public disk directly as configured in PetResource
-        
+        // Normalize image to a full S3 URL
+        if (!empty($data['image']) && !str_starts_with($data['image'], 'http')) {
+            $base = rtrim(config('filesystems.disks.s3.url') ?: ("https://".config('filesystems.disks.s3.bucket').".s3.".config('filesystems.disks.s3.region').".amazonaws.com"), '/');
+            $data['image'] = $base.'/'.ltrim($data['image'], '/');
+        }
+
         return $data;
     }
 }

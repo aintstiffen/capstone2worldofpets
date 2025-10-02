@@ -16,9 +16,9 @@ php artisan cache:clear
 Write-Host "Creating storage link..." -ForegroundColor Yellow
 php artisan storage:link
 
-# Create livewire temp directory
+# Create Livewire temp directory (matches 'local' disk => storage/app/private)
 Write-Host "Creating Livewire temp directory..." -ForegroundColor Yellow
-New-Item -ItemType Directory -Path "storage\app\public\livewire-tmp" -Force
+New-Item -ItemType Directory -Path "storage\app\private\livewire-tmp" -Force
 
 Write-Host "Livewire upload configuration has been fixed!" -ForegroundColor Green
 Write-Host "Please try uploading a file now." -ForegroundColor Cyan

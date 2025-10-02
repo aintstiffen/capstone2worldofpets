@@ -49,43 +49,50 @@ class FileUpload extends BaseFileUpload
         // Override the method that gets file information including URLs
         $this->getUploadedFileUsing(function (string $file, $storedFileNames): ?array {
             try {
+                // If DB already stores a full URL, use it directly for preview
+                if (str_starts_with($file, 'http://') || str_starts_with($file, 'https://')) {
+                    $basename = basename(parse_url($file, PHP_URL_PATH) ?? 'file');
+                    $extension = pathinfo($basename, PATHINFO_EXTENSION);
+                    $mimeType = match (strtolower($extension)) {
+                        'jpg', 'jpeg' => 'image/jpeg',
+                        'png' => 'image/png',
+                        'gif' => 'image/gif',
+                        'webp' => 'image/webp',
+                        'pdf' => 'application/pdf',
+                        default => 'application/octet-stream',
+                    };
+
+                    return [
+                        'name' => $basename,
+                        'size' => null,
+                        'type' => $mimeType,
+                        'url' => $file,
+                    ];
+                }
+
                 $disk = $this->getDiskName();
                 $storage = \Illuminate\Support\Facades\Storage::disk($disk);
-                
-                // Check if file exists
+
                 if (! $storage->exists($file)) {
                     \Log::warning('File does not exist on disk: ' . $file);
                     return null;
                 }
-                
+
                 // Generate URL for the file
-                $url = null;
                 if ($disk === 's3') {
-                    // Get S3 URL from environment or config
                     $s3Url = config('filesystems.disks.s3.url');
                     $bucket = config('filesystems.disks.s3.bucket');
                     $region = config('filesystems.disks.s3.region');
-                    
-                    if ($s3Url) {
-                        $url = rtrim($s3Url, '/') . '/' . ltrim($file, '/');
-                    } else {
-                        $url = "https://{$bucket}.s3.{$region}.amazonaws.com/{$file}";
-                    }
+                    $url = $s3Url
+                        ? rtrim($s3Url, '/') . '/' . ltrim($file, '/')
+                        : "https://{$bucket}.s3.{$region}.amazonaws.com/" . ltrim($file, '/');
                 } else {
-                    // For other disks, use a simple path-based approach
-                    $url = '/storage/' . $file;
+                    $url = '/storage/' . ltrim($file, '/');
                 }
-                
-                // Get filename from stored filenames or use the basename
+
                 $fileName = ($this->isMultiple() ? ($storedFileNames[$file] ?? null) : $storedFileNames) ?? basename($file);
-                
-                \Log::info('Custom FileUpload: Generated file info', [
-                    'file' => $file,
-                    'url' => $url,
-                    'fileName' => $fileName
-                ]);
-                
-                // Use extension to determine mime type instead of mimeType method
+
+                // Determine mime from extension
                 $extension = pathinfo($file, PATHINFO_EXTENSION);
                 $mimeType = match (strtolower($extension)) {
                     'jpg', 'jpeg' => 'image/jpeg',
@@ -95,10 +102,10 @@ class FileUpload extends BaseFileUpload
                     'pdf' => 'application/pdf',
                     default => 'application/octet-stream',
                 };
-                
+
                 return [
                     'name' => $fileName,
-                    'size' => $storage->exists($file) ? $storage->size($file) : 0,
+                    'size' => $storage->size($file),
                     'type' => $mimeType,
                     'url' => $url,
                 ];

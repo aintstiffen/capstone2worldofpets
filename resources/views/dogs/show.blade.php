@@ -32,7 +32,7 @@
                 <div class="space-y-4">
                     <div class="relative" x-data="{ activeTooltip: null, showAllHotspots: false }">
                         <div class="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                            <img src="{{ $pet->image ? asset('storage/' . $pet->image) : '/placeholder.svg?height=600&width=600' }}"
+                            <img src="{{ $pet->image ? $pet->image_url : '/placeholder.svg?height=600&width=600' }}"
                                  alt="{{ $pet->name }}"
                                  class="object-cover w-full h-full"
                                  @mouseenter="showAllHotspots = true"

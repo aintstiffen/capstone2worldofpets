@@ -253,8 +253,10 @@ class PetResource extends Resource
                 // Use this approach to generate the full S3 URL:
                 ->getStateUsing(function ($record) {
                     if (!$record->image) return null;
-                    // Use the AWS_URL from environment
-                    return env('AWS_URL') . '/' . $record->image;
+                    if (str_starts_with($record->image, 'http')) {
+                        return $record->image;
+                    }
+                    return rtrim(env('AWS_URL', ''), '/') . '/' . ltrim($record->image, '/');
                 })
                 ->extraImgAttributes(['loading' => 'lazy']),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),

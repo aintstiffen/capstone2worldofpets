@@ -34,15 +34,19 @@ class Pet extends Model
         'fun_facts' => 'array',
     ];
 
-    // Add accessor for image URL
+    // Add accessor for image URL (works with either relative path or absolute URL)
     public function getImageUrlAttribute()
     {
         if (!$this->image) {
             return null;
         }
-        
-        // Use AWS_URL environment variable to build the URL
-        return env('AWS_URL') . '/' . $this->image;
+
+        if (str_starts_with($this->image, 'http')) {
+            return $this->image;
+        }
+
+        $path = ltrim($this->image, '/');
+        return rtrim(env('AWS_URL', ''), '/') . '/' . $path;
     }
 
     // auto-generate slug if not provided
