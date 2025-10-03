@@ -92,11 +92,14 @@ class PetResource extends Resource
                 Forms\Components\TagsInput::make('colors'),
 
                 // ✅ Upload directly to Cloudflare R2
-                FileUpload::make('image')
-    ->disk('r2')                 // your R2 disk
-    ->directory('pets')          // folder in R2
-    ->visibility('public')       // so the files are publicly accessible
-    ->image()                    // enables preview
+   FileUpload::make('image')
+    ->disk('r2')                            // Your R2 disk
+    ->directory('pets')                     // Folder in R2
+    ->visibility('public')                  // Make files publicly accessible
+    ->image()                               // Tell Filament this is an image
+->getPreviewUrlUsing(function ($file) {
+        return Storage::disk('public')->url($file); // Or however you store your files
+    })
     ->imageEditor()
     ->required()
     
