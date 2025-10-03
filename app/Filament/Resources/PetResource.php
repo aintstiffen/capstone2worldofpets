@@ -126,7 +126,7 @@ class PetResource extends Resource
                 // inside PetResource::form(...)
                 \App\Filament\Components\FileUpload::make('image')
                     ->disk('s3')                 // upload locally first to avoid S3 ACL issues
-                    ->directory('pets/temp')         // temporary local directory
+                    ->directory('pets')         // temporary local directory
                     ->preserveFilenames()            // keep original filename
                     ->rules(['required', 'image', 'max:2048'])
                     ->acceptedFileTypes(['image/jpeg','image/png','image/webp'])
