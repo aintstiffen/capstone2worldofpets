@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -34,15 +33,19 @@ class Pet extends Model
         'fun_facts' => 'array',
     ];
 
-    // Simple accessor for image URL - using R2 only
+    // Accessor for image URL - supports direct URLs or legacy stored paths
     public function getImageUrlAttribute()
     {
         if (!$this->image) {
             return null;
         }
-        
-        // Use the pub-{bucket-id}.r2.dev format which is working in your browser
-        return "https://pub-1c70e1b6445e4076a7225a0b45b8bf3b.r2.dev/" . ltrim($this->image, '/');
+        // If it's already a full URL, return as-is
+        if (preg_match('/^https?:\/\//i', $this->image)) {
+            return $this->image;
+        }
+        // Legacy fallback: if an old relative path remains, just return it unchanged
+        // so front-end or columns can decide how to handle it. You may migrate later.
+        return $this->image;
     }
 
     // Auto-generate slug if not provided
@@ -81,17 +84,7 @@ class Pet extends Model
             }
         });
 
-        static::deleting(function ($breed) {
-            // Remove associated image from R2 when deleting record
-            if (!empty($breed->image)) {
-                try {
-                    Storage::disk('r2')->delete($breed->image);
-                } catch (\Throwable $e) {
-                    // Swallow errors; optionally log
-                    \Log::warning('Failed deleting R2 image for pet ID '.$breed->id.': '.$e->getMessage());
-                }
-            }
-        });
+        // No storage-side deletion needed anymore; images are external URLs now.
     }
     
     /**

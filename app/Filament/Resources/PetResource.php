@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms\Components\FileUpload;
 use App\Filament\Resources\PetResource\Pages;
 use App\Models\Pet;
 use Filament\Forms;
@@ -12,6 +11,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Tables\Columns\ImageColumn;
+use Illuminate\Support\Facades\Http;
 
 class PetResource extends Resource
 {
@@ -47,7 +47,8 @@ class PetResource extends Resource
                         'cat' => 'Cat',
                     ])
                     ->required()
-                    ->label('Pet Type'),
+                    ->label('Pet Type')
+                    ->reactive(),
 
                 Forms\Components\TextInput::make('size')
                     ->required()
@@ -91,19 +92,94 @@ class PetResource extends Resource
 
                 Forms\Components\TagsInput::make('colors'),
 
-                // ✅ Upload directly to Cloudflare R2
-   FileUpload::make('image')
-    ->disk('r2')                            // Your R2 disk
-    ->directory('pets')                     // Folder in R2
-    ->visibility('public')                  // Make files publicly accessible
-    ->image()                               // Tell Filament this is an image
-->getPreviewUrlUsing(function ($file) {
-        return Storage::disk('public')->url($file); // Or however you store your files
-    })
-    ->imageEditor()
-    ->required()
-    
-    ->preserveFilenames(),
+                // Replace upload with external image URL resolved from breed API
+
+                Forms\Components\Select::make('breed_lookup')
+                    ->label('Breed (search from API)')
+                    ->searchable()
+                    ->reactive()
+                    ->helperText('Start typing to search breeds from your selected Pet Type')
+                    ->getSearchResultsUsing(function (string $search, $get) {
+                        $type = $get('category');
+                        if (!$type) return [];
+
+                        try {
+                            if ($type === 'dog') {
+                                $resp = Http::withHeaders([
+                                    'x-api-key' => config('services.dog_api.key'),
+                                ])->get(config('services.dog_api.base_url') . '/breeds/search', [
+                                    'q' => $search,
+                                ]);
+                            } else {
+                                $resp = Http::withHeaders([
+                                    'x-api-key' => config('services.cat_api.key'),
+                                ])->get(config('services.cat_api.base_url') . '/breeds/search', [
+                                    'q' => $search,
+                                ]);
+                            }
+                        } catch (\Throwable $e) {
+                            return [];
+                        }
+
+                        if (!$resp->ok()) return [];
+
+                        $results = [];
+                        foreach ($resp->json() as $item) {
+                            // Use unique id as value, show name
+                            $results[$item['id']] = $item['name'] ?? $item['id'];
+                        }
+                        return $results;
+                    })
+                    ->afterStateUpdated(function ($state, $set, $get) {
+                        // When a breed is chosen, fetch an image for it and set image field to URL
+                        $type = $get('category');
+                        if (!$type || !$state) return;
+
+                        try {
+                            if ($type === 'dog') {
+                                // TheDogAPI: images search by breed id
+                                $resp = Http::withHeaders([
+                                    'x-api-key' => config('services.dog_api.key'),
+                                ])->get(config('services.dog_api.base_url') . '/images/search', [
+                                    'breed_ids' => $state,
+                                    'limit' => 1,
+                                ]);
+                            } else {
+                                // TheCatAPI
+                                $resp = Http::withHeaders([
+                                    'x-api-key' => config('services.cat_api.key'),
+                                ])->get(config('services.cat_api.base_url') . '/images/search', [
+                                    'breed_ids' => $state,
+                                    'limit' => 1,
+                                ]);
+                            }
+
+                            if ($resp->ok() && !empty($resp->json())) {
+                                $payload = $resp->json()[0] ?? [];
+                                $url = $payload['url'] ?? null;
+                                if ($url) {
+                                    $set('image', $url);
+                                }
+                                // Try to fill name/slug from the returned breed details if not already set
+                                $breeds = $payload['breeds'] ?? [];
+                                $currentName = $get('name');
+                                if (empty($currentName) && !empty($breeds) && !empty($breeds[0]['name'])) {
+                                    $name = $breeds[0]['name'];
+                                    $set('name', $name);
+                                    $set('slug', \Illuminate\Support\Str::slug($name));
+                                }
+                            }
+                        } catch (\Throwable $e) {
+                            // Ignore errors silently
+                        }
+                    })
+                    ->dehydrated(false),
+
+                Forms\Components\TextInput::make('image')
+                    ->label('Image URL')
+                    ->required()
+                    ->url()
+                    ->helperText('This stores a direct image URL from the API'),
 
                 Forms\Components\Textarea::make('description')
                     ->required()
@@ -125,16 +201,9 @@ class PetResource extends Resource
                     ->label('Image')
                     ->circular()
                     ->defaultImageUrl('/placeholder.svg?height=200&width=200')
-                    ->getStateUsing(function ($record) {
-                        if (!$record->image) {
-                            return null;
-                        }
-                        // Always use the Public Development URL, never the direct R2 storage URL
-                        return 'https://pub-1c70e1b6445e4076a7225a0b45b8bf3b.r2.dev/' . ltrim($record->image, '/');
-                    })
+                    ->getStateUsing(fn($record) => $record->image_url ?? $record->image)
                     ->extraImgAttributes(['loading' => 'lazy'])
-                    // Keep using r2 disk for uploads
-                    ->disk('r2'),
+                    ,
 
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category')->sortable(),
