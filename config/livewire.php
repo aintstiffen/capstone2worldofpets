@@ -6,10 +6,10 @@ return [
     'layout' => null,
 
     'temporary_file_upload' => [
-        'disk' => 's3', // Changed from 'local' to 's3'
+        'disk' => 's3',
         'directory' => 'livewire-tmp',
-        'middleware' => null, // Changed to null to avoid auth issues
-        'rules' => null, // Set to null or customize as needed
+        'middleware' => null,
+        'rules' => null, // This disables the MIME check
         'preview_mimes' => [
             'png', 'gif', 'bmp', 'svg', 'jpg', 'jpeg', 'webp'
         ],
