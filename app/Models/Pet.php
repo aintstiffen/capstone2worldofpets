@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\File as HttpFile;
 
 class Pet extends Model
 {
@@ -85,6 +86,16 @@ class Pet extends Model
             }
         });
 
+        // After create/update, if an image was uploaded to local 'public' disk,
+        // move it to S3 and store only the S3 key in the DB. Avoid any ACL options.
+        static::created(function ($breed) {
+            self::moveLocalImageToS3($breed);
+        });
+
+        static::updated(function ($breed) {
+            self::moveLocalImageToS3($breed);
+        });
+
         static::deleting(function ($breed) {
             // Remove associated image from S3 when deleting record
             if (!empty($breed->image)) {
@@ -97,6 +108,50 @@ class Pet extends Model
                 }
             }
         });
+    }
+
+    /**
+     * If the current image path is on the local public disk, move it to S3
+     * and update the record to the S3 key. Skips if already an S3-style key
+     * or if the local file doesn't exist.
+     */
+    protected static function moveLocalImageToS3(self $breed): void
+    {
+        $path = $breed->image ?? null;
+        if (!$path) return;
+
+        // If it's already an S3 key (e.g., starts with pets/ or form-attachments/), skip
+        if (str_starts_with($path, 'pets/') || str_starts_with($path, 'form-attachments/')) {
+            return;
+        }
+
+        // Normalize and check local public disk
+        $localPath = ltrim($path, '/');
+        if (!Storage::disk('public')->exists($localPath)) {
+            return;
+        }
+
+        $fullLocal = Storage::disk('public')->path($localPath);
+        $filename = basename($localPath);
+        $s3Dir = 'pets';
+
+        try {
+            // Put to S3 without ACL/visibility options
+            Storage::disk('s3')->putFileAs($s3Dir, new HttpFile($fullLocal), $filename);
+
+            // Delete local temp file
+            Storage::disk('public')->delete($localPath);
+
+            // Update DB quietly
+            $breed->image = $s3Dir . '/' . $filename;
+            $breed->saveQuietly();
+        } catch (\Throwable $e) {
+            \Log::error('Failed moving image to S3', [
+                'pet_id' => $breed->id,
+                'path' => $localPath,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
     
     /**

@@ -125,29 +125,12 @@ class PetResource extends Resource
 
                 // inside PetResource::form(...)
                 \App\Filament\Components\FileUpload::make('image')
-                    ->disk('s3')
-                    ->directory('pets')
-                    // Using our custom component with no visibility/ACL settings
-                    ->image()
-                    ->maxSize(1024)
-                    ->preserveFilenames() // Keep original filenames
-                    ->required()
-                    // Enhanced debugging
-                    ->afterStateUpdated(function ($state, $set) {
-                        \Log::info('FileUpload state updated', ['state' => $state]);
-                        if (!empty($state)) {
-                            try {
-                                // Verify the file exists on S3
-                                $exists = \Illuminate\Support\Facades\Storage::disk('s3')->exists($state);
-                                \Log::info('File on S3: ' . ($exists ? 'EXISTS' : 'MISSING'), [
-                                    'path' => $state,
-                                    'aws_url' => env('AWS_URL') . '/' . $state,
-                                ]);
-                            } catch (\Exception $e) {
-                                \Log::error('S3 file check failed: ' . $e->getMessage());
-                            }
-                        }
-                    }),
+                    ->disk('public')                 // upload locally first to avoid S3 ACL issues
+                    ->directory('pets/temp')         // temporary local directory
+                    ->preserveFilenames()            // keep original filename
+                    ->rules(['required', 'image', 'max:2048'])
+                    ->acceptedFileTypes(['image/jpeg','image/png','image/webp'])
+                    ->required(),
                 Forms\Components\Textarea::make('description')
                     ->required()
                     ->minLength(50)
