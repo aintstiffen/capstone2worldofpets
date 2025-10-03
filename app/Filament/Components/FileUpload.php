@@ -41,7 +41,10 @@ class FileUpload extends BaseFileUpload
             return is_array($state) ? $state : array_filter([$state]);
         });
 
-        // Preview metadata / URL (don’t fail on exists/size)
+        // Override validation rules to skip image validation
+        $this->rules(['sometimes']);
+        
+        // Preview metadata / URL (don't fail on exists/size)
         $this->getUploadedFileUsing(function (string $file, $storedFileNames): ?array {
             if (str_starts_with($file, 'http://') || str_starts_with($file, 'https://')) {
                 $basename = basename(parse_url($file, PHP_URL_PATH) ?? 'file');
@@ -59,7 +62,6 @@ class FileUpload extends BaseFileUpload
 
             $exists = false;
             try {
-                // Flysystem v3 underlying call might throw – ignore if it does
                 $exists = $storage->exists($file);
             } catch (\Throwable $e) {
                 \Log::warning('exists() failed (ignored) for preview', ['disk' => $disk, 'path' => $file, 'err' => $e->getMessage()]);

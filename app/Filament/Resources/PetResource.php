@@ -128,7 +128,6 @@ class PetResource extends Resource
                     ->disk('s3')                 // upload locally first to avoid S3 ACL issues
                     ->directory('pets')         // temporary local directory
                     ->preserveFilenames()            // keep original filename
-                    ->image() // This handles image validation without MIME checks
                     ->required(),
                 Forms\Components\Textarea::make('description')
                     ->required()
