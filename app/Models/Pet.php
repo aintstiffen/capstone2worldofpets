@@ -40,8 +40,9 @@ class Pet extends Model
         if (!$this->image) {
             return null;
         }
-
-        return Storage::disk('r2')->url($this->image);
+        
+        // Use the pub-{bucket-id}.r2.dev format which is working in your browser
+        return "https://pub-1c70e1b6445e4076a7225a0b45b8bf3b.r2.dev/" . ltrim($this->image, '/');
     }
 
     // Auto-generate slug if not provided
