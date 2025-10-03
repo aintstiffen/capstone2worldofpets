@@ -6,7 +6,7 @@ return [
     'layout' => null,
 
     'temporary_file_upload' => [
-        'disk' => 's3',
+        'disk' => 'r2',
         'directory' => 'livewire-tmp',
         'middleware' => null,
         'rules' => null, // This disables the MIME check
