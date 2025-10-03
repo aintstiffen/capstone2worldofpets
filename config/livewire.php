@@ -6,20 +6,17 @@ return [
     'layout' => null,
 
     'temporary_file_upload' => [
-        'disk' => 'local',   // must be local
+        'disk' => 's3', // Changed from 'local' to 's3'
         'directory' => 'livewire-tmp',
-        'middleware' => ['web'], // remove custom middlewares unless you added them intentionally
-        'rules' => [
-            'file',
-            'max:5120', // 5MB
-            'mimes:jpeg,png,gif,webp',
+        'middleware' => null, // Changed to null to avoid auth issues
+        'rules' => null, // Set to null or customize as needed
+        'preview_mimes' => [
+            'png', 'gif', 'bmp', 'svg', 'jpg', 'jpeg', 'webp'
         ],
+        'max_upload_time' => 5,
     ],
-
 
     'features' => [
         // 'ignore_csrf' => env('LIVEWIRE_IGNORE_CSRF', false),
     ],
-
-    // Other defaults left as-is for brevity
 ];
