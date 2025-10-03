@@ -9,8 +9,11 @@ class HandleLivewireUploads
 {
     public function handle(Request $request, Closure $next)
     {
-        // Skip CSRF for Livewire uploads
-        if ($request->is('livewire/upload-file') || $request->is('livewire/upload-file/*')) {
+        // Skip CSRF for Livewire uploads and updates
+        if ($request->is('livewire/upload-file') || 
+            $request->is('livewire/upload-file/*') || 
+            $request->is('livewire/update') || 
+            $request->is('livewire/update/*')) {
             $request->attributes->add(['csrf_exempt' => true]);
         }
         
