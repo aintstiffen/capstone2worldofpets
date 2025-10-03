@@ -93,16 +93,14 @@ class PetResource extends Resource
 
                 // ✅ Upload directly to Cloudflare R2
                 FileUpload::make('image')
-                    ->disk('r2')
-                    ->directory('pets')
-                    ->image()
-                    ->imageEditor()
-                    ->required()
-                    // Add custom URL generator for previews that uses the Public Development URL
-                    ->previewable(true)
-                     ->visibility('public')
-                        
-                    ->previewable(),
+    ->disk('r2')                 // your R2 disk
+    ->directory('pets')          // folder in R2
+    ->visibility('public')       // so the files are publicly accessible
+    ->image()                    // enables preview
+    ->imageEditor()
+    ->required()
+    
+    ->preserveFilenames(),
 
                 Forms\Components\Textarea::make('description')
                     ->required()

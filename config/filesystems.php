@@ -45,16 +45,14 @@ return [
 
         // 🚀 Cloudflare R2 Disk
         'r2' => [
-            'driver' => 's3', // Use the s3 driver for R2
-            'key' => env('R2_ACCESS_KEY_ID'),
-            'secret' => env('R2_SECRET_ACCESS_KEY'),
-            'region' => 'auto', // R2 uses 'auto' for region
-            'bucket' => env('R2_BUCKET'),
-            'url' => env('R2_URL'),
-            'endpoint' => env('R2_ENDPOINT'),
-            'use_path_style_endpoint' => true,
-            'throw' => true,
-        ],
+    'driver' => 's3',
+    'key' => env('R2_ACCESS_KEY_ID'),
+    'secret' => env('R2_SECRET_ACCESS_KEY'),
+    'region' => 'auto', // Doesn't matter for R2
+    'bucket' => env('R2_BUCKET'),
+    'endpoint' => env('R2_ENDPOINT'),
+    'use_path_style_endpoint' => true,
+],
     ],
 
     /*
