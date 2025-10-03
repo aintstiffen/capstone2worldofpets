@@ -189,7 +189,105 @@ class PetResource extends Resource
                     ->placeholder('Provide a comprehensive description of this pet breed')
                     ->helperText('Include origin, history, common uses, and distinguishing characteristics'),
 
-                // Sections unchanged (Hotspots, Fun Facts)...
+                // Image Preview Section
+                Forms\Components\Section::make('Image Preview')
+                    ->schema([
+                        Forms\Components\ViewField::make('image_preview')
+                            ->view('filament.components.image-preview')
+                            ->label('Preview Image (Click on areas to add fun facts)')
+                            ->helperText('Click on different parts of the image (ears, eyes, nose, etc.) to add fun facts'),
+                    ])
+                    ->collapsed()
+                    ->visible(fn ($get) => !empty($get('image'))),
+
+                // Hotspots & Fun Facts Management
+                Forms\Components\Section::make('Interactive Hotspots & Fun Facts')
+                    ->description('Add clickable areas on the image with interesting facts. Click on the image preview above to add hotspots.')
+                    ->schema([
+                        Forms\Components\Repeater::make('hotspots')
+                            ->label('Hotspots')
+                            ->schema([
+                                Forms\Components\Select::make('feature')
+                                    ->label('Feature')
+                                    ->options([
+                                        'ears' => 'Ears',
+                                        'eyes' => 'Eyes',
+                                        'nose' => 'Nose',
+                                        'tail' => 'Tail',
+                                        'paws' => 'Paws',
+                                        'coat' => 'Coat',
+                                        'whiskers' => 'Whiskers',
+                                        'mouth' => 'Mouth',
+                                    ])
+                                    ->required()
+                                    ->distinct(),
+                                Forms\Components\TextInput::make('position_x')
+                                    ->label('Position X (%)')
+                                    ->numeric()
+                                    ->required()
+                                    ->minValue(0)
+                                    ->maxValue(100)
+                                    ->suffix('%'),
+                                Forms\Components\TextInput::make('position_y')
+                                    ->label('Position Y (%)')
+                                    ->numeric()
+                                    ->required()
+                                    ->minValue(0)
+                                    ->maxValue(100)
+                                    ->suffix('%'),
+                                Forms\Components\TextInput::make('width')
+                                    ->label('Width (px)')
+                                    ->numeric()
+                                    ->default(40)
+                                    ->required()
+                                    ->minValue(10)
+                                    ->maxValue(200),
+                                Forms\Components\TextInput::make('height')
+                                    ->label('Height (px)')
+                                    ->numeric()
+                                    ->default(40)
+                                    ->required()
+                                    ->minValue(10)
+                                    ->maxValue(200),
+                            ])
+                            ->columns(2)
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): ?string => $state['feature'] ?? null)
+                            ->reorderable()
+                            ->defaultItems(0),
+
+                        Forms\Components\Repeater::make('fun_facts')
+                            ->label('Fun Facts')
+                            ->schema([
+                                Forms\Components\Select::make('feature')
+                                    ->label('Feature')
+                                    ->options([
+                                        'ears' => 'Ears',
+                                        'eyes' => 'Eyes',
+                                        'nose' => 'Nose',
+                                        'tail' => 'Tail',
+                                        'paws' => 'Paws',
+                                        'coat' => 'Coat',
+                                        'whiskers' => 'Whiskers',
+                                        'mouth' => 'Mouth',
+                                    ])
+                                    ->required()
+                                    ->distinct()
+                                    ->helperText('Should match a hotspot feature'),
+                                Forms\Components\Textarea::make('fact')
+                                    ->label('Fun Fact')
+                                    ->required()
+                                    ->rows(2)
+                                    ->maxLength(500)
+                                    ->placeholder('Enter an interesting fact about this feature'),
+                            ])
+                            ->columns(1)
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): ?string => $state['feature'] ?? null)
+                            ->reorderable()
+                            ->defaultItems(0),
+                    ])
+                    ->collapsed(),
             ]);
     }
 

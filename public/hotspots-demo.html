@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Hotspots Demo</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .demo-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .demo-section {
+            margin-bottom: 40px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4F46E5;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #4F46E5;
+            margin-top: 30px;
+        }
+        .image-container {
+            position: relative;
+            display: inline-block;
+            max-width: 600px;
+        }
+        .image-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .hotspot {
+            position: absolute;
+            border: 2px solid;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .image-container:hover .hotspot {
+            opacity: 0.6;
+            animation: pulse 2s infinite;
+        }
+        .hotspot:hover {
+            opacity: 1 !important;
+            animation: none;
+        }
+        .hotspot-ears { border-color: #3B82F6; background: rgba(59, 130, 246, 0.2); }
+        .hotspot-eyes { border-color: #10B981; background: rgba(16, 185, 129, 0.2); }
+        .hotspot-nose { border-color: #EC4899; background: rgba(236, 72, 153, 0.2); }
+        .hotspot-tail { border-color: #F59E0B; background: rgba(245, 158, 11, 0.2); }
+        .hotspot-paws { border-color: #8B5CF6; background: rgba(139, 92, 246, 0.2); }
+        .hotspot-coat { border-color: #F97316; background: rgba(249, 115, 22, 0.2); }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            min-width: 200px;
+            max-width: 250px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .hotspot:hover .tooltip {
+            opacity: 1;
+        }
+        .tooltip strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        .tooltip p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #666;
+        }
+        
+        .instructions {
+            background: #EEF2FF;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #4F46E5;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #4F46E5;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .feature-item {
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .feature-ears { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
+        .feature-eyes { background: rgba(16, 185, 129, 0.1); color: #10B981; }
+        .feature-nose { background: rgba(236, 72, 153, 0.1); color: #EC4899; }
+        .feature-tail { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
+        .feature-paws { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
+        .feature-coat { background: rgba(249, 115, 22, 0.1); color: #F97316; }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🐾 Interactive Pet Image Hotspots Demo</h1>
+        
+        <div class="instructions">
+            <h3>How to Use:</h3>
+            <ol>
+                <li><strong>Hover over the image</strong> - All hotspot areas become visible with pulsing animation</li>
+                <li><strong>Hover over a specific area</strong> - See the fun fact tooltip appear</li>
+                <li><strong>In Filament Admin</strong> - Click on the image preview to add new hotspots</li>
+            </ol>
+        </div>
+
+        <div class="demo-section">
+            <h2>Demo: Golden Retriever</h2>
+            <p>Hover over the dog image to discover fun facts about different features!</p>
+            
+            <div class="image-container">
+                <img src="https://cdn2.thedogapi.com/images/HJ7PzgY4Q.jpg" alt="Golden Retriever">
+                
+                <!-- Ears Hotspot -->
+                <div class="hotspot hotspot-ears" style="top: 15%; left: 50%; width: 50px; height: 45px; transform: translate(-50%, -50%);">
+                    <div class="tooltip" style="bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 8px;">
+                        <strong style="color: #3B82F6;">🦻 Golden Retriever's Ears</strong>
+                        <p>Their floppy ears help protect the ear canal from water and debris when swimming.</p>
+                    </div>
+                </div>
+                
+                <!-- Eyes Hotspot -->
+                <div class="hotspot hotspot-eyes" style="top: 30%; left: 50%; width: 50px; height: 30px; transform: translate(-50%, -50%);">
+                    <div class="tooltip" style="bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 8px;">
+                        <strong style="color: #10B981;">👁️ Golden Retriever's Eyes</strong>
+                        <p>Their soft, intelligent expression is a key characteristic that's part of the breed standard.</p>
+                    </div>
+                </div>
+                
+                <!-- Nose Hotspot -->
+                <div class="hotspot hotspot-nose" style="top: 45%; left: 50%; width: 30px; height: 30px; transform: translate(-50%, -50%);">
+                    <div class="tooltip" style="top: 100%; left: 50%; transform: translateX(-50%); margin-top: 8px;">
+                        <strong style="color: #EC4899;">👃 Golden Retriever's Nose</strong>
+                        <p>Their excellent sense of smell makes them perfect for search and rescue work.</p>
+                    </div>
+                </div>
+                
+                <!-- Tail Hotspot -->
+                <div class="hotspot hotspot-tail" style="top: 70%; left: 85%; width: 40px; height: 50px; transform: translate(-50%, -50%);">
+                    <div class="tooltip" style="right: 100%; top: 0; margin-right: 8px;">
+                        <strong style="color: #F59E0B;">🦴 Golden Retriever's Tail</strong>
+                        <p>The tail acts as a rudder when swimming and shows their happy, friendly nature.</p>
+                    </div>
+                </div>
+                
+                <!-- Paws Hotspot -->
+                <div class="hotspot hotspot-paws" style="top: 85%; left: 30%; width: 35px; height: 35px; transform: translate(-50%, -50%);">
+                    <div class="tooltip" style="bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 8px;">
+                        <strong style="color: #8B5CF6;">🐾 Golden Retriever's Paws</strong>
+                        <p>Their webbed feet help them excel at swimming and water activities.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Available Features & Colors</h2>
+            <div class="feature-list">
+                <div class="feature-item feature-ears">🦻 Ears (Blue)</div>
+                <div class="feature-item feature-eyes">👁️ Eyes (Green)</div>
+                <div class="feature-item feature-nose">👃 Nose (Pink)</div>
+                <div class="feature-item feature-tail">🦴 Tail (Amber)</div>
+                <div class="feature-item feature-paws">🐾 Paws (Purple)</div>
+                <div class="feature-item feature-coat">🧥 Coat (Orange)</div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Implementation in Filament</h2>
+            <div class="instructions">
+                <h3>Step-by-Step:</h3>
+                <ol>
+                    <li>Go to <strong>Pets</strong> resource in Filament admin</li>
+                    <li>Create or edit a pet breed</li>
+                    <li>Add an image URL (or select from API)</li>
+                    <li>Expand the <strong>"Image Preview"</strong> section</li>
+                    <li><strong>Click on the image</strong> where you want to add a hotspot</li>
+                    <li>Enter the feature name when prompted (e.g., <code>ears</code>, <code>eyes</code>, <code>nose</code>)</li>
+                    <li>Enter a fun fact about that feature</li>
+                    <li>Repeat for other features</li>
+                    <li>Save the form</li>
+                </ol>
+                
+                <p style="margin-top: 15px;"><strong>🎯 Pro Tip:</strong> Enable the "Show Helper" button to see a grid overlay that helps you position hotspots more accurately!</p>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>JSON Structure Example</h2>
+            <pre style="background: #f4f4f4; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>{
+  "hotspots": [
+    {
+      "feature": "ears",
+      "position_x": 50,
+      "position_y": 15,
+      "width": 50,
+      "height": 45
+    },
+    {
+      "feature": "eyes",
+      "position_x": 50,
+      "position_y": 30,
+      "width": 50,
+      "height": 30
+    }
+  ],
+  "fun_facts": [
+    {
+      "feature": "ears",
+      "fact": "Their floppy ears help protect the ear canal from water."
+    },
+    {
+      "feature": "eyes",
+      "fact": "Their soft expression is part of the breed standard."
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <div class="demo-section">
+            <h2>✨ Features</h2>
+            <ul style="line-height: 1.8;">
+                <li>✅ <strong>Visual Image Editor</strong> - Click directly on images to add hotspots</li>
+                <li>✅ <strong>Real-time Preview</strong> - See hotspots as you add them</li>
+                <li>✅ <strong>Smart Positioning</strong> - Tooltips automatically position themselves based on hotspot location</li>
+                <li>✅ <strong>Color-Coded Features</strong> - Each body part has its own distinctive color</li>
+                <li>✅ <strong>Responsive Design</strong> - Works on desktop and mobile devices</li>
+                <li>✅ <strong>Pulsing Animation</strong> - Hotspots pulse when hovering over the image</li>
+                <li>✅ <strong>Grid Helper</strong> - Optional grid overlay for precise positioning</li>
+                <li>✅ <strong>Database Storage</strong> - All hotspots and facts stored as JSON in the database</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666;">
+            <p><strong>Interactive Pet Image Hotspots</strong> - Created for Pets of World</p>
+            <p>For more details, see <code>INTERACTIVE_HOTSPOTS_GUIDE.md</code></p>
+        </div>
+    </div>
+</body>
+</html>
