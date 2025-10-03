@@ -179,6 +179,7 @@ class PetResource extends Resource
                     ->label('Image URL')
                     ->required()
                     ->url()
+                    ->live(onBlur: true)
                     ->helperText('This stores a direct image URL from the API'),
 
                 Forms\Components\Textarea::make('description')
@@ -195,7 +196,12 @@ class PetResource extends Resource
                         Forms\Components\ViewField::make('image_preview')
                             ->view('filament.components.image-preview')
                             ->label('Preview Image (Click on areas to add fun facts)')
-                            ->helperText('Click on different parts of the image (ears, eyes, nose, etc.) to add fun facts'),
+                            ->helperText('Click on different parts of the image (ears, eyes, nose, etc.) to add fun facts')
+                            ->reactive()
+                            ->afterStateHydrated(function ($component, $state, $get) {
+                                // Pass the current image URL to the component
+                                $component->state($get('image'));
+                            }),
                     ])
                     ->collapsed()
                     ->visible(fn ($get) => !empty($get('image'))),
