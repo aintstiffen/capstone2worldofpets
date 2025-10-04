@@ -122,8 +122,8 @@ class AssessmentController extends Controller
                 'name' => $pet->name,
                 'size' => $mappedSize,
                 'hairLength' => $hairLength,
-                // Use the same accessor as breed pages so images match everywhere
-                'image' => $pet->image_url ?: ("https://placedog.net/400/300?id=" . $pet->id),
+                // Use the same accessor and fallback placeholder as breed pages
+                'image' => $pet->image_url ?: '/placeholder.svg?height=300&width=400',
                 'description' => $pet->description,
                 'traits' => $traits,
                 'personalityMatch' => $personalityMatch
@@ -208,8 +208,8 @@ class AssessmentController extends Controller
                 'name' => $pet->name,
                 'size' => $mappedSize,
                 'hairLength' => $hairLength,
-                // Use the same accessor as breed pages so images match everywhere
-                'image' => $pet->image_url ?: ("https://placekitten.com/400/300?image=" . $pet->id),
+                // Use the same accessor and fallback placeholder as breed pages
+                'image' => $pet->image_url ?: '/placeholder.svg?height=300&width=400',
                 'description' => $pet->description,
                 'traits' => $traits,
                 'personalityMatch' => $personalityMatch
@@ -248,36 +248,42 @@ class AssessmentController extends Controller
             ];
         }
         
-        // Check if we have saved results and need to enhance them with complete breed data
-        if ($savedResults['petType'] && !empty($savedResults['recommendedBreeds'])) {
-            // Ensure the recommended breeds have complete data
+        // Check if we have saved results and normalize them with complete, current DB data
+        if (($savedResults['petType'] ?? null) && !empty($savedResults['recommendedBreeds'])) {
             foreach ($savedResults['recommendedBreeds'] as $index => $breed) {
-                // If we're missing important breed data, try to fetch it
-                if (empty($breed['image']) || empty($breed['description']) || empty($breed['traits'])) {
+                // Try to resolve the Pet by id first, then by slug
+                $petInfo = null;
+                if (!empty($breed['id'])) {
                     $petInfo = Pet::find($breed['id']);
-                    
-                    if ($petInfo) {
-                        // Update with full breed information
-                        $savedResults['recommendedBreeds'][$index] = [
-                            'id' => $petInfo->id,
-                            'slug' => $petInfo->slug,
-                            'name' => $petInfo->name,
-                            'size' => $savedResults['preferences']['size'] ?? 'medium',
-                            'hairLength' => $savedResults['preferences']['hairLength'] ?? 'short',
-                            // Match breed pages image resolution using accessor
-                            'image' => $petInfo->image_url ?: (
-                                $savedResults['petType'] === 'dog' 
-                                    ? ("https://placedog.net/400/300?id=" . $petInfo->id) 
-                                    : ("https://placekitten.com/400/300?image=" . $petInfo->id)
-                            ),
-                            'description' => $petInfo->description,
-                            'traits' => explode(', ', $petInfo->temperament),
-                        ];
+                }
+                // If ID lookup fails or points to a different slug, prefer slug to ensure correctness
+                if (!empty($breed['slug'])) {
+                    if (!$petInfo || ($petInfo && $petInfo->slug !== $breed['slug'])) {
+                        $bySlug = Pet::where('slug', $breed['slug'])->first();
+                        if ($bySlug) {
+                            $petInfo = $bySlug;
+                        }
                     }
                 }
+
+                if ($petInfo) {
+                    // Always refresh with canonical data to avoid stale/placeholder images
+                    $savedResults['recommendedBreeds'][$index] = [
+                        'id' => $petInfo->id,
+                        'slug' => $petInfo->slug,
+                        'name' => $petInfo->name,
+                        // Preferences-driven summary fields (for display chips on the card)
+                        'size' => $savedResults['preferences']['size'] ?? 'medium',
+                        'hairLength' => $savedResults['preferences']['hairLength'] ?? 'short',
+                        // Use the same accessor as breed pages so images always match
+                        'image' => $petInfo->image_url ?: '/placeholder.svg?height=300&width=400',
+                        'description' => $petInfo->description,
+                        'traits' => array_slice(explode(', ', (string) $petInfo->temperament), 0, 3),
+                    ];
+                }
             }
-            
-            // Re-save the enhanced results to session
+
+            // Re-save the normalized results to session so the view uses updated images
             Session::put('assessment_results', $savedResults);
         }
 
@@ -297,11 +303,16 @@ class AssessmentController extends Controller
                 }
                 
                 // Make sure image is set
-                if (empty($breed['image']) && isset($breed['id'])) {
-                    $defaultImage = ($savedResults['petType'] === 'dog') 
-                        ? "https://placedog.net/400/300?id={$breed['id']}" 
-                        : "https://placekitten.com/400/300?image={$breed['id']}";
-                    $breed['image'] = $defaultImage;
+                if (empty($breed['image'])) {
+                    // Try to pull from DB; if not, use the neutral placeholder used by breed pages
+                    $pet = null;
+                    if (!empty($breed['id'])) {
+                        $pet = Pet::find($breed['id']);
+                    }
+                    if (!$pet && !empty($breed['slug'])) {
+                        $pet = Pet::where('slug', $breed['slug'])->first();
+                    }
+                    $breed['image'] = $pet && $pet->image_url ? $pet->image_url : '/placeholder.svg?height=300&width=400';
                 }
             }
         }

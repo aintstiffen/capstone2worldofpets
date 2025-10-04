@@ -200,7 +200,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                             <template x-for="(breed, index) in recommendedBreeds" :key="index">
                                 <div class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition h-full flex flex-col">
-                                    <img :src="breed.image || (`/${petType}s/${breed.slug}.jpg`)" :alt="breed.name"
+                                    <img :src="getBreedImage(breed)" :alt="breed.name"
                                         class="w-full h-48 object-cover" loading="lazy">
                                     <div class="p-4 flex flex-col flex-1">
                                         <h3 class="font-bold text-lg mb-1" x-text="breed.name"></h3>
@@ -214,8 +214,7 @@
                                             <div class="text-sm font-medium mb-1">Your Personality Traits:</div>
                                             <div class="flex flex-wrap gap-2">
                                                 <template x-for="(trait, i) in breed.traits" :key="i">
-                                                    <span class="text-xs px-2 py-1 rounded bg-[color-mix(in_oklab,var(--color-primary)_12%,white)] text-[var(--color-primary)] border border-[var(--color-border)]" 
-                                                        x-text="trait"></span>
+                                                    <span class="text-xs px-2 py-1 rounded bg-[color-mix(in_oklab,var(--color-primary)_12%,white)] text-[var(--color-primary)] border border-[var(--color-border)]" x-text="trait"></span>
                                                 </template>
                                             </div>
                                         </div>
@@ -278,6 +277,11 @@
             // Use safer initialization with try/catch
             let savedResults = { petType: null, preferences: null, recommendedBreeds: [] };
             let hasSavedResults = false;
+            // Load master breed lists once so we can always resolve canonical images by slug/id
+            let masterDogBreeds = [];
+            let masterCatBreeds = [];
+            try { masterDogBreeds = JSON.parse('{!! addslashes($dogBreeds ?? "[]") !!}'); } catch (e) { masterDogBreeds = []; }
+            try { masterCatBreeds = JSON.parse('{!! addslashes($catBreeds ?? "[]") !!}'); } catch (e) { masterCatBreeds = []; }
             
             try {
                 // Check if the variable exists and is valid JSON
@@ -347,6 +351,13 @@
                     hairLength: null, // short, long
                     size: null, // small, medium, large
                 },
+                // Master data and quick-lookup maps to keep images in sync with breed pages
+                masterDogBreeds: masterDogBreeds,
+                masterCatBreeds: masterCatBreeds,
+                dogSlugIndex: Object.fromEntries((masterDogBreeds || []).map(b => [b.slug, b])),
+                catSlugIndex: Object.fromEntries((masterCatBreeds || []).map(b => [b.slug, b])),
+                dogIdIndex: Object.fromEntries((masterDogBreeds || []).map(b => [b.id, b])),
+                catIdIndex: Object.fromEntries((masterCatBreeds || []).map(b => [b.id, b])),
                 // New: sectioned flow over 3 sets of 10
                 currentSection: 0,
                 questionsPerSection: 10,
@@ -689,6 +700,24 @@
                     
                     // Take top 3
                     this.recommendedBreeds = filteredBreeds.slice(0, 3);
+                },
+
+                // Always resolve to the canonical image for a breed by slug/id, falling back to the value on the item
+                getBreedImage(breed) {
+                    const placeholder = '/placeholder.svg?height=300&width=400';
+                    if (!breed) return placeholder;
+                    // Try slug first
+                    const slugMap = this.petType === 'dog' ? this.dogSlugIndex : this.catSlugIndex;
+                    if (breed.slug && slugMap[breed.slug] && slugMap[breed.slug].image) {
+                        return slugMap[breed.slug].image;
+                    }
+                    // Then id
+                    const idMap = this.petType === 'dog' ? this.dogIdIndex : this.catIdIndex;
+                    if (breed.id && idMap[breed.id] && idMap[breed.id].image) {
+                        return idMap[breed.id].image;
+                    }
+                    // Finally, use what's on the item (which may have been normalized server-side)
+                    return breed.image || placeholder;
                 },
                 
                 saveResults() {
