@@ -190,6 +190,10 @@
                         <h1 class="text-3xl font-bold">{{ $pet->name }}</h1>
                         <p class="text-[--color-muted-foreground]">{{ $pet->temperament }}</p>
                     </div>
+                                       {{-- Quick Actions (Top) --}}
+                    <div class="flex flex-wrap gap-3">
+                        <a href="{{ route('dogs') }}" class="inline-flex items-center px-4 py-2 rounded-md bg-[color-mix(in_oklab,var(--color-primary)_8%,white)] hover:bg-[color-mix(in_oklab,var(--color-primary)_15%,white)] text-[var(--color-foreground)] border border-[var(--color-border)] transition hover-lift">← Back to Dog Breeds</a>
+                    </div>
 
                     {{-- Overview --}}
                     <div class="space-y-4 pt-4">
