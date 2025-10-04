@@ -25,7 +25,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path('worldofpets/admin/admin/hidden')
             ->login()
             ->authGuard('admin')
             ->brandName('World of Pets Admin')
