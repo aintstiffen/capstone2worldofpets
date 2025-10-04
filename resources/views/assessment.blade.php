@@ -118,76 +118,74 @@
                     </div>
                 </template>
 
-                <!-- Step 4: Personality Questions -->
+                <!-- Step 4: Personality Questions (3 sets of 10 with transitions) -->
                 <template x-if="currentStage === 'personality'">
                     <div>
                         <h2 class="text-2xl font-bold mb-2">Personality Assessment</h2>
-                        <p class="text-gray-600 mb-4">Question <span x-text="currentQuestion + 1"></span> of <span x-text="personalityQuestions.length"></span></p>
-                        
-                        <!-- Required field notification -->
-                        <p class="text-sm text-gray-600 mb-4">* All questions require an answer</p>
+                        <p class="text-[var(--color-muted-foreground)] mb-4">Set <span x-text="currentSection + 1"></span> of <span x-text="totalSections"></span> · Questions <span x-text="(currentSection*questionsPerSection)+1"></span>-<span x-text="Math.min((currentSection+1)*questionsPerSection, personalityQuestions.length)"></span></p>
+                        <p class="text-sm text-[var(--color-muted-foreground)] mb-4">All questions in this set are required.</p>
 
-                        <!-- Progress Bar -->
-                        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
-                            <div class="bg-blue-500 h-2.5 rounded-full"
-                                :style="`width: ${((currentQuestion+1)/personalityQuestions.length)*100}%`">
-                            </div>
+                        <!-- Overall Progress Bar -->
+                        <div class="w-full rounded-full h-2.5 mb-6" style="background-color: color-mix(in oklab, var(--color-muted) 60%, white);">
+                            <div class="h-2.5 rounded-full bg-[var(--color-primary)]" :style="`width: ${Math.round((answeredCount()/personalityQuestions.length)*100)}%`"></div>
                         </div>
 
-                        <div class="border rounded-lg p-6 mb-6 bg-white shadow-sm">
-                            <h3 class="text-lg font-medium mb-6" x-text="personalityQuestions[currentQuestion].question"></h3>
-                            
-                            <div class="grid grid-cols-5 gap-2 text-center">
-                                <div class="text-sm text-gray-600">Strongly Disagree</div>
-                                <div class="col-span-3"></div>
-                                <div class="text-sm text-gray-600">Strongly Agree</div>
-                            </div>
-                            
-                            <div class="flex justify-between items-center mt-2 mb-4">
-                                <template x-for="n in 5" :key="n">
-                                    <label class="flex flex-col items-center cursor-pointer">
-                                        <input type="radio" :name="'q'+currentQuestion" :value="n" 
-                                            x-model="personalityAnswers[currentQuestion]" 
-                                            class="mb-2 h-4 w-4 accent-blue-500 transition duration-200">
-                                        <span class="text-sm" x-text="n"></span>
-                                    </label>
-                                </template>
-                            </div>
-                            
-                            <!-- Selection indicator -->
-                            <div class="flex justify-center mt-2" x-show="!personalityAnswers[currentQuestion]">
-                                <p class="text-sm text-amber-600" x-show="attemptedNext"
-                                   x-transition:enter="transition ease-out duration-300"
-                                   x-transition:enter-start="opacity-0 transform translate-y-2"
-                                   x-transition:enter-end="opacity-100 transform translate-y-0">
-                                   Please select one option above
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-between">
-                            <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
-                                @click="prevQuestion" x-show="currentQuestion > 0 || currentStage !== 'personality'">
-                                Back
-                            </button>
-                            <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
-                                @click="currentStage = 'size'" x-show="currentQuestion === 0">
-                                Back to Preferences
-                            </button>
-                            <div class="relative" x-data="{ showTooltip: false }">
-                                <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
-                                    @click="personalityAnswers[currentQuestion] ? nextQuestion() : showTooltip = true"
-                                    @mouseleave="showTooltip = false">
-                                    <span x-show="currentQuestion < personalityQuestions.length - 1">Next</span>
-                                    <span x-show="currentQuestion === personalityQuestions.length - 1">See Results</span>
-                                </button>
-                                <!-- Validation tooltip -->
-                                <div x-show="showTooltip && !personalityAnswers[currentQuestion]" 
-                                    class="absolute bottom-full mb-2 right-0 bg-red-100 text-red-700 px-3 py-1 rounded shadow-sm text-sm"
-                                    style="width: max-content;">
-                                    Please select an answer before proceeding
-                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-l-4 border-r-4 border-t-4 border-transparent border-t-red-100" style="border-width: 6px;"></div>
+                        <!-- Section Card with animated transition -->
+                        <div class="border rounded-lg p-6 mb-6 bg-white shadow-sm overflow-hidden"
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 transform translate-y-2"
+                             x-transition:enter-end="opacity-100 transform translate-y-0"
+                             x-transition:leave="transition ease-in duration-200"
+                             x-transition:leave-start="opacity-100 transform translate-y-0"
+                             x-transition:leave-end="opacity-0 transform -translate-y-2">
+                            <template x-for="(q, i) in sectionQuestions()" :key="currentSection + '-' + i">
+                                <div class="mb-5">
+                                    <h3 class="text-base font-medium mb-3" x-text="q.question"></h3>
+                                    <div class="grid grid-cols-5 gap-2 text-center text-xs text-[var(--color-muted-foreground)] mb-1">
+                                        <div>Strongly Disagree</div>
+                                        <div class="col-span-3"></div>
+                                        <div>Strongly Agree</div>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <template x-for="n in 5" :key="n">
+                                            <label class="flex flex-col items-center cursor-pointer select-none">
+                                                <input type="radio" :name="'q'+(sectionBaseIndex()+i)" :value="n"
+                                                    x-model="personalityAnswers[sectionBaseIndex()+i]"
+                                                    class="mb-1 h-4 w-4 accent-[var(--color-primary)] transition duration-200">
+                                                <span class="text-sm" x-text="n"></span>
+                                            </label>
+                                        </template>
+                                    </div>
                                 </div>
+                            </template>
+
+                            <!-- Section completion hint -->
+                            <p class="text-sm text-amber-600" x-show="attemptedNext && !isSectionComplete()"
+                               x-transition:enter="transition ease-out duration-300"
+                               x-transition:enter-start="opacity-0 transform translate-y-2"
+                               x-transition:enter-end="opacity-100 transform translate-y-0">
+                               Please answer all questions in this set before continuing.
+                            </p>
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 items-center justify-between">
+                            <div class="flex gap-3">
+                                <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5" 
+                                    @click="prevSet" x-show="currentSection > 0">
+                                    Back
+                                </button>
+                                <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5" 
+                                    @click="currentStage = 'size'">
+                                    Back to Preferences
+                                </button>
+                            </div>
+                            <div class="flex gap-3 items-center">
+                                <div class="text-sm text-[var(--color-muted-foreground)]">Set progress: <span x-text="sectionAnsweredCount()"></span>/<span x-text="questionsPerSection"></span></div>
+                                <button class="text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] focus:ring-4 focus:outline-none focus:ring-[var(--color-accent)] font-medium rounded-lg text-sm px-5 py-2.5" 
+                                    @click="isSectionComplete() ? nextSet() : attemptedNext = true">
+                                    <span x-show="currentSection < totalSections - 1">Next Set</span>
+                                    <span x-show="currentSection === totalSections - 1">See Results</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -349,7 +347,11 @@
                     hairLength: null, // short, long
                     size: null, // small, medium, large
                 },
-                currentQuestion: 0,
+                // New: sectioned flow over 3 sets of 10
+                currentSection: 0,
+                questionsPerSection: 10,
+                get totalSections() { return Math.ceil(this.personalityQuestions.length / this.questionsPerSection) },
+                currentQuestion: 0, // kept for backward compat if needed
                 personalityAnswers: {},
                 attemptedNext: false,
                 resultsSaved: false, // Initially false, only true when user manually saves results
@@ -527,29 +529,38 @@
                     this.currentStage = 'hairLength';
                 },
                 
-                nextQuestion() {
-                    if (!this.personalityAnswers[this.currentQuestion]) {
-                        this.attemptedNext = true;
-                        return false;
+                // Helpers for sectioned flow
+                sectionBaseIndex() { return this.currentSection * this.questionsPerSection },
+                sectionQuestions() {
+                    const start = this.sectionBaseIndex();
+                    return this.personalityQuestions.slice(start, start + this.questionsPerSection);
+                },
+                sectionAnsweredCount() {
+                    const start = this.sectionBaseIndex();
+                    let count = 0;
+                    for (let i = 0; i < this.questionsPerSection; i++) {
+                        if (this.personalityAnswers[start + i]) count++;
                     }
-                    
+                    return count;
+                },
+                isSectionComplete() { return this.sectionAnsweredCount() === Math.min(this.questionsPerSection, this.personalityQuestions.length - this.sectionBaseIndex()) },
+                answeredCount() { return Object.keys(this.personalityAnswers).filter(k => this.personalityAnswers[k]).length },
+                nextSet() {
+                    if (!this.isSectionComplete()) { this.attemptedNext = true; return; }
                     this.attemptedNext = false;
-                    
-                    if (this.currentQuestion < this.personalityQuestions.length - 1) {
-                        this.currentQuestion++;
+                    if (this.currentSection < this.totalSections - 1) {
+                        this.currentSection++;
                     } else {
+                        // finished all sets
                         this.calculatePersonalityScores();
                         this.calculateResults();
                         this.currentStage = 'results';
                     }
                 },
-                
-                prevQuestion() {
-                    if (this.currentQuestion > 0) {
-                        this.currentQuestion--;
-                    } else {
-                        this.currentStage = 'size';
-                    }
+                prevSet() {
+                    this.attemptedNext = false;
+                    if (this.currentSection > 0) { this.currentSection--; }
+                    else { this.currentStage = 'size'; }
                 },
                 
                 calculatePersonalityScores() {
