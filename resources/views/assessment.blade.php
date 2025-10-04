@@ -67,7 +67,7 @@
                             <button class="p-6 border rounded-lg hover:bg-blue-50 transition" 
                                 @click="preferences.hairLength = 'short'; currentStage = 'size'">
                                 <div class="h-32 flex items-center justify-center mb-3">
-                                    <img :src="petType === 'dog' ? 'https://placedog.net/400/300?id=7' : 'https://placekitten.com/400/300?image=9'" 
+                                    <img :src="petType === 'dog' ? 'https://topdogtips.com/wp-content/uploads/2017/04/Best-short-hair-dog-breeds-16.jpg' : 'https://www.petrescueblog.com/wp-content/uploads/2021/01/e8901c74e0ffaebaac19d375c30c39b8-1140x855.jpg'" 
                                         alt="Short hair" class="h-full object-cover rounded">
                                 </div>
                                 <p class="text-center font-medium">Short Hair</p>
@@ -75,7 +75,7 @@
                             <button class="p-6 border rounded-lg hover:bg-blue-50 transition" 
                                 @click="preferences.hairLength = 'long'; currentStage = 'size'">
                                 <div class="h-32 flex items-center justify-center mb-3">
-                                    <img :src="petType === 'dog' ? 'https://placedog.net/400/300?id=8' : 'https://placekitten.com/400/300?image=3'" 
+                                    <img :src="petType === 'dog' ? 'https://tse1.mm.bing.net/th/id/OIP.oj0himbKqq-E9Qz_x8EYrwHaHa?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3' : 'https://static9.depositphotos.com/1594920/1089/i/950/depositphotos_10893465-stock-photo-british-longhair-kitten-3-months.jpg'" 
                                         alt="Long hair" class="h-full object-cover rounded">
                                 </div>
                                 <p class="text-center font-medium">Long Hair</p>
@@ -199,10 +199,10 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                             <template x-for="(breed, index) in recommendedBreeds" :key="index">
-                                <div class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition">
+                                <div class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition h-full flex flex-col">
                                     <img :src="breed.image" :alt="breed.name"
                                         class="w-full h-48 object-cover">
-                                    <div class="p-4">
+                                    <div class="p-4 flex flex-col flex-1">
                                         <h3 class="font-bold text-lg mb-1" x-text="breed.name"></h3>
                                         <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
                                             <span x-text="preferences.size.charAt(0).toUpperCase() + preferences.size.slice(1)"></span>
@@ -221,7 +221,7 @@
                                         </div>
                                         
                                         <!-- Add link to view more details -->
-                                        <div class="mt-4 text-center">
+                                        <div class="mt-auto pt-4 text-center">
                                             <a :href="'/' + petType + 's/' + breed.slug" 
                                                class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2">
                                                View Details

@@ -29,9 +29,6 @@ class UserResource extends Resource
                             ->disabled(),
                         Forms\Components\TextInput::make('email')
                             ->disabled(),
-                        Forms\Components\TextInput::make('assessments_count')
-                            ->label('Total Assessments')
-                            ->disabled(),
                         Forms\Components\DateTimePicker::make('created_at')
                             ->label('Registration Date')
                             ->disabled(),
