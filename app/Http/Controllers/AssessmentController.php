@@ -44,7 +44,7 @@ class AssessmentController extends Controller
         }
         
         // Get dog and cat breeds from database
-        $dogBreeds = Pet::where('category', 'dog')->get()->map(function($pet) {
+    $dogBreeds = Pet::where('category', 'dog')->get()->map(function($pet) {
             $sizeMap = [
                 'Small' => 'small',
                 'Small to Medium' => 'small',
@@ -122,7 +122,8 @@ class AssessmentController extends Controller
                 'name' => $pet->name,
                 'size' => $mappedSize,
                 'hairLength' => $hairLength,
-                'image' => $pet->image ? asset('storage/' . $pet->image) : "https://placedog.net/400/300?id=" . $pet->id,
+                // Use the same accessor as breed pages so images match everywhere
+                'image' => $pet->image_url ?: ("https://placedog.net/400/300?id=" . $pet->id),
                 'description' => $pet->description,
                 'traits' => $traits,
                 'personalityMatch' => $personalityMatch
@@ -207,7 +208,8 @@ class AssessmentController extends Controller
                 'name' => $pet->name,
                 'size' => $mappedSize,
                 'hairLength' => $hairLength,
-                'image' => $pet->image ? asset('storage/' . $pet->image) : "https://placekitten.com/400/300?image=" . $pet->id,
+                // Use the same accessor as breed pages so images match everywhere
+                'image' => $pet->image_url ?: ("https://placekitten.com/400/300?image=" . $pet->id),
                 'description' => $pet->description,
                 'traits' => $traits,
                 'personalityMatch' => $personalityMatch
@@ -262,9 +264,12 @@ class AssessmentController extends Controller
                             'name' => $petInfo->name,
                             'size' => $savedResults['preferences']['size'] ?? 'medium',
                             'hairLength' => $savedResults['preferences']['hairLength'] ?? 'short',
-                            'image' => $petInfo->image ? asset('storage/' . $petInfo->image) : 
-                                ($savedResults['petType'] === 'dog' ? "https://placedog.net/400/300?id=" . $petInfo->id : 
-                                                                  "https://placekitten.com/400/300?image=" . $petInfo->id),
+                            // Match breed pages image resolution using accessor
+                            'image' => $petInfo->image_url ?: (
+                                $savedResults['petType'] === 'dog' 
+                                    ? ("https://placedog.net/400/300?id=" . $petInfo->id) 
+                                    : ("https://placekitten.com/400/300?image=" . $petInfo->id)
+                            ),
                             'description' => $petInfo->description,
                             'traits' => explode(', ', $petInfo->temperament),
                         ];
@@ -366,9 +371,12 @@ class AssessmentController extends Controller
                     'name' => $petInfo->name,
                     'size' => $sizeMap[$petInfo->size] ?? 'medium',
                     'hairLength' => $hairLength,
-                    'image' => $petInfo->image ? asset('storage/' . $petInfo->image) : 
-                        ($petType === 'dog' ? "https://placedog.net/400/300?id=" . $petInfo->id : 
-                                           "https://placekitten.com/400/300?image=" . $petInfo->id),
+                    // Ensure assessment uses the same image as breed pages
+                    'image' => $petInfo->image_url ?: (
+                        $petType === 'dog' 
+                            ? ("https://placedog.net/400/300?id=" . $petInfo->id) 
+                            : ("https://placekitten.com/400/300?image=" . $petInfo->id)
+                    ),
                     'description' => $petInfo->description,
                     'traits' => $traits,
                 ];

@@ -200,8 +200,8 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                             <template x-for="(breed, index) in recommendedBreeds" :key="index">
                                 <div class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition h-full flex flex-col">
-                                    <img :src="breed.image" :alt="breed.name"
-                                        class="w-full h-48 object-cover">
+                                    <img :src="breed.image || (`/${petType}s/${breed.slug}.jpg`)" :alt="breed.name"
+                                        class="w-full h-48 object-cover" loading="lazy">
                                     <div class="p-4 flex flex-col flex-1">
                                         <h3 class="font-bold text-lg mb-1" x-text="breed.name"></h3>
                                         <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
@@ -214,7 +214,7 @@
                                             <div class="text-sm font-medium mb-1">Your Personality Traits:</div>
                                             <div class="flex flex-wrap gap-2">
                                                 <template x-for="(trait, i) in breed.traits" :key="i">
-                                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded" 
+                                                    <span class="text-xs px-2 py-1 rounded bg-[color-mix(in_oklab,var(--color-primary)_12%,white)] text-[var(--color-primary)] border border-[var(--color-border)]" 
                                                         x-text="trait"></span>
                                                 </template>
                                             </div>
