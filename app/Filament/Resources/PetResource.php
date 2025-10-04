@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Tables\Columns\ImageColumn;
 use Illuminate\Support\Facades\Http;
+use Filament\Notifications\Notification;
 
 class PetResource extends Resource
 {
@@ -131,46 +132,214 @@ class PetResource extends Resource
                         return $results;
                     })
                     ->afterStateUpdated(function ($state, $set, $get) {
-                        // When a breed is chosen, fetch an image for it and set image field to URL
+                        // When a breed is chosen, fetch full details and autofill form fields
                         $type = $get('category');
                         if (!$type || !$state) return;
 
                         try {
+                            // Show loading notification
+                            \Filament\Notifications\Notification::make()
+                                ->title('Fetching breed details...')
+                                ->info()
+                                ->send();
+                            
+                            $breedData = null;
+                            
                             if ($type === 'dog') {
-                                // TheDogAPI: images search by breed id
-                                $resp = Http::withHeaders([
+                                // Fetch breed details from TheDogAPI using breeds endpoint
+                                $breedResp = Http::withHeaders([
+                                    'x-api-key' => config('services.dog_api.key'),
+                                ])->get(config('services.dog_api.base_url') . '/breeds', [
+                                    'attach_breed' => 0
+                                ]);
+                                
+                                if ($breedResp->ok()) {
+                                    $breeds = $breedResp->json();
+                                    // Find the breed by ID
+                                    foreach ($breeds as $breed) {
+                                        if ($breed['id'] == $state) {
+                                            $breedData = $breed;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                // Fetch an image for the breed
+                                $imageResp = Http::withHeaders([
                                     'x-api-key' => config('services.dog_api.key'),
                                 ])->get(config('services.dog_api.base_url') . '/images/search', [
                                     'breed_ids' => $state,
                                     'limit' => 1,
                                 ]);
+                                
+                                if ($imageResp->ok() && !empty($imageResp->json())) {
+                                    $imageData = $imageResp->json()[0] ?? [];
+                                    $url = $imageData['url'] ?? null;
+                                    if ($url) {
+                                        $set('image', $url);
+                                    }
+                                }
                             } else {
-                                // TheCatAPI
-                                $resp = Http::withHeaders([
+                                // Fetch breed details from TheCatAPI using breeds endpoint
+                                $breedResp = Http::withHeaders([
+                                    'x-api-key' => config('services.cat_api.key'),
+                                ])->get(config('services.cat_api.base_url') . '/breeds', [
+                                    'attach_breed' => 0
+                                ]);
+                                
+                                if ($breedResp->ok()) {
+                                    $breeds = $breedResp->json();
+                                    // Find the breed by ID
+                                    foreach ($breeds as $breed) {
+                                        if ($breed['id'] == $state) {
+                                            $breedData = $breed;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                // Fetch an image for the breed
+                                $imageResp = Http::withHeaders([
                                     'x-api-key' => config('services.cat_api.key'),
                                 ])->get(config('services.cat_api.base_url') . '/images/search', [
                                     'breed_ids' => $state,
                                     'limit' => 1,
                                 ]);
-                            }
-
-                            if ($resp->ok() && !empty($resp->json())) {
-                                $payload = $resp->json()[0] ?? [];
-                                $url = $payload['url'] ?? null;
-                                if ($url) {
-                                    $set('image', $url);
-                                }
-                                // Try to fill name/slug from the returned breed details if not already set
-                                $breeds = $payload['breeds'] ?? [];
-                                $currentName = $get('name');
-                                if (empty($currentName) && !empty($breeds) && !empty($breeds[0]['name'])) {
-                                    $name = $breeds[0]['name'];
-                                    $set('name', $name);
-                                    $set('slug', \Illuminate\Support\Str::slug($name));
+                                
+                                if ($imageResp->ok() && !empty($imageResp->json())) {
+                                    $imageData = $imageResp->json()[0] ?? [];
+                                    $url = $imageData['url'] ?? null;
+                                    if ($url) {
+                                        $set('image', $url);
+                                    }
                                 }
                             }
+                            
+                            // Autofill form fields from breed data
+                            if ($breedData) {
+                                // Name and slug
+                                if (!empty($breedData['name'])) {
+                                    $set('name', $breedData['name']);
+                                    $set('slug', \Illuminate\Support\Str::slug($breedData['name']));
+                                }
+                                
+                                // Temperament
+                                if (!empty($breedData['temperament'])) {
+                                    $set('temperament', $breedData['temperament']);
+                                }
+                                
+                                // Lifespan
+                                if (!empty($breedData['life_span'])) {
+                                    $set('lifespan', $breedData['life_span']);
+                                }
+                                
+                                // Description - handle both APIs
+                                $description = '';
+                                if (!empty($breedData['description'])) {
+                                    $description = $breedData['description'];
+                                } elseif (!empty($breedData['bred_for'])) {
+                                    // For dogs, use bred_for as part of description
+                                    $description = "Bred for: " . $breedData['bred_for'] . ". ";
+                                    if (!empty($breedData['breed_group'])) {
+                                        $description .= "Breed Group: " . $breedData['breed_group'] . ". ";
+                                    }
+                                }
+                                
+                                // Add temperament to description if not already set
+                                if ($description && !empty($breedData['temperament'])) {
+                                    $description .= "Temperament: " . $breedData['temperament'] . ".";
+                                }
+                                
+                                if ($description) {
+                                    $set('description', $description);
+                                }
+                                
+                                // Cat-specific ratings (1-5 scale)
+                                if ($type === 'cat') {
+                                    // Energy level
+                                    if (isset($breedData['energy_level'])) {
+                                        $energyMap = [1 => 'Low', 2 => 'Low', 3 => 'Medium', 4 => 'High', 5 => 'High'];
+                                        $set('energy', $energyMap[$breedData['energy_level']] ?? 'Medium');
+                                    }
+                                    
+                                    if (isset($breedData['affection_level'])) {
+                                        $set('friendliness', $breedData['affection_level']);
+                                    }
+                                    
+                                    if (isset($breedData['intelligence'])) {
+                                        $set('trainability', $breedData['intelligence']);
+                                    }
+                                    
+                                    if (isset($breedData['energy_level'])) {
+                                        $set('exerciseNeeds', $breedData['energy_level']);
+                                    }
+                                    
+                                    if (isset($breedData['grooming'])) {
+                                        $set('grooming', $breedData['grooming']);
+                                    }
+                                    
+                                    // Size from weight
+                                    if (!empty($breedData['weight']['imperial'])) {
+                                        $weight = $breedData['weight']['imperial'];
+                                        preg_match('/(\d+)/', $weight, $matches);
+                                        $avgWeight = isset($matches[1]) ? (int)$matches[1] : 0;
+                                        
+                                        if ($avgWeight < 8) {
+                                            $set('size', 'Small');
+                                        } elseif ($avgWeight < 15) {
+                                            $set('size', 'Medium');
+                                        } else {
+                                            $set('size', 'Large');
+                                        }
+                                    }
+                                }
+                                
+                                // Dog-specific fields
+                                if ($type === 'dog') {
+                                    // Set default ratings for dogs (APIs don't provide these)
+                                    $set('friendliness', 4);
+                                    $set('trainability', 3);
+                                    $set('exerciseNeeds', 3);
+                                    $set('grooming', 3);
+                                    $set('energy', 'Medium');
+                                    
+                                    // Size from weight
+                                    if (!empty($breedData['weight']['imperial'])) {
+                                        $weight = $breedData['weight']['imperial'];
+                                        preg_match('/(\d+)/', $weight, $matches);
+                                        $avgWeight = isset($matches[1]) ? (int)$matches[1] : 0;
+                                        
+                                        if ($avgWeight < 25) {
+                                            $set('size', 'Small');
+                                        } elseif ($avgWeight < 60) {
+                                            $set('size', 'Medium');
+                                        } else {
+                                            $set('size', 'Large');
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Show success notification
+                            Notification::make()
+                                ->title('Breed details loaded!')
+                                ->body('Form fields have been automatically filled with breed information.')
+                                ->success()
+                                ->send();
+                                
                         } catch (\Throwable $e) {
-                            // Ignore errors silently
+                            // Log error for debugging
+                            \Log::error('Breed fetch error: ' . $e->getMessage(), [
+                                'breed_id' => $state,
+                                'type' => $type
+                            ]);
+                            
+                            // Show error notification
+                            Notification::make()
+                                ->title('Failed to fetch breed details')
+                                ->body('Error: ' . $e->getMessage() . '. Please fill in the fields manually.')
+                                ->danger()
+                                ->send();
                         }
                     })
                     ->dehydrated(false),
@@ -180,6 +349,7 @@ class PetResource extends Resource
                     ->required()
                     ->url()
                     ->live(onBlur: true)
+                    ->reactive()
                     ->helperText('This stores a direct image URL from the API'),
 
                 Forms\Components\Textarea::make('description')
@@ -196,12 +366,7 @@ class PetResource extends Resource
                         Forms\Components\ViewField::make('image_preview')
                             ->view('filament.components.image-preview')
                             ->label('Preview Image (Click on areas to add fun facts)')
-                            ->helperText('Click on different parts of the image (ears, eyes, nose, etc.) to add fun facts')
-                            ->reactive()
-                            ->afterStateHydrated(function ($component, $state, $get) {
-                                // Pass the current image URL to the component
-                                $component->state($get('image'));
-                            }),
+                            ->helperText('Click on different parts of the image (ears, eyes, nose, etc.) to add fun facts'),
                     ])
                     ->collapsed()
                     ->visible(fn ($get) => !empty($get('image'))),
