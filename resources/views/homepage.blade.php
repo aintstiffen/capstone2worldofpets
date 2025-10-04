@@ -142,9 +142,9 @@
                                     class="rounded-lg object-cover shadow-lg w-full h-auto max-w-md mx-auto" />
 
                                 <!-- Ears Hotspot -->
-                                <div class="absolute rounded-full border-2 border-[var(--color-primary)] bg-white/80 flex items-center justify-center animate-pulse group cursor-pointer"
-                                    style="top: 25%; left: 15%; height: 2rem; width: 2rem;">
-                                    <span class="text-xs font-bold text-primary">Ears</span>
+                                <div class="absolute rounded-full border-2 flex items-center justify-center group cursor-pointer"
+                                    style="top: 15%; left: 12%; height: 3rem; width: 3rem; border-color: rgba(240, 82, 82, 0.9); background-color: rgba(240, 82, 82, 0.18); animation: pulse 2s infinite;">
+                                    <span class="text-xs font-bold text-pink-700">Ears</span>
                                     <!-- Tooltip -->
                                     <div
                                         class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block md:group-hover:block bg-white border border-[var(--color-primary)] rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
@@ -155,9 +155,9 @@
                                 </div>
 
                                 <!-- Tail Hotspot -->
-                                <div class="absolute rounded-full border-2 border-[var(--color-primary)] bg-white/80 flex items-center justify-center animate-pulse group cursor-pointer"
-                                    style="bottom: 10%; right: 15%; height: 2rem; width: 2rem;">
-                                    <span class="text-xs font-bold text-primary">Tail</span>
+                                <div class="absolute rounded-full border-2 flex items-center justify-center group cursor-pointer"
+                                    style="bottom: 8%; right: 10%; height: 3rem; width: 3rem; border-color: rgba(240, 82, 82, 0.9); background-color: rgba(240, 82, 82, 0.18); animation: pulse 2s infinite;">
+                                    <span class="text-xs font-bold text-pink-700">Tail</span>
                                     <!-- Tooltip -->
                                     <div
                                         class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block md:group-hover:block bg-white border border-[var(--color-primary)] rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
@@ -168,9 +168,9 @@
                                 </div>
 
                                 <!-- Furr Hotspot -->
-                                <div class="absolute rounded-full border-2 border-[var(--color-primary)] bg-white/80 flex items-center justify-center animate-pulse group cursor-pointer"
-                                    style="bottom: 20%; right: 40%; height: 2rem; width: 2rem;">
-                                    <span class="text-xs font-bold text-[var(--color-primary)]">Furr</span>
+                                <div class="absolute rounded-full border-2 flex items-center justify-center group cursor-pointer"
+                                    style="top: 70%; left: 48%; height: 3rem; width: 3rem; border-color: rgba(240, 82, 82, 0.9); background-color: rgba(240, 82, 82, 0.18); animation: pulse 2s infinite;">
+                                    <span class="text-xs font-bold text-pink-700">Furr</span>
                                     <div
                                         class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block md:group-hover:block bg-white border border-[var(--color-primary)] rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
                                         <span class="font-semibold text-[var(--color-primary)]">Fun Fact:</span>
@@ -180,9 +180,9 @@
                                 </div>
 
                                 <!-- Mouth Hotspot -->
-                                <div class="absolute rounded-full border-2 border-[var(--color-primary)] bg-white/80 flex items-center justify-center animate-pulse group cursor-pointer"
-                                    style="top: 50%; left: 30%; height: 2rem; width: 2rem;">
-                                    <span class="text-xs font-bold text-[var(--color-primary)]">Mouth</span>
+                                <div class="absolute rounded-full border-2 flex items-center justify-center group cursor-pointer"
+                                    style="top: 42%; left: 30%; height: 3rem; width: 3rem; border-color: rgba(240, 82, 82, 0.9); background-color: rgba(240, 82, 82, 0.18); animation: pulse 2s infinite;">
+                                    <span class="text-xs font-bold text-pink-700">Mouth</span>
                                     <div
                                         class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block md:group-hover:block bg-white border border-[var(--color-primary)] rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
                                         <span class="font-semibold text-[var(--color-primary)]">Fun Fact:</span>

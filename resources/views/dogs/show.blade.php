@@ -43,15 +43,10 @@
                                      style="top: {{ $hotspot['position_y'] }}%; left: {{ $hotspot['position_x'] }}%; transform: translate(-50%, -50%);"
                                      @mouseenter="activeTooltip = '{{ $feature }}'"
                                      @mouseleave="activeTooltip = null">
-                                         <div class="cursor-pointer rounded-full border-2 tooltip-hotspot flex items-center justify-center backdrop-blur-sm"
-                                             style="width: {{ max(56, $hotspot['width']) }}px; height: {{ max(56, $hotspot['height']) }}px; border-color: rgba(240, 82, 82, 0.9); background-color: rgba(240, 82, 82, 0.18); border-color: color-mix(in oklab, var(--color-primary) 85%, white); background-color: color-mix(in oklab, var(--color-primary) 22%, white);"
-                                         :class="{
-                                                          'text-pink-700': true,
-                                            'pulse-animation': showAllHotspots,
-                                                          'bg-pink-100': activeTooltip === '{{ $feature }}'
-                                         }">
-                                         <span class="text-xs font-semibold select-none">{{ ucfirst($feature) }}</span>
-                                    </div>
+                                        <div class="cursor-pointer rounded-full border-2 tooltip-hotspot flex items-center justify-center backdrop-blur-sm text-pink-700 pulse-animation"
+                                             style="width: {{ max(56, $hotspot['width']) }}px; height: {{ max(56, $hotspot['height']) }}px;">
+                                            <span class="text-xs font-semibold select-none">{{ ucfirst($feature) }}</span>
+                                        </div>
                                     <div x-show="activeTooltip === '{{ $feature }}'" 
                                         'nose' => 'pink',
                                         'coat' => 'orange'

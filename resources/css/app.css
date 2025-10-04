@@ -73,6 +73,25 @@
 }
 .animate-wiggle:hover { animation: wiggle .35s ease-in-out; }
 
+/* Pulse animation for hotspots */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.85; }
+}
+.pulse-animation { animation: pulse 2s infinite; }
+
+/* Hotspot styling */
+.tooltip-hotspot {
+  z-index: 20;
+  position: relative;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-color: rgba(240, 82, 82, 0.9) !important;
+  background-color: rgba(240, 82, 82, 0.18) !important;
+}
+
 /* Utility to create a soft card surface consistent with palette */
 .surface-card { background-color: var(--color-card); border: 1px solid color-mix(in oklab, var(--color-border) 100%, transparent); }
 
