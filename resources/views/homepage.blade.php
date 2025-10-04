@@ -135,11 +135,11 @@
                                 Try It Now
                             </a>
                         </div>
-                        <div class="mx-auto lg:ml-auto flex justify-center w-full max-w-md lg:max-w-none">
+                        <div class="mx-auto lg:ml-auto lg:col-span-2 flex flex-col items-center w-full max-w-md lg:max-w-3xl">
                             <div class="relative w-full">
                                 <img src="https://imgs.search.brave.com/7ad6u7NSwUDebItDOPca4slPF88rKp790UGkd9rpgC0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudW5zcGxhc2gu/Y29tL3Bob3RvLTE1/MzcyMDQ2OTY0ODYt/OTY3ZjFiNzE5OGM4/P2ZtPWpwZyZxPTYw/Jnc9MzAwMCZpeGxp/Yj1yYi00LjEuMCZp/eGlkPU0zd3hNakEz/ZkRCOE1IeHpaV0Z5/WTJoOE0zeDhiR0Zp/Y21Ga2IzSjhaVzU4/TUh4OE1IeDhmREE9"
                                     alt="Labrador Retriever with interactive hotspots"
-                                    class="rounded-lg object-cover shadow-lg w-full h-auto max-w-md mx-auto" />
+                                    class="rounded-2xl object-cover shadow-2xl ring-1 ring-black/5 border border-[var(--color-border)] w-full h-auto max-w-2xl sm:max-w-3xl lg:max-w-none mx-auto" />
 
                                 <!-- Ears Hotspot -->
                                 <div class="absolute rounded-full border-2 flex items-center justify-center group cursor-pointer"
@@ -154,20 +154,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Tail Hotspot -->
-                                <div class="absolute rounded-full border-2 flex items-center justify-center group cursor-pointer"
-                                    style="bottom: 8%; right: 10%; height: 3rem; width: 3rem; border-color: rgba(240, 82, 82, 0.9); background-color: rgba(240, 82, 82, 0.18); animation: pulse 2s infinite;">
-                                    <span class="text-xs font-bold text-pink-700">Tail</span>
-                                    <!-- Tooltip -->
-                                    <div
-                                        class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block md:group-hover:block bg-white border border-[var(--color-primary)] rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
-                                        <span class="font-semibold text-[var(--color-primary)]">Fun Fact:</span>
-                                        A Labrador's "otter tail" is thick and strong, helping them swim efficiently. It
-                                        acts like a rudder in the water!
-                                    </div>
-                                </div>
-
-                                <!-- Furr Hotspot -->
+                                <!-- Fur Hotspot -->
                                 <div class="absolute rounded-full border-2 flex items-center justify-center group cursor-pointer"
                                     style="top: 70%; left: 48%; height: 3rem; width: 3rem; border-color: rgba(240, 82, 82, 0.9); background-color: rgba(240, 82, 82, 0.18); animation: pulse 2s infinite;">
                                     <span class="text-xs font-bold text-pink-700">Furr</span>
@@ -191,6 +178,8 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Responsive thumbnail grid to fill blanks -->
                         </div>
                     </div>
                 </div>
