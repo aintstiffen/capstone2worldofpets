@@ -9,8 +9,10 @@ class DogController extends Controller
 {
     public function index()
     {
-        // Get all dog breeds without pagination
-        $pets = Pet::where('category', 'dog')->orderBy('id', 'desc')->get();
+        // Get all dog breeds with pagination (12 per page)
+        $pets = Pet::where('category', 'dog')
+            ->orderBy('name', 'asc')
+            ->paginate(12);
 
         return view('dogs', compact('pets'));
     }

@@ -58,6 +58,55 @@
                     
 
                 </div>
+                
+                <!-- Pagination Links -->
+                @if($petss->hasPages())
+                    <div class="mt-12 flex justify-center">
+                        <nav class="flex items-center gap-2">
+                            {{-- Previous Page Link --}}
+                            @if ($petss->onFirstPage())
+                                <span class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed">
+                                    ← Previous
+                                </span>
+                            @else
+                                <a href="{{ $petss->previousPageUrl() }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors">
+                                    ← Previous
+                                </a>
+                            @endif
+
+                            {{-- Page Numbers --}}
+                            <div class="flex items-center gap-1">
+                                @foreach ($petss->getUrlRange(1, $petss->lastPage()) as $page => $url)
+                                    @if ($page == $petss->currentPage())
+                                        <span class="px-4 py-2 text-sm font-bold text-white bg-blue-600 border border-blue-600 rounded-lg">
+                                            {{ $page }}
+                                        </span>
+                                    @else
+                                        <a href="{{ $url }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors">
+                                            {{ $page }}
+                                        </a>
+                                    @endif
+                                @endforeach
+                            </div>
+
+                            {{-- Next Page Link --}}
+                            @if ($petss->hasMorePages())
+                                <a href="{{ $petss->nextPageUrl() }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors">
+                                    Next →
+                                </a>
+                            @else
+                                <span class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed">
+                                    Next →
+                                </span>
+                            @endif
+                        </nav>
+                    </div>
+
+                    {{-- Pagination Info --}}
+                    <div class="mt-4 text-center text-sm text-gray-600">
+                        Showing {{ $petss->firstItem() }} to {{ $petss->lastItem() }} of {{ $petss->total() }} cat breeds
+                    </div>
+                @endif
             </div>
         </section>
     </main>
