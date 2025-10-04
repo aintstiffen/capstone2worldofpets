@@ -6,9 +6,16 @@
 <div class="container mx-auto py-10 px-4">
     <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
         <div class="px-6 py-8">
+            <style>
+                .avatar-option input:checked + label div {
+                    border-color: #3b82f6;
+                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+                    transform: scale(1.05);
+                }
+            </style>
+            
             <div class="flex items-center justify-between mb-6">
                 <h1 class="text-2xl font-semibold text-gray-900">My Profile</h1>
-            
             </div>
 
             <div class="border-t border-gray-200 pt-6">
@@ -28,39 +35,71 @@
                             </div>
                         @endif
                         
-                        <div class="space-y-4">
+                        <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-4">
+                            @csrf
+                            @method('patch')
+                            
                             <div class="flex flex-col items-center mb-6">
                                 <div class="w-32 h-32 rounded-lg overflow-hidden mb-4 shadow-lg bg-white p-2">
                                     <img src="{{ auth()->user()->getProfilePictureUrl() }}" 
                                          alt="{{ auth()->user()->name }}'s avatar" 
-                                         class="w-full h-full object-contain">
+                                         class="w-full h-full object-contain" id="current-avatar">
+                                </div>
+                                
+                                <div class="w-full">
+                                    <label class="block font-medium text-gray-700 mb-1">Choose Avatar Style</label>
+                                    <!-- Hidden field to ensure avatar_style is always submitted -->
+                                    <input type="hidden" name="avatar_style" id="selected_avatar_style" value="{{ auth()->user()->avatar_style }}">
+                                    
+                                    <div class="grid grid-cols-5 gap-2 mb-4">
+                                        @foreach($avatarStyles as $styleKey => $styleUrl)
+                                            <div class="avatar-option">
+                                                <input type="radio" name="avatar_style" id="style-{{ $styleKey }}" 
+                                                    value="{{ $styleKey }}" class="hidden avatar-radio" 
+                                                    {{ auth()->user()->avatar_style === $styleKey ? 'checked' : '' }}
+                                                    data-preview-url="{{ $styleUrl . md5(auth()->user()->id . auth()->user()->name) }}"
+                                                    onclick="document.getElementById('selected_avatar_style').value='{{ $styleKey }}'">
+                                                <label for="style-{{ $styleKey }}" class="cursor-pointer block">
+                                                    <div class="w-full aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200
+                                                        {{ auth()->user()->avatar_style === $styleKey ? 'border-blue-500 shadow-lg' : 'border-gray-200 hover:border-gray-300' }}">
+                                                        <img src="{{ $styleUrl . md5(auth()->user()->id . auth()->user()->name) }}" 
+                                                            alt="{{ $styleKey }} style" class="w-full h-full object-contain">
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
                             
                             <div>
                                 <label for="name" class="block font-medium text-gray-700 mb-1">Name</label>
-                                <input id="name" type="text" value="{{ auth()->user()->name }}" 
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
-                                    disabled readonly />
-                                <p class="mt-1 text-sm text-gray-500">Name cannot be changed for security reasons.</p>
-                            </div>
+                                <input id="name" name="name" type="text" value="{{ auth()->user()->name }}" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                @error('name')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
                             
                             <div>
-                                <label for="email" class="block font-medium text-gray-700 mb-1">Email</label>
-                                <input id="email" type="email" value="{{ auth()->user()->email }}" 
+                                <label for="email-display" class="block font-medium text-gray-700 mb-1">Email</label>
+                                <input id="email-display" type="email" value="{{ auth()->user()->email }}" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
-                                    disabled readonly />
+                                    readonly />
+                                <input type="hidden" name="email" value="{{ auth()->user()->email }}" />
                                 <p class="mt-1 text-sm text-gray-500">Email address cannot be changed for security reasons.</p>
                             </div>
                             
-                            <div>
-                                
+                            <div class="flex space-x-4">
+                                <button type="submit" class="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2">
+                                    Save Changes
+                                </button>
                             </div>
                         </form>
                     </div>
                     
                     <div>
+                        <h2 class="text-lg font-medium text-gray-900 mb-4">Change Password</h2>
                         
                         @if (session('status') === 'password-updated')
                             <div class="mb-4 p-4 bg-green-100 text-green-700 border border-green-200 rounded">
@@ -118,16 +157,13 @@
                 @if(auth()->user()->assessments->count() > 0)
                     <div class="space-y-4">
                         @foreach(auth()->user()->assessments as $assessment)
-                            <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                 <div class="flex justify-between items-center">
                                     <div>
-                                        <h3 class="font-medium">{{ ucfirst($assessment->pet_type) }} Assessment</h3>
-                                        <p class="text-gray-500 text-sm">{{ $assessment->created_at->format('F j, Y') }}</p>
+                                        <p class="font-medium">{{ $assessment->created_at->format('F j, Y') }}</p>
+                                        <p class="text-sm text-gray-600">Assessment ID: {{ $assessment->id }}</p>
                                     </div>
-                                    <a href="{{ route('assessment', ['id' => $assessment->id]) }}" 
-                                       class="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition">
-                                        View Results
-                                    </a>
+                                    <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">View Details</a>
                                 </div>
                             </div>
                         @endforeach
@@ -142,4 +178,33 @@
         </div>
     </div>
 </div>
+
+<script>
+    // JavaScript to handle avatar preview when selecting different styles
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatarRadios = document.querySelectorAll('.avatar-radio');
+        const currentAvatar = document.getElementById('current-avatar');
+        const selectedAvatarStyleField = document.getElementById('selected_avatar_style');
+        
+        avatarRadios.forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    // Update the preview
+                    currentAvatar.src = this.dataset.previewUrl;
+                    // Update the hidden field
+                    selectedAvatarStyleField.value = this.value;
+                    console.log('Avatar style selected:', this.value);
+                }
+            });
+        });
+        
+        // Debug output for form submission
+        const form = document.querySelector('form[action="{{ route("profile.update") }}"]');
+        form.addEventListener('submit', function(e) {
+            console.log('Form is being submitted');
+            console.log('Selected avatar style:', selectedAvatarStyleField.value);
+            // Don't prevent default - let the form submit normally
+        });
+    });
+</script>
 @endsection

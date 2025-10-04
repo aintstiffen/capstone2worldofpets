@@ -21,8 +21,25 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'profile_picture',
+        'avatar_style',
     ];
 
+    /**
+     * Get the available avatar styles
+     * 
+     * @return array
+     */
+    public static function getAvatarStyles()
+    {
+        return [
+            'bottts' => 'https://api.dicebear.com/7.x/bottts/svg?seed=',  // Robot style
+            'adventurer' => 'https://api.dicebear.com/7.x/adventurer/svg?seed=', // Adventure style
+            'fun-emoji' => 'https://api.dicebear.com/7.x/fun-emoji/svg?seed=', // Fun emoji style
+            'pixel-art' => 'https://api.dicebear.com/7.x/pixel-art/svg?seed=', // Pixel art style
+            'identicon' => 'https://api.dicebear.com/7.x/identicon/svg?seed=', // Abstract style
+        ];
+    }
+    
     /**
      * Get the URL for the user's profile picture
      *
@@ -33,18 +50,20 @@ class User extends Authenticatable implements MustVerifyEmail
         // Use seed based on user ID to keep the same avatar for the same user
         $seed = md5($this->id . $this->name);
         
-        // Create an array of available pet avatar styles
-        $styles = [
-            'https://api.dicebear.com/7.x/bottts/svg?seed=',  // Robot style
-            'https://api.dicebear.com/7.x/adventurer/svg?seed=', // Adventure style
-            'https://api.dicebear.com/7.x/fun-emoji/svg?seed=', // Fun emoji style
-        ];
+        // Get available avatar styles
+        $styles = self::getAvatarStyles();
         
-        // Use the first characters of the seed to pick a style
+        // If user has selected a style, use it, otherwise pick one based on their ID
+        if ($this->avatar_style && isset($styles[$this->avatar_style])) {
+            return $styles[$this->avatar_style] . $seed;
+        }
+        
+        // Use the first characters of the seed to pick a default style
+        $styleKeys = array_keys($styles);
         $styleIndex = hexdec(substr($seed, 0, 2)) % count($styles);
         
         // Return the URL with the seed
-        return $styles[$styleIndex] . $seed;
+        return $styles[$styleKeys[$styleIndex]] . $seed;
     }
 
     /**

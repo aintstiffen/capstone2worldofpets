@@ -66,3 +66,8 @@ Route::get('/system-info', function () {
         'session_driver' => config('session.driver'),
     ];
 });
+
+// Debug route for testing profile updates
+Route::get('/debug/profile-test', [\App\Http\Controllers\DebugController::class, 'testProfileUpdate'])
+    ->middleware('auth')
+    ->name('debug.profile-test');

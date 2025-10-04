@@ -17,8 +17,12 @@ class ProfileController extends Controller
      */
     public function edit(Request $request)
     {
+        $user = $request->user();
+        $avatarStyles = \App\Models\User::getAvatarStyles();
+        
         return view('auth.profile', [
-            'user' => $request->user(),
+            'user' => $user,
+            'avatarStyles' => $avatarStyles,
         ]);
     }
 
@@ -34,10 +38,18 @@ class ProfileController extends Controller
             'all_data' => $request->all()
         ]);
 
+        // Log all request data
+        \Log::info('Profile update all request data', [
+            'all_data' => $request->all(),
+            'has_avatar_style' => $request->has('avatar_style'),
+            'avatar_style' => $request->input('avatar_style'),
+        ]);
+        
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'profile_picture' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'avatar_style' => ['nullable', 'string', Rule::in(array_keys(\App\Models\User::getAvatarStyles()))],
         ]);
 
         try {
@@ -79,15 +91,47 @@ class ProfileController extends Controller
                 \Log::info('No profile picture file in request');
             }
 
-            // Update user information
-            $user->forceFill([
-                'name' => $validated['name'],
-                'email' => $validated['email']
+            // Update user information with detailed logging
+            \Log::info('Before update', [
+                'current_name' => $user->name,
+                'new_name' => $validated['name'],
+                'current_avatar_style' => $user->avatar_style,
+                'new_avatar_style' => $request->input('avatar_style'),
             ]);
+            
+            // Debug flag processing
+            if ($request->has('debug')) {
+                \Log::alert('Debug mode enabled - form data', [
+                    'all_data' => $request->all(),
+                    'input_name' => $request->input('name'),
+                    'input_avatar_style' => $request->input('avatar_style')
+                ]);
+            }
+            
+            // Directly update fields one by one
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
+            
+            // Always attempt to set avatar style from the request
+            $avatarStyle = $request->input('avatar_style');
+            if ($avatarStyle) {
+                $user->forceFill(['avatar_style' => $avatarStyle]);
+                \Log::info('Avatar style update forced', [
+                    'style' => $avatarStyle,
+                    'user_id' => $user->id
+                ]);
+            }
 
             if ($user->isDirty('email')) {
                 $user->email_verified_at = null;
             }
+            
+            // Log what will be saved
+            \Log::info('Changes to be saved', [
+                'name' => $user->name,
+                'avatar_style' => $user->avatar_style,
+                'dirty_fields' => $user->getDirty()
+            ]);
 
             // Save all changes and verify
             $saved = $user->save();
