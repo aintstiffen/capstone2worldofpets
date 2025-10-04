@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DogController;
 use App\Http\Controllers\CatController;
 use App\Http\Controllers\AssessmentController;
+use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\PrivateFileController;
 
@@ -71,3 +72,7 @@ Route::get('/system-info', function () {
 Route::get('/debug/profile-test', [\App\Http\Controllers\DebugController::class, 'testProfileUpdate'])
     ->middleware('auth')
     ->name('debug.profile-test');
+    
+// Static pages routes
+Route::get('/terms', [PageController::class, 'terms'])->name('terms');
+Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');

@@ -33,8 +33,8 @@
                 <div class="space-y-4">
                     <h3 class="text-sm font-medium">Legal</h3>
                     <ul class="space-y-3 text-sm">
-                        <li><a href="#" class="text-[var(--color-muted-foreground)] transition-colors hover:text-[var(--color-foreground)]">Privacy Policy</a></li>
-                        <li><a href="#" class="text-[var(--color-muted-foreground)] transition-colors hover:text-[var(--color-foreground)]">Terms of Service</a></li>
+                        <li><a href="{{ route('privacy') }}" class="text-[var(--color-muted-foreground)] transition-colors hover:text-[var(--color-foreground)]">Privacy Policy</a></li>
+                        <li><a href="{{ route('terms') }}" class="text-[var(--color-muted-foreground)] transition-colors hover:text-[var(--color-foreground)]">Terms of Service</a></li>
                     </ul>
                 </div>
             </div>
