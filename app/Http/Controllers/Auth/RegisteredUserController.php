@@ -42,7 +42,25 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        event(new Registered($user));
+        // Dispatch the Registered event (sends email verification if enabled)
+        // - Skip in non-production to avoid mail failures during local/dev testing
+        // - In production, catch and report mail errors but don't block registration
+        if (app()->environment('production')) {
+            try {
+                event(new Registered($user));
+            } catch (\Throwable $e) {
+                \Log::warning('Registration mail dispatch failed', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage(),
+                ]);
+                session()->flash('warning', 'We couldn\'t send a verification email right now. You can continue and verify later.');
+            }
+        } else {
+            \Log::info('Skipping email verification dispatch in non-production environment', [
+                'user_id' => $user->id,
+                'env' => app()->environment(),
+            ]);
+        }
 
         Auth::login($user);
 
