@@ -33,7 +33,7 @@
                                         </div>
                                         <hr>
                                         <div class="p-4 flex justify-between items-center text-sm">
-                                            <div class="flex items-center gap-2">
+                                              <div class="flex items-center gap-2">
                                                 <span class="px-2 py-0.5 rounded-full" style="background-color: color-mix(in oklab, var(--color-primary) 12%, white); color: var(--color-primary);">{{ $pet->size ?? 'N/A' }}</span>
                                                 <span class="text-[var(--color-muted-foreground)]">•</span>
                                                 <span class="px-2 py-0.5 rounded-full text-[--color-primary]" style="background-color: color-mix(in oklab, var(--color-primary) 10%, white);">{{ $pet->lifespan ?? 'N/A' }} years</span>

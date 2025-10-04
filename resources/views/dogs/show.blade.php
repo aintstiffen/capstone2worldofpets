@@ -30,23 +30,29 @@
             <div class="grid gap-6 lg:grid-cols-2 lg:gap-12">
                 {{-- Left: Image & Info Cards --}}
                 <div class="space-y-4">
-                    <div class="relative" x-data="{ activeTooltip: null, showAllHotspots: false }">
-                        <div class="aspect-square rounded-lg overflow-hidden bg-[--color-muted]">
+                    <div class="relative" x-data="{ activeTooltip: null, showAllHotspots: true }">
+                        <div class="aspect-square rounded-lg overflow-hidden bg-[var(--color-muted)]">
                             <img src="{{ $pet->image ? $pet->image_url : '/placeholder.svg?height=600&width=600' }}"
                                  alt="{{ $pet->name }}"
                                  class="object-cover w-full h-full"
                                  @mouseenter="showAllHotspots = true"
-                                 @mouseleave="showAllHotspots = false">
+                                 @mouseleave="showAllHotspots = true">
                                  
-                            <!-- Interactive Tooltips -->
-                            <div class="absolute inset-0">
-                                @php
-                                    // Default feature colors
-                                    $featureColors = [
-                                        'ears' => 'blue',
-                                        'eyes' => 'green',
-                                        'tail' => 'amber',
-                                        'paws' => 'purple',
+                                <!-- {{ $feature }} Tooltip -->
+                                <div class="absolute" 
+                                     style="top: {{ $hotspot['position_y'] }}%; left: {{ $hotspot['position_x'] }}%; transform: translate(-50%, -50%);"
+                                     @mouseenter="activeTooltip = '{{ $feature }}'"
+                                     @mouseleave="activeTooltip = null">
+                                         <div class="cursor-pointer rounded-full border-2 tooltip-hotspot flex items-center justify-center backdrop-blur-sm"
+                                             style="width: {{ max(56, $hotspot['width']) }}px; height: {{ max(56, $hotspot['height']) }}px; border-color: rgba(240, 82, 82, 0.9); background-color: rgba(240, 82, 82, 0.18); border-color: color-mix(in oklab, var(--color-primary) 85%, white); background-color: color-mix(in oklab, var(--color-primary) 22%, white);"
+                                         :class="{
+                                                          'text-pink-700': true,
+                                            'pulse-animation': showAllHotspots,
+                                                          'bg-pink-100': activeTooltip === '{{ $feature }}'
+                                         }">
+                                         <span class="text-xs font-semibold select-none">{{ ucfirst($feature) }}</span>
+                                    </div>
+                                    <div x-show="activeTooltip === '{{ $feature }}'" 
                                         'nose' => 'pink',
                                         'coat' => 'orange'
                                     ];
@@ -67,13 +73,13 @@
                                 @endphp
 
                                 @foreach($hotspots as $hotspot)
-                                @php
-                                    $feature = $hotspot['feature'];
+                                <!-- Hint text for users -->
+                                <div class="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded"
                                     $color = $featureColors[$feature] ?? 'gray';
                                     
                                     // Find matching fact if it exists in the database
-                                    $fact = null;
-                                    if(!empty($funFacts)) {
+                                     x-show="showAllHotspots || activeTooltip !== null">
+                                    <span x-show="activeTooltip === null">Hover the pink circles to learn about features</span>
                                         foreach($funFacts as $funFact) {
                                             if(isset($funFact['feature']) && $funFact['feature'] === $feature) {
                                                 $fact = $funFact['fact'];
