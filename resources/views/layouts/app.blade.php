@@ -27,7 +27,7 @@
         @stack('styles')
     </head>
 
-    <body class="font-sans antialiased bg-gray-50 text-gray-900">
+    <body class="font-sans antialiased bg-[var(--color-background)] text-[var(--color-foreground)] paw-pattern">
 
         {{-- Main Content --}}
         @include('navs.navs')

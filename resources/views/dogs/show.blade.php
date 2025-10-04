@@ -31,7 +31,7 @@
                 {{-- Left: Image & Info Cards --}}
                 <div class="space-y-4">
                     <div class="relative" x-data="{ activeTooltip: null, showAllHotspots: false }">
-                        <div class="aspect-square rounded-lg overflow-hidden bg-gray-100">
+                        <div class="aspect-square rounded-lg overflow-hidden bg-[--color-muted]">
                             <img src="{{ $pet->image ? $pet->image_url : '/placeholder.svg?height=600&width=600' }}"
                                  alt="{{ $pet->name }}"
                                  class="object-cover w-full h-full"
@@ -170,16 +170,16 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                        <div class="p-3 border rounded">
-                            <p class="text-sm text-gray-500">Size</p>
+                        <div class="p-3 border rounded surface-card">
+                            <p class="text-sm text-[--color-muted-foreground]">Size</p>
                             <p class="text-base font-bold">{{ $pet->size }}</p>
                         </div>
-                        <div class="p-3 border rounded">
-                            <p class="text-sm text-gray-500">Lifespan</p>
+                        <div class="p-3 border rounded surface-card">
+                            <p class="text-sm text-[--color-muted-foreground]">Lifespan</p>
                             <p class="text-base font-bold">{{ $pet->lifespan }} years</p>
                         </div>
-                        <div class="p-3 border rounded">
-                            <p class="text-sm text-gray-500">Energy</p>
+                        <div class="p-3 border rounded surface-card">
+                            <p class="text-sm text-[--color-muted-foreground]">Energy</p>
                             <p class="text-base font-bold">{{ $pet->energy }}</p>
                         </div>
                     </div>
@@ -189,7 +189,7 @@
                 <div class="space-y-6">
                     <div>
                         <h1 class="text-3xl font-bold">{{ $pet->name }}</h1>
-                        <p class="text-gray-500">{{ $pet->temperament }}</p>
+                        <p class="text-[--color-muted-foreground]">{{ $pet->temperament }}</p>
                     </div>
 
                     {{-- Overview --}}
@@ -200,7 +200,7 @@
                                 <h3 class="font-medium mb-2">Common Colors</h3>
                                 <div class="flex flex-wrap gap-2">
                                     @foreach($pet->colors as $color)
-                                        <div class="px-3 py-1 bg-gray-100 rounded-full text-sm">{{ $color }}</div>
+                                        <div class="px-3 py-1 rounded-full text-sm" style="background-color: color-mix(in oklab, var(--color-secondary) 12%, white); color: color-mix(in oklab, var(--color-secondary) 50%, black);">{{ $color }}</div>
                                     @endforeach
                                 </div>
                             </div>
@@ -222,9 +222,9 @@
                             <div>
                                 <div class="flex justify-between mb-1">
                                     <span class="text-sm font-medium">{{ $label }}</span>
-                                    <span class="text-sm text-gray-500">{{ $value }}/5</span>
+                                    <span class="text-sm text-[--color-muted-foreground]">{{ $value }}/5</span>
                                 </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="w-full rounded-full h-2.5" style="background-color: color-mix(in oklab, var(--color-muted) 60%, white);">
                                     <div class="bg-primary h-2.5 rounded-full" style="width: {{ ($value / 5) * 100 }}%"></div>
                                 </div>
                             </div>
@@ -233,8 +233,8 @@
 
                     {{-- Buttons --}}
                     <div class="flex gap-4">
-                        <button class="px-4 py-2 border border-black rounded-md bg-black text-white hover:bg-gray-700 hover:text-white transition">Add to Comparison</button>
-                        <a href="{{ route('dogs') }}" class="px-4 py-2 border border-black rounded-md bg-black text-white hover:bg-gray-700 hover:text-white transition">
+                        <button class="px-4 py-2 rounded-md text-white bg-[--color-primary] hover:bg-[--color-primary-dark] transition hover-lift">Add to Comparison</button>
+                        <a href="{{ route('dogs') }}" class="px-4 py-2 rounded-md text-white bg-[--color-primary] hover:bg-[--color-primary-dark] transition hover-lift">
                             Return to Dog Breeds
                         </a>
                     </div>

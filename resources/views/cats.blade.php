@@ -6,10 +6,10 @@
 
     <!-- Hero Section -->
     <main class="flex-1">
-        <section class="w-full py-12 md:py-24 lg:py-32 bg-muted/30">
+    <section class="w-full py-12 md:py-24 lg:py-32 paw-pattern" style="background: linear-gradient(180deg, color-mix(in oklab, var(--color-secondary) 8%, white), var(--color-muted));">
             <div class="container mx-auto px-4 md:px-6 text-center">
                 <h1 class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Cat Breeds</h1>
-                <p class="max-w-[900px] mx-auto text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                <p class="max-w-[900px] mx-auto text-[--color-muted-foreground] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                     Explore detailed profiles of the most popular cat breeds in the Philippines.
                 </p>
             </div>
@@ -22,8 +22,8 @@
 
                    @if(isset($petss) && $petss->count() > 0)
                         @foreach($petss as $pets)
-                        <a href="{{ route('cats.show', $pets->slug) }}" class="group">
-                            <div class="overflow-hidden border rounded-lg transition-all hover:shadow-lg">
+                        <a href="{{ route('cats.show', $pets->slug) }}" class="group hover-lift">
+                            <div class="overflow-hidden border rounded-lg transition-all hover:shadow-lg surface-card hover:border-[--color-primary]">
                                 <div class="aspect-square relative">
                                     <img src="{{ $pets->image ? $pets->image_url : '/placeholder.svg?height=600&width=600' }}"
                                          alt="{{ $pets->name }}"
@@ -31,16 +31,16 @@
                                 </div>
                                 <div class="p-4">
                                     <h2 class="font-bold text-lg truncate">{{ $pets->name }}</h2>
-                                    <p class="text-sm text-muted-foreground truncate">{{ $pets->temperament ?? 'N/A' }}</p>
+                                    <p class="text-sm text-[var(--color-muted-foreground)] truncate">{{ $pets->temperament ?? 'N/A' }}</p>
                                 </div>
                                 <hr>
                                 <div class="p-4 flex justify-between items-center text-sm">
                                     <div class="flex items-center gap-2">
-                                        <span>{{ $pets->size ?? 'N/A' }}</span>
-                                        <span class="text-muted-foreground">•</span>
-                                        <span class="text-muted-foreground">{{ $pets->lifespan ?? 'N/A' }} years</span>
+                                        <span class="px-2 py-0.5 rounded-full" style="background-color: color-mix(in oklab, var(--color-primary) 12%, white); color: var(--color-primary);">{{ $pets->size ?? 'N/A' }}</span>
+                                        <span class="text-[var(--color-muted-foreground)]">•</span>
+                                        <span class="px-2 py-0.5 rounded-full text-[--color-primary]" style="background-color: color-mix(in oklab, var(--color-primary) 10%, white);">{{ $pets->lifespan ?? 'N/A' }} years</span>
                                     </div>
-                                    <span class="rounded-full border p-1">➜</span>
+                                    <span class="rounded-full border p-1 text-[--color-primary]">➜</span>
                                 </div>
                             </div>
                         </a>
@@ -65,11 +65,11 @@
                         <nav class="flex items-center gap-2">
                             {{-- Previous Page Link --}}
                             @if ($petss->onFirstPage())
-                                <span class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed">
+                                <span class="px-4 py-2 text-sm font-medium text-[--color-muted-foreground] bg-[--color-muted] border border-gray-300 rounded-lg cursor-not-allowed">
                                     ← Previous
                                 </span>
                             @else
-                                <a href="{{ $petss->previousPageUrl() }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors">
+                                <a href="{{ $petss->previousPageUrl() }}" class="px-4 py-2 text-sm font-medium text-[--color-foreground] bg-white border border-gray-300 rounded-lg hover:bg-[--color-muted] hover:border-[--color-border] transition-colors">
                                     ← Previous
                                 </a>
                             @endif
@@ -78,11 +78,11 @@
                             <div class="flex items-center gap-1">
                                 @foreach ($petss->getUrlRange(1, $petss->lastPage()) as $page => $url)
                                     @if ($page == $petss->currentPage())
-                                        <span class="px-4 py-2 text-sm font-bold text-white bg-blue-600 border border-blue-600 rounded-lg">
+                                        <span class="px-4 py-2 text-sm font-bold text-white bg-[--color-primary] border border-[--color-primary] rounded-lg">
                                             {{ $page }}
                                         </span>
                                     @else
-                                        <a href="{{ $url }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors">
+                                        <a href="{{ $url }}" class="px-4 py-2 text-sm font-medium text-[--color-foreground] bg-white border border-gray-300 rounded-lg hover:bg-[--color-muted] hover:border-[--color-border] transition-colors">
                                             {{ $page }}
                                         </a>
                                     @endif
@@ -91,11 +91,11 @@
 
                             {{-- Next Page Link --}}
                             @if ($petss->hasMorePages())
-                                <a href="{{ $petss->nextPageUrl() }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors">
+                                <a href="{{ $petss->nextPageUrl() }}" class="px-4 py-2 text-sm font-medium text-[--color-foreground] bg-white border border-gray-300 rounded-lg hover:bg-[--color-muted] hover:border-[--color-border] transition-colors">
                                     Next →
                                 </a>
                             @else
-                                <span class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed">
+                                <span class="px-4 py-2 text-sm font-medium text-[--color-muted-foreground] bg-[--color-muted] border border-gray-300 rounded-lg cursor-not-allowed">
                                     Next →
                                 </span>
                             @endif
@@ -103,7 +103,7 @@
                     </div>
 
                     {{-- Pagination Info --}}
-                    <div class="mt-4 text-center text-sm text-gray-600">
+                    <div class="mt-4 text-center text-sm text-[--color-muted-foreground]">
                         Showing {{ $petss->firstItem() }} to {{ $petss->lastItem() }} of {{ $petss->total() }} cat breeds
                     </div>
                 @endif

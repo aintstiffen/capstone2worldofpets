@@ -8,4 +8,74 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Pet-friendly, warm and lively palette */
+    --color-background: #fff8f1; /* warm cream */
+    --color-foreground: #1f2937; /* gray-800 */
+
+    --color-primary: #ff6b6b; /* coral */
+    --color-primary-dark: #e85d5d; /* darker coral for hover */
+    --color-secondary: #4cc9f0; /* playful sky */
+    --color-accent: #ffd166; /* sunny accent */
+
+    --color-muted: #f2ede9; /* soft sand */
+    --color-muted-foreground: #6b7280; /* gray-500/600 */
+    --color-card: #ffffff; /* surfaces/cards */
+    --color-border: #e5e7eb; /* gray-200 */
 }
+
+/* Fallback variable definitions for environments that don't process Tailwind's @theme at-rule */
+:root {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-background: #fff8f1;
+    --color-foreground: #1f2937;
+    --color-primary: #ff6b6b;
+    --color-primary-dark: #e85d5d;
+    --color-secondary: #4cc9f0;
+    --color-accent: #ffd166;
+    --color-muted: #f2ede9;
+    --color-muted-foreground: #6b7280;
+    --color-card: #ffffff;
+    --color-border: #e5e7eb;
+}
+
+/* Alias common utility-like classes to CSS variables to preserve older markup */
+.text-primary { color: var(--color-primary) !important; }
+.bg-primary { background-color: var(--color-primary) !important; }
+.hover\:bg-primary-dark:hover { background-color: var(--color-primary-dark) !important; }
+.text-muted-foreground { color: var(--color-muted-foreground) !important; }
+.bg-muted\/30 { background-color: color-mix(in oklab, var(--color-muted) 30%, transparent) !important; }
+.bg-muted\/40 { background-color: color-mix(in oklab, var(--color-muted) 40%, transparent) !important; }
+.bg-muted { background-color: var(--color-muted) !important; }
+.hover\:text-primary:hover { color: var(--color-primary) !important; }
+
+/* Subtle paw-print background pattern (very light) */
+.paw-pattern {
+    background-image:
+        radial-gradient(ellipse at top left, color-mix(in oklab, var(--color-primary) 6%, transparent) 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f3c5c5' fill-opacity='0.22'%3E%3Ccircle cx='6' cy='7' r='2'/%3E%3Ccircle cx='10' cy='5' r='1.6'/%3E%3Ccircle cx='14' cy='6' r='1.8'/%3E%3Ccircle cx='8' cy='10' r='2.2'/%3E%3Cpath d='M14 13c-1.2-1.2-3.2-1.2-4.4 0-.5.5-.7 1.2-.6 1.9l.2 1.3 1.3.2c.7.1 1.4-.1 1.9-.6 1.2-1.2 1.2-3.2 0-4.4Z'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: auto, 24px 24px;
+    background-repeat: no-repeat, repeat;
+}
+
+/* Micro-interactions */
+.hover-lift { transition: transform .2s ease, box-shadow .2s ease; }
+.hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 18px -10px color-mix(in oklab, var(--color-primary) 35%, transparent); }
+
+.hover-pop { transition: transform .18s ease; }
+.hover-pop:hover { transform: scale(1.02); }
+
+/* Fun, gentle wiggle for icons on hover */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(6deg); }
+}
+.animate-wiggle:hover { animation: wiggle .35s ease-in-out; }
+
+/* Utility to create a soft card surface consistent with palette */
+.surface-card { background-color: var(--color-card); border: 1px solid color-mix(in oklab, var(--color-border) 100%, transparent); }
+
+/* Buttons helpers (optional; can be mixed with Tailwind utilities) */
+.btn-primary { background: var(--color-primary); color: white; }
+.btn-primary:hover { background: var(--color-primary-dark); }
