@@ -32,7 +32,7 @@
             </nav>
             <div class="flex items-center gap-2">
                 @guest
-                    <a href="{{ route('login') }}" class="hidden md:inline-flex items-center justify-center text-[var(--color-foreground)] bg-white hover:bg-[var(--color-muted)] focus:ring-4 focus:outline-none focus:ring-[var(--color-accent)] font-medium rounded-lg text-sm px-5 py-2.5 leading-none hover-lift">Login</a>
+                    <a href="{{ route('login') }}" class="hidden md:inline-flex items-center justify-center text-[var(--color-foreground)] bg-[color-mix(in_oklab,var(--color-primary)_8%,white)] hover:bg-[color-mix(in_oklab,var(--color-primary)_15%,white)] focus:ring-4 focus:outline-none focus:ring-[var(--color-accent)] font-medium rounded-lg text-sm px-5 py-2.5 leading-none hover-lift">Login</a>
                     <a href="{{ route('register') }}" class="hidden md:inline-flex items-center justify-center font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] rounded-lg text-sm px-5 py-2.5 leading-none hover-lift">Sign Up</a>
                 @else
                     <div class="relative hidden md:block" x-data="{ open: false }">
@@ -107,8 +107,8 @@
                 
                 @guest
                     <div class="border-t border-gray-200 pt-4 mt-2 flex flex-col space-y-3">
-                        <a href="{{ route('login') }}" class="text-[var(--color-foreground)] bg-white hover:bg-[var(--color-muted)] focus:ring-4 focus:outline-none focus:ring-[var(--color-accent)] font-medium rounded-lg text-sm px-5 py-2.5 text-center">Login</a>
-                        <a href="{{ route('register') }}" class="font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] rounded-md px-3 py-2 text-center">Sign Up</a>
+                        <a href="{{ route('login') }}" class="text-[var(--color-foreground)] bg-[color-mix(in_oklab,var(--color-primary)_8%,white)] hover:bg-[color-mix(in_oklab,var(--color-primary)_15%,white)] focus:ring-4 focus:outline-none focus:ring-[var(--color-accent)] font-medium rounded-lg text-sm px-5 py-2.5 text-center hover-lift">Login</a>
+                        <a href="{{ route('register') }}" class="font-medium text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] rounded-lg text-sm px-5 py-2.5 text-center hover-lift">Sign Up</a>
                     </div>
                 @else
                     <div class="border-t border-gray-200 pt-4 mt-2">

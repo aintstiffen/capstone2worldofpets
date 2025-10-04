@@ -1,29 +1,29 @@
 @extends('layouts.app')
 
 @section('content')
-<div x-data="compareData()" class="min-h-screen bg-gray-50 py-8">
+<div x-data="compareData()" class="min-h-screen bg-[var(--color-background)] py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h1 class="text-3xl font-bold text-center mb-8 text-gray-900">Compare Breeds</h1>
+        <div class="bg-[var(--color-card)] rounded-lg shadow-sm p-6 border border-[var(--color-border)]">
+            <h1 class="text-3xl font-bold text-center mb-8 text-[var(--color-foreground)]">Compare Breeds</h1>
 
             <!-- Animal Type Selection -->
             <div class="mb-8">
-                <h2 class="text-lg font-medium mb-4 text-center text-gray-700">Select Animal Type</h2>
+                <h2 class="text-lg font-medium mb-4 text-center text-[var(--color-muted-foreground)]">Select Animal Type</h2>
                 <div class="flex justify-center gap-4">
                     <button 
                         @click="setAnimalType('cat')"
-                        class="px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105"
+                        class="px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 hover-lift"
                         :class="animalType === 'cat' 
-                            ? 'bg-purple-600 text-white hover:bg-purple-700 shadow-lg' 
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'">
+                            ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)] shadow-lg' 
+                            : 'bg-[var(--color-muted)] text-[var(--color-foreground)] hover:bg-[color-mix(in_oklab,var(--color-primary)_15%,white)]'">
                         🐱 Cats
                     </button>
                     <button 
                         @click="setAnimalType('dog')"
-                        class="px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105"
+                        class="px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 hover-lift"
                         :class="animalType === 'dog' 
-                            ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg' 
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'">
+                            ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)] shadow-lg' 
+                            : 'bg-[var(--color-muted)] text-[var(--color-foreground)] hover:bg-[color-mix(in_oklab,var(--color-primary)_15%,white)]'">
                         🐕 Dogs
                     </button>
                 </div>
@@ -31,8 +31,8 @@
 
             <!-- Loading State -->
             <div x-show="loading" class="text-center py-12">
-                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                <p class="mt-4 text-lg text-gray-600">Loading...</p>
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)]"></div>
+                <p class="mt-4 text-lg text-[var(--color-muted-foreground)]">Loading...</p>
             </div>
 
             <!-- Error Message -->
@@ -49,9 +49,9 @@
             <div x-show="animalType && !loading && !error && breeds.length > 0" x-transition class="space-y-8">
                 <div class="grid md:grid-cols-2 gap-8">
                     <div class="space-y-3">
-                        <label class="block text-sm font-semibold text-gray-800 mb-3">
+                        <label class="block text-sm font-semibold text-[var(--color-foreground)] mb-3">
                             <span class="flex items-center">
-                                <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mr-3">
+                                <div class="w-6 h-6 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-full flex items-center justify-center mr-3">
                                     <span class="text-white text-xs font-bold">1</span>
                                 </div>
                                 First Breed
@@ -60,23 +60,23 @@
                         <div class="select-container relative">
                             <select 
                                 x-model="breed1"
-                                class="appearance-none w-full px-4 py-4 pr-12 text-base border-2 border-gray-200 rounded-xl shadow-sm bg-white hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 text-gray-700 font-medium cursor-pointer">
-                                <option value="" class="text-gray-500">🔎 Choose your first breed...</option>
+                                class="appearance-none w-full px-4 py-4 pr-12 text-base border-2 border-[var(--color-border)] rounded-xl shadow-sm bg-white hover:border-[var(--color-primary)] focus:outline-none focus:ring-4 focus:ring-[color-mix(in_oklab,var(--color-primary)_20%,white)] focus:border-[var(--color-primary)] transition-all duration-200 text-[var(--color-foreground)] font-medium cursor-pointer">
+                                <option value="" class="text-[var(--color-muted-foreground)]">🔎 Choose your first breed...</option>
                                 <template x-for="breed in breeds" :key="breed.id">
-                                    <option :value="breed.id" x-text="breed.name" class="py-2 text-gray-800"></option>
+                                    <option :value="breed.id" x-text="breed.name" class="py-2 text-[var(--color-foreground)]"></option>
                                 </template>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-[var(--color-muted-foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </div>
                         </div>
                     </div>
                     <div class="space-y-3">
-                        <label class="block text-sm font-semibold text-gray-800 mb-3">
+                        <label class="block text-sm font-semibold text-[var(--color-foreground)] mb-3">
                             <span class="flex items-center">
-                                <div class="w-6 h-6 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center mr-3">
+                                <div class="w-6 h-6 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-full flex items-center justify-center mr-3">
                                     <span class="text-white text-xs font-bold">2</span>
                                 </div>
                                 Second Breed
@@ -85,14 +85,14 @@
                         <div class="select-container relative">
                             <select 
                                 x-model="breed2"
-                                class="appearance-none w-full px-4 py-4 pr-12 text-base border-2 border-gray-200 rounded-xl shadow-sm bg-white hover:border-green-300 focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-200 text-gray-700 font-medium cursor-pointer">
-                                <option value="" class="text-gray-500">🔎 Choose your second breed...</option>
+                                class="appearance-none w-full px-4 py-4 pr-12 text-base border-2 border-[var(--color-border)] rounded-xl shadow-sm bg-white hover:border-[var(--color-primary)] focus:outline-none focus:ring-4 focus:ring-[color-mix(in_oklab,var(--color-primary)_20%,white)] focus:border-[var(--color-primary)] transition-all duration-200 text-[var(--color-foreground)] font-medium cursor-pointer">
+                                <option value="" class="text-[var(--color-muted-foreground)]">🔎 Choose your second breed...</option>
                                 <template x-for="breed in breeds" :key="breed.id">
-                                    <option :value="breed.id" x-text="breed.name" class="py-2 text-gray-800"></option>
+                                    <option :value="breed.id" x-text="breed.name" class="py-2 text-[var(--color-foreground)]"></option>
                                 </template>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-[var(--color-muted-foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </div>
@@ -117,14 +117,14 @@
 
             <!-- No breeds message -->
             <div x-show="animalType && !loading && !error && breeds.length === 0" x-transition class="text-center py-8">
-                <p class="text-gray-600">No breeds found for the selected animal type.</p>
+                <p class="text-[var(--color-muted-foreground)]">No breeds found for the selected animal type.</p>
             </div>
 
             <!-- Recent Comparisons -->
             <template x-if="getRecentComparisons().length > 0">
-                <div class="mt-8 bg-gray-50 rounded-lg p-6 border border-gray-200">
+                <div class="mt-8 bg-[var(--color-muted)] rounded-lg p-6 border border-[var(--color-border)]">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900">Recent Comparisons</h3>
+                        <h3 class="text-lg font-semibold text-[var(--color-foreground)]">Recent Comparisons</h3>
                         <button @click="clearRecentComparisons(); refreshRecentComparisons()" class="text-sm text-red-600 hover:text-red-700 underline">
                             Clear All
                         </button>
@@ -160,7 +160,7 @@
             <!-- Comparison Results -->
             <template x-if="comparison && !loading">
                 <div class="mt-12">
-                    <h2 class="text-2xl font-bold text-center mb-8 text-gray-900">Comparison Results</h2>
+                    <h2 class="text-2xl font-bold text-center mb-8 text-[var(--color-foreground)]">Comparison Results</h2>
                     <div class="grid md:grid-cols-2 gap-8">
                         <!-- First Breed -->
                         <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
@@ -180,19 +180,19 @@
                                 </template>
                             </div>
                             <div class="p-6 space-y-4">
-                                <h3 class="text-xl font-bold text-gray-900" x-text="comparison.breed1.info?.name || 'Unknown'"></h3>
+                                <h3 class="text-xl font-bold text-[var(--color-foreground)]" x-text="comparison.breed1.info?.name || 'Unknown'"></h3>
                                 <div class="space-y-3 text-sm">
                                     <div class="flex flex-col">
-                                        <span class="font-semibold text-gray-700">Temperament:</span>
-                                        <span class="text-gray-600" x-text="comparison.breed1.info?.temperament || 'Not specified'"></span>
+                                        <span class="font-semibold text-[var(--color-foreground)]">Temperament:</span>
+                                        <span class="text-[var(--color-muted-foreground)]" x-text="comparison.breed1.info?.temperament || 'Not specified'"></span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="font-semibold text-gray-700">Weight:</span>
-                                        <span class="text-gray-600" x-text="(comparison.breed1.info?.weight?.metric || 'Not specified') + (comparison.breed1.info?.weight?.metric ? ' kg' : '')"></span>
+                                        <span class="font-semibold text-[var(--color-foreground)]">Weight:</span>
+                                        <span class="text-[var(--color-muted-foreground)]" x-text="(comparison.breed1.info?.weight?.metric || 'Not specified') + (comparison.breed1.info?.weight?.metric ? ' kg' : '')"></span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="font-semibold text-gray-700">Life Span:</span>
-                                        <span class="text-gray-600" x-text="(comparison.breed1.info?.life_span || 'Not specified') + (comparison.breed1.info?.life_span ? ' years' : '')"></span>
+                                        <span class="font-semibold text-[var(--color-foreground)]">Life Span:</span>
+                                        <span class="text-[var(--color-muted-foreground)]" x-text="(comparison.breed1.info?.life_span || 'Not specified') + (comparison.breed1.info?.life_span ? ' years' : '')"></span>
                                     </div>
                                     
                                     <!-- Cat-specific fields -->
@@ -239,8 +239,8 @@
                         </div>
 
                         <!-- Second Breed -->
-                        <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
-                            <div class="h-64 bg-gradient-to-br from-gray-100 to-gray-200">
+                        <div class="bg-[var(--color-card)] rounded-lg shadow-lg overflow-hidden border border-[var(--color-border)] hover:shadow-xl transition-shadow">
+                            <div class="h-64 bg-gradient-to-br from-[color-mix(in_oklab,var(--color-primary)_5%,white)] to-[color-mix(in_oklab,var(--color-primary)_15%,white)]">
                                 <template x-if="comparison.breed2.image?.url">
                                     <img 
                                         :src="comparison.breed2.image.url" 
@@ -256,19 +256,19 @@
                                 </template>
                             </div>
                             <div class="p-6 space-y-4">
-                                <h3 class="text-xl font-bold text-gray-900" x-text="comparison.breed2.info?.name || 'Unknown'"></h3>
+                                <h3 class="text-xl font-bold text-[var(--color-foreground)]" x-text="comparison.breed2.info?.name || 'Unknown'"></h3>
                                 <div class="space-y-3 text-sm">
                                     <div class="flex flex-col">
-                                        <span class="font-semibold text-gray-700">Temperament:</span>
-                                        <span class="text-gray-600" x-text="comparison.breed2.info?.temperament || 'Not specified'"></span>
+                                        <span class="font-semibold text-[var(--color-foreground)]">Temperament:</span>
+                                        <span class="text-[var(--color-muted-foreground)]" x-text="comparison.breed2.info?.temperament || 'Not specified'"></span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="font-semibold text-gray-700">Weight:</span>
-                                        <span class="text-gray-600" x-text="(comparison.breed2.info?.weight?.metric || 'Not specified') + (comparison.breed2.info?.weight?.metric ? ' kg' : '')"></span>
+                                        <span class="font-semibold text-[var(--color-foreground)]">Weight:</span>
+                                        <span class="text-[var(--color-muted-foreground)]" x-text="(comparison.breed2.info?.weight?.metric || 'Not specified') + (comparison.breed2.info?.weight?.metric ? ' kg' : '')"></span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="font-semibold text-gray-700">Life Span:</span>
-                                        <span class="text-gray-600" x-text="(comparison.breed2.info?.life_span || 'Not specified') + (comparison.breed2.info?.life_span ? ' years' : '')"></span>
+                                        <span class="font-semibold text-[var(--color-foreground)]">Life Span:</span>
+                                        <span class="text-[var(--color-muted-foreground)]" x-text="(comparison.breed2.info?.life_span || 'Not specified') + (comparison.breed2.info?.life_span ? ' years' : '')"></span>
                                     </div>
                                     
                                     <!-- Cat-specific fields -->
@@ -319,7 +319,7 @@
                     <div class="text-center mt-8">
                         <button 
                             @click="comparison = null; breed1 = ''; breed2 = '';"
-                            class="inline-flex items-center px-6 py-2 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                            class="inline-flex items-center px-6 py-2 border border-[var(--color-border)] rounded-lg shadow-sm text-base font-medium text-[var(--color-foreground)] bg-white hover:bg-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--color-primary)] transition-colors hover-lift">
                             Compare Different Breeds
                         </button>
                     </div>

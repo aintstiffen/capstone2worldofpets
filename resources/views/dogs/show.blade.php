@@ -31,60 +31,60 @@
                 {{-- Left: Image & Info Cards --}}
                 <div class="space-y-4">
                     <div class="relative" x-data="{ activeTooltip: null, showAllHotspots: true }">
-                        <div class="aspect-square rounded-lg overflow-hidden bg-[var(--color-muted)]">
+                        <div class="aspect-square rounded-lg overflow-hidden bg-[var(--color-muted)] relative">
                             <img src="{{ $pet->image ? $pet->image_url : '/placeholder.svg?height=600&width=600' }}"
                                  alt="{{ $pet->name }}"
                                  class="object-cover w-full h-full"
+                                 style="z-index: 10"
                                  @mouseenter="showAllHotspots = true"
                                  @mouseleave="showAllHotspots = true">
-                                 
-                                <!-- {{ $feature }} Tooltip -->
-                                <div class="absolute" 
-                                     style="top: {{ $hotspot['position_y'] }}%; left: {{ $hotspot['position_x'] }}%; transform: translate(-50%, -50%);"
-                                     @mouseenter="activeTooltip = '{{ $feature }}'"
-                                     @mouseleave="activeTooltip = null">
-                                        <div class="cursor-pointer rounded-full border-2 tooltip-hotspot flex items-center justify-center backdrop-blur-sm text-pink-700 pulse-animation"
-                                             style="width: {{ max(56, $hotspot['width']) }}px; height: {{ max(56, $hotspot['height']) }}px;">
-                                            <span class="text-xs font-semibold select-none">{{ ucfirst($feature) }}</span>
-                                        </div>
-                                    <div x-show="activeTooltip === '{{ $feature }}'" 
+
+                            <!-- Interactive Tooltips -->
+                            <div class="absolute inset-0" style="z-index: 15">
+                                @php
+                                    // Feature colors per feature key
+                                    $featureColors = [
+                                        'ears' => 'blue',
+                                        'eyes' => 'green',
+                                        'tail' => 'amber',
+                                        'paws' => 'purple',
                                         'nose' => 'pink',
-                                        'coat' => 'orange'
+                                        'coat' => 'orange',
                                     ];
-                                    
+
                                     // Default hotspots if none are defined in the database
                                     $defaultHotspots = [
                                         ['feature' => 'ears', 'position_x' => 50, 'position_y' => 15, 'width' => 64, 'height' => 40],
                                         ['feature' => 'eyes', 'position_x' => 50, 'position_y' => 30, 'width' => 64, 'height' => 32],
                                         ['feature' => 'tail', 'position_x' => 85, 'position_y' => 70, 'width' => 40, 'height' => 48],
-                                        ['feature' => 'paws', 'position_x' => 30, 'position_y' => 85, 'width' => 32, 'height' => 32]
+                                        ['feature' => 'paws', 'position_x' => 30, 'position_y' => 85, 'width' => 32, 'height' => 32],
                                     ];
-                                    
+
                                     // Use the hotspots from the database if available, otherwise use defaults
                                     $hotspots = $pet->hotspots ?? $defaultHotspots;
-                                    
+
                                     // Get fun facts from database or use defaults
                                     $funFacts = $pet->fun_facts ?? [];
                                 @endphp
 
                                 @foreach($hotspots as $hotspot)
-                                <!-- Hint text for users -->
-                                <div class="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded"
+                                @php
+                                    $feature = $hotspot['feature'];
                                     $color = $featureColors[$feature] ?? 'gray';
-                                    
+
                                     // Find matching fact if it exists in the database
-                                     x-show="showAllHotspots || activeTooltip !== null">
-                                    <span x-show="activeTooltip === null">Hover the pink circles to learn about features</span>
-                                        foreach($funFacts as $funFact) {
-                                            if(isset($funFact['feature']) && $funFact['feature'] === $feature) {
+                                    $fact = null;
+                                    if (!empty($funFacts)) {
+                                        foreach ($funFacts as $funFact) {
+                                            if (isset($funFact['feature']) && $funFact['feature'] === $feature) {
                                                 $fact = $funFact['fact'];
                                                 break;
                                             }
                                         }
                                     }
-                                    
+
                                     // Default facts if none are provided in the database
-                                    if(!$fact) {
+                                    if (!$fact) {
                                         $defaultFacts = [
                                             'ears' => [
                                                 'Golden Retriever' => 'Their floppy ears help protect the ear canal from water and debris.',
@@ -107,36 +107,34 @@
                                                 'default' => 'Their paw pads contain sweat glands that help regulate temperature.'
                                             ],
                                             'nose' => [
-                                                'default' => 'Their nose contains over 300 million scent receptors, compared to about 5-6 million in humans.'
+                                                'default' => 'Their nose contains over 300 million scent receptors, compared to about 5–6 million in humans.'
                                             ],
                                             'coat' => [
-                                                'default' => 'Their coat has two layers: a soft undercoat for insulation and a water-resistant outer layer.'
-                                            ]
+                                                'default' => 'Many breeds have a double coat: a soft undercoat for insulation and a protective outer layer.'
+                                            ],
                                         ];
-                                        
+
                                         // Check if we have a breed-specific fact
                                         if (isset($defaultFacts[$feature][$pet->name])) {
                                             $fact = $defaultFacts[$feature][$pet->name];
-                                        } 
-                                        // Otherwise use the default fact for this feature
-                                        elseif (isset($defaultFacts[$feature]['default'])) {
+                                        } elseif (isset($defaultFacts[$feature]['default'])) {
                                             $fact = $defaultFacts[$feature]['default'];
-                                        }
-                                        else {
+                                        } else {
                                             $fact = 'Interesting facts about this ' . $feature . '.';
                                         }
                                     }
                                 @endphp
-                                
+
                                 <!-- {{ $feature }} Tooltip -->
-                                <div class="absolute" 
+                                <div class="absolute"
                                      style="top: {{ $hotspot['position_y'] }}%; left: {{ $hotspot['position_x'] }}%; transform: translate(-50%, -50%);"
                                      @mouseenter="activeTooltip = '{{ $feature }}'"
                                      @mouseleave="activeTooltip = null">
-                                    <div class="cursor-pointer rounded-full opacity-0 hover:opacity-100 border-2 border-{{ $color }}-500 hover:bg-{{ $color }}-500/20 tooltip-hotspot"
-                                         style="width: {{ $hotspot['width'] }}px; height: {{ $hotspot['height'] }}px;"
-                                         :class="{'opacity-50 pulse-animation': showAllHotspots, 'opacity-0': !showAllHotspots && activeTooltip !== '{{ $feature }}', 'opacity-100 bg-{{ $color }}-500/20': activeTooltip === '{{ $feature }}'}"></div>
-                                    <div x-show="activeTooltip === '{{ $feature }}'" 
+                                    <div class="cursor-pointer rounded-full border-2 tooltip-hotspot flex items-center justify-center backdrop-blur-sm text-pink-700 pulse-animation"
+                                         style="width: {{ max(56, $hotspot['width']) }}px; height: {{ max(56, $hotspot['height']) }}px;">
+                                        <span class="text-xs font-semibold select-none">{{ ucfirst($feature) }}</span>
+                                    </div>
+                                    <div x-show="activeTooltip === '{{ $feature }}'"
                                          x-transition:enter="transition ease-out duration-200"
                                          x-transition:enter-start="opacity-0 scale-95"
                                          x-transition:enter-end="opacity-100 scale-100"
@@ -150,20 +148,20 @@
                                          @else
                                              style="top: 100%; left: 50%; transform: translateX(-50%); margin-top: 8px;"
                                          @endif
-                                        >
+                                    >
                                         <strong class="block mb-1 text-{{ $color }}-600">{{ $pet->name }}'s {{ ucfirst($feature) }}</strong>
                                         <p>{{ $fact }}</p>
                                     </div>
                                 </div>
                                 @endforeach
-                                
+
                                 <!-- Hint text for users -->
                                 <div class="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded"
                                      x-transition:enter="transition ease-out duration-300"
                                      x-transition:enter-start="opacity-0"
                                      x-transition:enter-end="opacity-100"
                                      x-show="showAllHotspots || activeTooltip !== null">
-                                    <span x-show="activeTooltip === null">Hover over colored areas for fun facts</span>
+                                    <span x-show="activeTooltip === null">Hover the pink circles to learn about features</span>
                                     <span x-show="activeTooltip !== null">Interesting facts about this {{ $pet->name }}'s <span x-text="activeTooltip"></span></span>
                                 </div>
                             </div>
