@@ -16,7 +16,9 @@ class Authenticate extends Middleware
             return null;
         }
         
-        if (str_starts_with($request->path(), 'admin')) {
+        // Redirect to Filament admin login for requests under the hidden admin path
+        if (str_starts_with($request->path(), 'worldofpets/admin/admin/hidden') ||
+            str_starts_with($request->path(), 'admin')) {
             return route('filament.admin.auth.login');
         }
         
