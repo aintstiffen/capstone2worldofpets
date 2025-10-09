@@ -163,7 +163,7 @@
                                         <p class="font-medium">{{ $assessment->created_at->format('F j, Y') }}</p>
                                         <p class="text-sm text-gray-600">Assessment ID: {{ $assessment->id }}</p>
                                     </div>
-                                    <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">View Details</a>
+                                    <a href="{{ route('assessment', ['id' => $assessment->id]) }}" class="text-blue-600 hover:text-blue-800 font-medium">View Details</a>
                                 </div>
                             </div>
                         @endforeach

@@ -11,17 +11,139 @@ use Illuminate\Support\Facades\Session;
 
 class AssessmentController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Determine hair length for a pet based on breed name and description
+     */
+    private function determineHairLength($pet)
     {
-        // Check if an assessment ID is specified and the user is logged in
-        if ($request->has('id') && auth()->check()) {
-            $assessmentId = $request->input('id');
+        $nameLower = strtolower($pet->name);
+        $descLower = strtolower($pet->description ?? '');
+        
+        // Known long-haired breeds (this is more reliable than description parsing)
+        $longHairBreeds = [
+            'afghan hound', 'shih tzu', 'maltese', 'yorkshire terrier', 'lhasa apso',
+            'pomeranian', 'pekingese', 'havanese', 'cocker spaniel', 'golden retriever',
+            'rough collie', 'shetland sheepdog', 'old english sheepdog', 'bearded collie',
+            'tibetan terrier', 'portuguese water dog', 'bernese mountain dog',
+            'newfoundland', 'samoyed', 'chow chow', 'keeshond', 'finnish lapphund',
+            'persian', 'maine coon', 'ragdoll', 'himalayan', 'norwegian forest',
+            'siberian', 'birman', 'turkish angora', 'ragamuffin', 'somali'
+        ];
+        
+        // Check if breed name matches known long-haired breeds
+        foreach ($longHairBreeds as $breed) {
+            if (stripos($nameLower, $breed) !== false) {
+                return 'long';
+            }
+        }
+        
+        // Check description for long hair indicators
+        if (stripos($descLower, 'long hair') !== false || 
+            stripos($descLower, 'long coat') !== false || 
+            stripos($descLower, 'luxurious coat') !== false ||
+            stripos($descLower, 'flowing coat') !== false ||
+            stripos($descLower, 'silky coat') !== false) {
+            return 'long';
+        }
+        
+        // Default to short
+        return 'short';
+    }
+    
+    /**
+     * Extract personality matches from temperament
+     */
+    private function extractPersonalityMatches($temperament)
+    {
+        $personalityMatch = [];
+        $temperamentLower = strtolower($temperament);
+        
+        if (stripos($temperamentLower, 'friendly') !== false || 
+            stripos($temperamentLower, 'outgoing') !== false || 
+            stripos($temperamentLower, 'social') !== false) {
+            $personalityMatch[] = 'highExtraversion';
+        }
+        
+        if (stripos($temperamentLower, 'gentle') !== false || 
+            stripos($temperamentLower, 'affectionate') !== false || 
+            stripos($temperamentLower, 'loving') !== false) {
+            $personalityMatch[] = 'highAgreeableness';
+        }
+        
+        if (stripos($temperamentLower, 'intelligent') !== false || 
+            stripos($temperamentLower, 'trainable') !== false || 
+            stripos($temperamentLower, 'smart') !== false) {
+            $personalityMatch[] = 'highConscientiousness';
+        }
+        
+        if (stripos($temperamentLower, 'loyal') !== false || 
+            stripos($temperamentLower, 'devoted') !== false || 
+            stripos($temperamentLower, 'faithful') !== false) {
+            $personalityMatch[] = 'highHonesty';
+        }
+        
+        if (stripos($temperamentLower, 'curious') !== false || 
+            stripos($temperamentLower, 'adaptable') !== false || 
+            stripos($temperamentLower, 'alert') !== false) {
+            $personalityMatch[] = 'highOpenness';
+        }
+        
+        if (stripos($temperamentLower, 'sensitive') !== false || 
+            stripos($temperamentLower, 'shy') !== false ||
+            stripos($temperamentLower, 'loving') !== false) {
+            $personalityMatch[] = 'highEmotionality';
+        }
+        
+        // Make sure we have at least 2 personality matches
+        if (count($personalityMatch) < 2) {
+            $personalityMatch[] = 'highExtraversion';
+        }
+        
+        // Get just the first 2 personality matches
+        return array_slice($personalityMatch, 0, 2);
+    }
+    
+    /**
+     * Format pet data consistently
+     */
+    private function formatPetData($pet, $defaultPersonality = 'highExtraversion')
+    {
+        $sizeMap = [
+            'Small' => 'small',
+            'Small to Medium' => 'small',
+            'Medium' => 'medium',
+            'Medium to Large' => 'medium',
+            'Large' => 'large',
+        ];
+        
+        $mappedSize = $sizeMap[$pet->size] ?? 'medium';
+        $hairLength = $this->determineHairLength($pet);
+        $traits = array_slice(explode(', ', $pet->temperament), 0, 3);
+        $personalityMatch = $this->extractPersonalityMatches($pet->temperament);
+        
+        return [
+            'id' => $pet->id,
+            'slug' => $pet->slug,
+            'name' => $pet->name,
+            'size' => $mappedSize,
+            'hairLength' => $hairLength,
+            'image' => $pet->image_url ?: '/placeholder.svg?height=300&width=400',
+            'description' => $pet->description,
+            'traits' => $traits,
+            'personalityMatch' => $personalityMatch
+        ];
+    }
+
+    public function index(Request $request, $id = null)
+    {
+        // Check if an assessment ID is specified
+        $assessmentId = $id ?: ($request->has('id') ? $request->input('id') : null);
+        if ($assessmentId && auth()->check()) {
             $assessment = Assessment::where('id', $assessmentId)
                 ->where('user_id', auth()->id())
                 ->first();
                 
             if ($assessment) {
-                // Load the assessment from the database into the session
                 Session::put('assessment_results', [
                     'petType' => $assessment->pet_type,
                     'preferences' => $assessment->preferences,
@@ -33,187 +155,22 @@ class AssessmentController extends Controller
             }
         }
         
-        // Check if reset parameter is present and clear session data
+        // Check if reset parameter is present
         if ($request->has('reset')) {
             Log::debug('Reset parameter detected, clearing assessment results');
             Session::forget('assessment_results');
-            // For debugging only
             if ($request->has('debug')) {
                 dd('Session reset complete, assessment_results removed from session');
             }
         }
         
         // Get dog and cat breeds from database
-    $dogBreeds = Pet::where('category', 'dog')->get()->map(function($pet) {
-            $sizeMap = [
-                'Small' => 'small',
-                'Small to Medium' => 'small',
-                'Medium' => 'medium',
-                'Medium to Large' => 'medium',
-                'Large' => 'large',
-            ];
-            
-            // Determine hair length from description or default to 'short'
-            $hairLength = 'short';
-            if (stripos($pet->description, 'long hair') !== false || 
-                stripos($pet->description, 'long coat') !== false || 
-                stripos($pet->description, 'luxurious coat') !== false) {
-                $hairLength = 'long';
-            }
-            
-            // Extract size from the size field
-            $mappedSize = $sizeMap[$pet->size] ?? 'medium';
-            
-            // Extract traits from temperament
-            $traits = explode(', ', $pet->temperament);
-            $traits = array_slice($traits, 0, 3); // Limit to 3 traits
-            
-            // Define personality matches based on temperament
-            $personalityMatch = [];
-            $temperamentLower = strtolower($pet->temperament);
-            
-            if (stripos($temperamentLower, 'friendly') !== false || 
-                stripos($temperamentLower, 'outgoing') !== false || 
-                stripos($temperamentLower, 'social') !== false) {
-                $personalityMatch[] = 'highExtraversion';
-            }
-            
-            if (stripos($temperamentLower, 'gentle') !== false || 
-                stripos($temperamentLower, 'affectionate') !== false || 
-                stripos($temperamentLower, 'loving') !== false) {
-                $personalityMatch[] = 'highAgreeableness';
-            }
-            
-            if (stripos($temperamentLower, 'intelligent') !== false || 
-                stripos($temperamentLower, 'trainable') !== false || 
-                stripos($temperamentLower, 'smart') !== false) {
-                $personalityMatch[] = 'highConscientiousness';
-            }
-            
-            if (stripos($temperamentLower, 'loyal') !== false || 
-                stripos($temperamentLower, 'devoted') !== false || 
-                stripos($temperamentLower, 'faithful') !== false) {
-                $personalityMatch[] = 'highHonesty';
-            }
-            
-            if (stripos($temperamentLower, 'curious') !== false || 
-                stripos($temperamentLower, 'adaptable') !== false || 
-                stripos($temperamentLower, 'alert') !== false) {
-                $personalityMatch[] = 'highOpenness';
-            }
-            
-            if (stripos($temperamentLower, 'sensitive') !== false || 
-                stripos($temperamentLower, 'shy') !== false ||
-                stripos($temperamentLower, 'loving') !== false) {
-                $personalityMatch[] = 'highEmotionality';
-            }
-            
-            // Make sure we have at least 2 personality matches
-            if (count($personalityMatch) < 2) {
-                $personalityMatch[] = 'highExtraversion';
-            }
-            
-            // Get just the first 2 personality matches
-            $personalityMatch = array_slice($personalityMatch, 0, 2);
-            
-            return [
-                'id' => $pet->id,
-                'slug' => $pet->slug,
-                'name' => $pet->name,
-                'size' => $mappedSize,
-                'hairLength' => $hairLength,
-                // Use the same accessor and fallback placeholder as breed pages
-                'image' => $pet->image_url ?: '/placeholder.svg?height=300&width=400',
-                'description' => $pet->description,
-                'traits' => $traits,
-                'personalityMatch' => $personalityMatch
-            ];
+        $dogBreeds = Pet::where('category', 'dog')->get()->map(function($pet) {
+            return $this->formatPetData($pet, 'highExtraversion');
         })->toArray();
         
         $catBreeds = Pet::where('category', 'cat')->get()->map(function($pet) {
-            $sizeMap = [
-                'Small' => 'small',
-                'Small to Medium' => 'small', 
-                'Medium' => 'medium',
-                'Medium to Large' => 'medium',
-                'Large' => 'large',
-            ];
-            
-            // Determine hair length from description or default to 'short'
-            $hairLength = 'short';
-            if (stripos($pet->description, 'long hair') !== false || 
-                stripos($pet->description, 'long coat') !== false || 
-                stripos($pet->description, 'luxurious coat') !== false) {
-                $hairLength = 'long';
-            }
-            
-            // Extract size from the size field
-            $mappedSize = $sizeMap[$pet->size] ?? 'medium';
-            
-            // Extract traits from temperament
-            $traits = explode(', ', $pet->temperament);
-            $traits = array_slice($traits, 0, 3); // Limit to 3 traits
-            
-            // Define personality matches based on temperament
-            $personalityMatch = [];
-            $temperamentLower = strtolower($pet->temperament);
-            
-            if (stripos($temperamentLower, 'friendly') !== false || 
-                stripos($temperamentLower, 'outgoing') !== false || 
-                stripos($temperamentLower, 'social') !== false) {
-                $personalityMatch[] = 'highExtraversion';
-            }
-            
-            if (stripos($temperamentLower, 'gentle') !== false || 
-                stripos($temperamentLower, 'affectionate') !== false || 
-                stripos($temperamentLower, 'loving') !== false) {
-                $personalityMatch[] = 'highAgreeableness';
-            }
-            
-            if (stripos($temperamentLower, 'intelligent') !== false || 
-                stripos($temperamentLower, 'trainable') !== false || 
-                stripos($temperamentLower, 'smart') !== false) {
-                $personalityMatch[] = 'highConscientiousness';
-            }
-            
-            if (stripos($temperamentLower, 'loyal') !== false || 
-                stripos($temperamentLower, 'devoted') !== false || 
-                stripos($temperamentLower, 'faithful') !== false) {
-                $personalityMatch[] = 'highHonesty';
-            }
-            
-            if (stripos($temperamentLower, 'curious') !== false || 
-                stripos($temperamentLower, 'adaptable') !== false || 
-                stripos($temperamentLower, 'alert') !== false) {
-                $personalityMatch[] = 'highOpenness';
-            }
-            
-            if (stripos($temperamentLower, 'sensitive') !== false || 
-                stripos($temperamentLower, 'shy') !== false ||
-                stripos($temperamentLower, 'loving') !== false) {
-                $personalityMatch[] = 'highEmotionality';
-            }
-            
-            // Make sure we have at least 2 personality matches
-            if (count($personalityMatch) < 2) {
-                $personalityMatch[] = 'highAgreeableness';
-            }
-            
-            // Get just the first 2 personality matches
-            $personalityMatch = array_slice($personalityMatch, 0, 2);
-            
-            return [
-                'id' => $pet->id,
-                'slug' => $pet->slug,
-                'name' => $pet->name,
-                'size' => $mappedSize,
-                'hairLength' => $hairLength,
-                // Use the same accessor and fallback placeholder as breed pages
-                'image' => $pet->image_url ?: '/placeholder.svg?height=300&width=400',
-                'description' => $pet->description,
-                'traits' => $traits,
-                'personalityMatch' => $personalityMatch
-            ];
+            return $this->formatPetData($pet, 'highAgreeableness');
         })->toArray();
 
         // Get any saved assessment results from the session
@@ -233,7 +190,6 @@ class AssessmentController extends Controller
                     'personality_scores' => $latestAssessment->personality_scores ?? [],
                 ];
                 
-                // Save to session so it's available for the rest of the request
                 Session::put('assessment_results', $savedResults);
                 Log::info('Loaded latest assessment from database for user #' . auth()->id());
             }
@@ -248,7 +204,7 @@ class AssessmentController extends Controller
             ];
         }
         
-        // Check if we have saved results and normalize them with complete, current DB data
+        // CRITICAL FIX: Normalize saved results with ACTUAL breed characteristics
         if (($savedResults['petType'] ?? null) && !empty($savedResults['recommendedBreeds'])) {
             foreach ($savedResults['recommendedBreeds'] as $index => $breed) {
                 // Try to resolve the Pet by id first, then by slug
@@ -256,7 +212,6 @@ class AssessmentController extends Controller
                 if (!empty($breed['id'])) {
                     $petInfo = Pet::find($breed['id']);
                 }
-                // If ID lookup fails or points to a different slug, prefer slug to ensure correctness
                 if (!empty($breed['slug'])) {
                     if (!$petInfo || ($petInfo && $petInfo->slug !== $breed['slug'])) {
                         $bySlug = Pet::where('slug', $breed['slug'])->first();
@@ -267,23 +222,12 @@ class AssessmentController extends Controller
                 }
 
                 if ($petInfo) {
-                    // Always refresh with canonical data to avoid stale/placeholder images
-                    $savedResults['recommendedBreeds'][$index] = [
-                        'id' => $petInfo->id,
-                        'slug' => $petInfo->slug,
-                        'name' => $petInfo->name,
-                        // Preferences-driven summary fields (for display chips on the card)
-                        'size' => $savedResults['preferences']['size'] ?? 'medium',
-                        'hairLength' => $savedResults['preferences']['hairLength'] ?? 'short',
-                        // Use the same accessor as breed pages so images always match
-                        'image' => $petInfo->image_url ?: '/placeholder.svg?height=300&width=400',
-                        'description' => $petInfo->description,
-                        'traits' => array_slice(explode(', ', (string) $petInfo->temperament), 0, 3),
-                    ];
+                    // Use formatPetData to get ACTUAL characteristics, not preferences
+                    $savedResults['recommendedBreeds'][$index] = $this->formatPetData($petInfo);
                 }
             }
 
-            // Re-save the normalized results to session so the view uses updated images
+            // Re-save the normalized results to session
             Session::put('assessment_results', $savedResults);
         }
 
@@ -297,14 +241,11 @@ class AssessmentController extends Controller
         // Ensure all required fields are present in savedResults
         if (!empty($savedResults['recommendedBreeds'])) {
             foreach ($savedResults['recommendedBreeds'] as &$breed) {
-                // Ensure each breed has all required fields
                 if (!isset($breed['traits']) || !is_array($breed['traits'])) {
                     $breed['traits'] = [];
                 }
                 
-                // Make sure image is set
                 if (empty($breed['image'])) {
-                    // Try to pull from DB; if not, use the neutral placeholder used by breed pages
                     $pet = null;
                     if (!empty($breed['id'])) {
                         $pet = Pet::find($breed['id']);
@@ -317,7 +258,6 @@ class AssessmentController extends Controller
             }
         }
         
-        // Encode with JSON_HEX_APOS and JSON_HEX_QUOT to avoid issues with single quotes in JavaScript
         return view('assessment', [
             'dogBreeds' => json_encode($dogBreeds, JSON_HEX_APOS | JSON_HEX_QUOT),
             'catBreeds' => json_encode($catBreeds, JSON_HEX_APOS | JSON_HEX_QUOT),
@@ -327,14 +267,13 @@ class AssessmentController extends Controller
     
     public function saveResults(SaveAssessmentRequest $request)
     {
-        // Handle reset case - clear session and return success
+        // Handle reset case
         if ($request->input('petType') === null) {
             Log::debug('Clearing assessment results from session');
             Session::forget('assessment_results');
             return response()->json(['success' => true, 'message' => 'Assessment data cleared']);
         }
         
-        // The validation is handled by SaveAssessmentRequest class
         $results = $request->validated();
         
         Log::debug('Saving assessment results', [
@@ -342,7 +281,6 @@ class AssessmentController extends Controller
             'breedCount' => count($results['recommendedBreeds'])
         ]);
         
-        // Get the full breed info for each recommended breed
         $petType = $results['petType'];
         $recommendedBreeds = $results['recommendedBreeds'];
         
@@ -350,54 +288,17 @@ class AssessmentController extends Controller
         $fullBreedInfo = [];
         foreach ($recommendedBreeds as $breed) {
             $breedId = $breed['id'];
-            
-            // Find the complete breed info from database
             $petInfo = Pet::find($breedId);
+            
             if ($petInfo) {
-                // Format pet data the same way we do in index method
-                $sizeMap = [
-                    'Small' => 'small',
-                    'Small to Medium' => 'small',
-                    'Medium' => 'medium',
-                    'Medium to Large' => 'medium',
-                    'Large' => 'large',
-                ];
-                
-                // Determine hair length from description or default to 'short'
-                $hairLength = 'short';
-                if (stripos($petInfo->description, 'long hair') !== false || 
-                    stripos($petInfo->description, 'long coat') !== false || 
-                    stripos($petInfo->description, 'luxurious coat') !== false) {
-                    $hairLength = 'long';
-                }
-                
-                // Extract traits from temperament
-                $traits = explode(', ', $petInfo->temperament);
-                $traits = array_slice($traits, 0, 3); // Limit to 3 traits
-                
-                // Store complete breed info
-                $fullBreedInfo[] = [
-                    'id' => $petInfo->id,
-                    'slug' => $petInfo->slug,
-                    'name' => $petInfo->name,
-                    'size' => $sizeMap[$petInfo->size] ?? 'medium',
-                    'hairLength' => $hairLength,
-                    // Ensure assessment uses the same image as breed pages
-                    'image' => $petInfo->image_url ?: (
-                        $petType === 'dog' 
-                            ? ("https://placedog.net/400/300?id=" . $petInfo->id) 
-                            : ("https://placekitten.com/400/300?image=" . $petInfo->id)
-                    ),
-                    'description' => $petInfo->description,
-                    'traits' => $traits,
-                ];
+                // Use formatPetData for consistency
+                $fullBreedInfo[] = $this->formatPetData($petInfo);
             }
         }
         
         // Update the results with complete breed info
         $results['recommendedBreeds'] = $fullBreedInfo;
         
-        // Log what we're about to save to help with debugging
         Log::debug('Final assessment results being saved to session', [
             'petType' => $results['petType'],
             'breedCount' => count($fullBreedInfo),
@@ -405,20 +306,16 @@ class AssessmentController extends Controller
             'hasHairLengthPreference' => isset($results['preferences']['hairLength'])
         ]);
         
-        // Make sure we have valid breed data before saving
         if (count($fullBreedInfo) === 0) {
             Log::warning('No valid breed information found to save');
         }
         
         // Save to session
         Session::put('assessment_results', $results);
-        
-        // Add flash message that will be available on the next request
         Session::flash('assessment_saved', true);
         
-        // Also save to database for statistics
+        // Save to database
         try {
-            // Get personality scores from request if available
             $personalityScores = $request->input('personalityScores', []);
             
             Assessment::create([
@@ -432,7 +329,6 @@ class AssessmentController extends Controller
             Log::info('Assessment saved to database');
         } catch (\Exception $e) {
             Log::error('Failed to save assessment to database: ' . $e->getMessage());
-            // Don't fail the request, as we've already saved to session
         }
         
         return response()->json([
