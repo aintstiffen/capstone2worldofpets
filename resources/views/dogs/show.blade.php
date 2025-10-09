@@ -6,20 +6,15 @@
         transition: all 0.2s ease;
     }
     .tooltip-content {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        /* Floating tooltips removed — use the bottom info panel for all viewports */
+        display: none !important;
     }
-    /* Prevent tooltip from being clipped and make content responsive on small screens */
-    .tooltip-content { z-index: 9999; }
-    /* On small screens hide floating tooltip (use bottom info panel instead) */
-    @media (max-width: 767px) {
-        .tooltip-hotspot { transform-origin: center center; transform: translate(-50%, -50%) scale(0.85); }
-        .tooltip-content { display: none !important; }
+    /* Responsive hotspot sizing so the interactive circles scale with viewport */
+    .hotspot-wrapper .tooltip-hotspot {
+        width: clamp(32px, 6vw, 64px) !important;
+        height: clamp(32px, 6vw, 64px) !important;
     }
-    /* On larger screens make tooltip readable and provide spacing from the hotspot */
-    @media (min-width: 768px) {
-        .tooltip-content { display: block; max-width: 320px; word-wrap: break-word; }
-        .tooltip-content.offset-small { margin-top: 12px; margin-bottom: 12px; }
-    }
+    .hotspot-wrapper .tooltip-hotspot span { font-size: clamp(10px, 1.6vw, 13px); }
     @keyframes pulse {
         0% { transform: scale(1); opacity: 0.6; }
         50% { transform: scale(1.05); opacity: 0.8; }
@@ -46,39 +41,10 @@
                 activeTooltip: null, 
                 activeFact: '',
                 showAllHotspots: true,
-                            // Show tooltip and adjust position so it stays within the image container
+                            // Activate a hotspot — show the bottom info panel (no floating tooltip)
                             setActive(feature, hotspotEl) {
                                 this.activeTooltip = feature;
-                                // Wait for the tooltip to render
-                                this.$nextTick(() => {
-                                    try {
-                                        const tooltip = hotspotEl.querySelector('.tooltip-content');
-                                        const container = this.$refs.imageContainer || document.querySelector('.tooltip-image-container');
-                                        if (!tooltip || !container) return;
-
-                                        const tRect = tooltip.getBoundingClientRect();
-                                        const cRect = container.getBoundingClientRect();
-
-                                        // Small padding from edges
-                                        const pad = 8;
-
-                                        // Calculate overflow on left and right relative to container
-                                        const leftOverflow = (cRect.left + pad) - tRect.left;
-                                        const rightOverflow = tRect.right - (cRect.right - pad);
-
-                                        let shift = 0;
-                                        if (leftOverflow > 0) shift = leftOverflow;
-                                        else if (rightOverflow > 0) shift = -rightOverflow;
-
-                                        // Apply a corrective translateX while preserving the default -50% centering
-                                        // Use px adjustment which works regardless of tooltip width
-                                        tooltip.style.transform = `translateX(calc(-50% + ${shift}px))`;
-                                        // Update the activeFact from the element dataset so the below-panel can show it
-                                        this.activeFact = hotspotEl.dataset.fact || '';
-                                    } catch (e) {
-                                        console.error('Tooltip adjust error', e);
-                                    }
-                                });
+                                this.activeFact = hotspotEl.dataset.fact || '';
                             },
                             clearActive() { this.activeTooltip = null; this.activeFact = ''; }
                         }">
@@ -178,12 +144,14 @@
                                 @endphp
 
                           <!-- {{ $feature }} Tooltip -->
-                          <div class="absolute"
+                          <div class="absolute hotspot-wrapper"
                               style="top: {{ $hotspot['position_y'] }}%; left: {{ $hotspot['position_x'] }}%; transform: translate(-50%, -50%);"
                               @mouseenter="setActive('{{ $feature }}', $el)"
                               @mouseleave="clearActive()"
                               @click="setActive('{{ $feature }}', $el)"
-                              data-fact="{{ e($fact) }}">
+                              data-fact="{{ e($fact) }}"
+                              data-x="{{ $hotspot['position_x'] }}"
+                              data-y="{{ $hotspot['position_y'] }}">
                                     <div class="cursor-pointer rounded-full border-2 tooltip-hotspot flex items-center justify-center backdrop-blur-sm text-pink-700 pulse-animation"
                                          style="width: {{ max(40, $hotspot['width']) }}px; height: {{ max(40, $hotspot['height']) }}px;">
                                         <span class="text-xs font-semibold select-none">{{ ucfirst($feature) }}</span>
@@ -208,6 +176,8 @@
                                     </div>
                                 </div>
                                 @endforeach
+
+                                <!-- Floating arrow removed — using the bottom info panel for all viewports -->
 
                                 <!-- Small hint badge (kept) -->
                                 <div class="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded"

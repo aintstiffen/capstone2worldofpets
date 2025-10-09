@@ -16,13 +16,15 @@
         100% { transform: scale(1); }
     }
 
-    .tooltip-content {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        z-index: 30;
-        background-color: white;
-        padding: 8px 12px;
-        border-radius: 6px;
+    /* Hide floating tooltip; use the bottom info panel for all viewports */
+    .tooltip-content { display: none !important; }
+
+    /* Responsive hotspot sizing so the interactive circles scale with viewport */
+    .hotspot-wrapper .tooltip-hotspot {
+        width: clamp(32px, 6vw, 64px) !important;
+        height: clamp(32px, 6vw, 64px) !important;
     }
+    .hotspot-wrapper .tooltip-hotspot span { font-size: clamp(10px, 1.6vw, 13px); }
 </style>
 @endpush
 
@@ -37,12 +39,16 @@
             <div class="grid gap-6 lg:grid-cols-2 lg:gap-12">
                 {{-- Left: Image & Info Cards --}}
                 <div class="space-y-4">
-                    <div class="relative" x-data="{ activeTooltip: null, showAllHotspots: true }">
-                        <div class="aspect-square rounded-lg overflow-hidden bg-[var(--color-muted)] relative">
+                    <div class="relative" x-data="{ activeTooltip: null, activeFact: '', showAllHotspots: true,
+                            setActive(feature, el) { this.activeTooltip = feature; this.activeFact = el.dataset.fact || ''; },
+                            clearActive() { this.activeTooltip = null; this.activeFact = ''; }
+                        }">
+                        <!-- Keep image at natural aspect, hotspots scale; tooltips removed -->
+                        <div class="rounded-lg overflow-hidden bg-[var(--color-muted)] relative inline-block w-full tooltip-image-container" x-ref="imageContainer">
                             <img src="{{ $pet->image ? $pet->image_url : '/placeholder.svg?height=600&width=600' }}"
                                  alt="{{ $pet->name }}"
-                                 class="object-cover w-full h-full"
-                                 style="z-index: 10"
+                                 class="block w-full h-auto object-contain"
+                                 style="z-index: 10; display:block;"
                                  @mouseenter="showAllHotspots = true"
                                  @mouseleave="showAllHotspots = true">
 
@@ -136,32 +142,19 @@
                                 @endphp
                                 
                           <!-- {{ $feature }} Tooltip -->
-                          <div class="absolute" 
+                          <div class="absolute hotspot-wrapper" 
                               style="top: {{ $hotspot['position_y'] }}%; left: {{ $hotspot['position_x'] }}%; transform: translate(-50%, -50%);"
-                              @mouseenter="activeTooltip = '{{ $feature }}'"
-                              @mouseleave="activeTooltip = null">
+                              @mouseenter="setActive('{{ $feature }}', $el)"
+                              @mouseleave="clearActive()"
+                              @click="setActive('{{ $feature }}', $el)"
+                              data-fact="{{ e($fact) }}"
+                              data-x="{{ $hotspot['position_x'] }}"
+                              data-y="{{ $hotspot['position_y'] }}">
                              <div class="cursor-pointer rounded-full border-2 tooltip-hotspot flex items-center justify-center backdrop-blur-sm text-pink-700 pulse-animation"
-                                 style="width: {{ max(56, $hotspot['width']) }}px; height: {{ max(56, $hotspot['height']) }}px;">
+                                 style="width: {{ max(40, $hotspot['width']) }}px; height: {{ max(40, $hotspot['height']) }}px;">
                                  <span class="text-xs font-semibold select-none">{{ ucfirst($feature) }}</span>
                              </div>
-                                    <div x-show="activeTooltip === '{{ $feature }}'" 
-                                         x-transition:enter="transition ease-out duration-200"
-                                         x-transition:enter-start="opacity-0 scale-95"
-                                         x-transition:enter-end="opacity-100 scale-100"
-                                         class="absolute z-10 p-3 bg-white rounded-lg shadow-lg tooltip-content w-48 text-sm"
-                                         @if($hotspot['position_x'] < 30)
-                                             style="left: 100%; top: 0; margin-left: 8px;"
-                                         @elseif($hotspot['position_x'] > 70)
-                                             style="right: 100%; top: 0; margin-right: 8px;"
-                                         @elseif($hotspot['position_y'] < 30)
-                                             style="bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 8px;"
-                                         @else
-                                             style="top: 100%; left: 50%; transform: translateX(-50%); margin-top: 8px;"
-                                         @endif
-                                        >
-                                        <strong class="block mb-1 text-{{ $color }}-600">{{ $pet->name }}'s {{ ucfirst($feature) }}</strong>
-                                        <p>{{ $fact }}</p>
-                                    </div>
+                                    {{-- floating tooltip removed; content shown in bottom panel --}}
                                 </div>
                                 @endforeach
                                 
@@ -171,9 +164,16 @@
                                      x-transition:enter-start="opacity-0"
                                      x-transition:enter-end="opacity-100"
                                      x-show="showAllHotspots || activeTooltip !== null">
-                                    <span x-show="activeTooltip === null">Hover the pink circles to learn about features</span>
-                                    <span x-show="activeTooltip !== null">Interesting facts about this {{ $pet->name }}'s <span x-text="activeTooltip"></span></span>
+                                    <span x-show="activeTooltip === null">Hover or tap the circles to learn about features</span>
+                                    <span x-show="activeTooltip !== null">Showing: <span x-text="activeTooltip"></span></span>
                                 </div>
+                            </div>
+                        </div>
+                        <!-- Non-overlapping info panel below the image: shows the currently active hotspot fact -->
+                        <div class="mt-3" x-show="activeTooltip" x-cloak>
+                            <div class="p-3 bg-white rounded-lg shadow">
+                                <strong class="block text-lg text-[--color-primary] mb-1">{{ $pet->name }}'s <span x-text="activeTooltip"></span></strong>
+                                <p class="text-sm text-[--color-muted-foreground]" x-text="activeFact"></p>
                             </div>
                         </div>
                     </div>
