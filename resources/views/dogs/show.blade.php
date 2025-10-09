@@ -191,7 +191,7 @@
                             </div>
                         </div>
                         <!-- Non-overlapping info panel below the image: shows the currently active hotspot fact -->
-                        <div class="mt-3" x-show="activeTooltip" x-cloak>
+                        <div class="mt-3 info-panel" x-show="activeTooltip" x-cloak>
                             <div class="p-3 bg-white rounded-lg shadow">
                                 <strong class="block text-lg text-[--color-primary] mb-1">{{ $pet->name }}'s <span x-text="activeTooltip"></span></strong>
                                 <p class="text-sm text-[--color-muted-foreground]" x-text="activeFact"></p>

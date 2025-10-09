@@ -1,5 +1,10 @@
 {{-- Header --}}
-    <header class="bg-[var(--color-card)] border-b sticky top-0 z-10" x-data="{
+    <style>
+        /* Keep hotspot info panels under the sticky header */
+        .info-panel { position: relative; z-index: 10; }
+        .tooltip-image-container { position: relative; z-index: 0; }
+    </style>
+    <header class="bg-[var(--color-card)] border-b sticky top-0 z-50" x-data="{
         scrolled: false,
         lastScrollY: 0,
         mobileMenuOpen: false,
