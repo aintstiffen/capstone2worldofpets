@@ -174,7 +174,7 @@
                                         class="absolute left-1/2 -translate-x-1/2 mt-10 w-56 z-10 hidden group-hover:block md:group-hover:block bg-white border border-[var(--color-primary)] rounded-lg shadow-lg p-3 text-sm text-gray-700 transition-all duration-200">
                                         <span class="font-semibold text-[var(--color-primary)]">Fun Fact:</span>
                                         Labradors have a "soft mouth," meaning they can carry objects gently without
-                                        damaging them—a trait prized in retrieving!
+                                        damaging them—a trait prized in retrieving.
                                     </div>
                                 </div>
                             </div>
