@@ -168,20 +168,20 @@
                             </p>
                         </div>
 
-                        <div class="flex flex-wrap gap-3 items-center justify-between">
-                            <div class="flex gap-3">
-                                <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5" 
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                                <button class="w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5" 
                                     @click="prevSet" x-show="currentSection > 0">
                                     Back
                                 </button>
-                                <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5" 
+                                <button class="w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5" 
                                     @click="currentStage = 'size'">
                                     Back to Preferences
                                 </button>
                             </div>
-                            <div class="flex gap-3 items-center">
-                                <div class="text-sm text-[var(--color-muted-foreground)]">Set progress: <span x-text="sectionAnsweredCount()"></span>/<span x-text="questionsPerSection"></span></div>
-                                <button class="text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] focus:ring-4 focus:outline-none focus:ring-[var(--color-accent)] font-medium rounded-lg text-sm px-5 py-2.5" 
+                            <div class="flex flex-col sm:flex-row gap-3 items-center w-full md:w-auto justify-between md:justify-end">
+                                <div class="text-sm text-[var(--color-muted-foreground)] order-1 sm:order-0">Set progress: <span x-text="sectionAnsweredCount()"></span>/<span x-text="questionsPerSection"></span></div>
+                                <button class="w-full sm:w-auto text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] focus:ring-4 focus:outline-none focus:ring-[var(--color-accent)] font-medium rounded-lg text-sm px-5 py-2.5" 
                                     @click="isSectionComplete() ? nextSet() : attemptedNext = true">
                                     <span x-show="currentSection < totalSections - 1">Next Set</span>
                                     <span x-show="currentSection === totalSections - 1">See Results</span>
