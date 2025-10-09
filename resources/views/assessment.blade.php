@@ -343,9 +343,13 @@
                 console.warn('Invalid or incomplete saved results detected', savedResults);
             }
             
+            // Read an optional 'start' parameter from the URL to jump directly into the flow (used after reset)
+            const urlParams = new URLSearchParams(window.location.search);
+            const requestedStart = urlParams.get('start');
+
             return {
-                // Only start with results if we have valid saved results
-                currentStage: hasValidSavedResults ? 'results' : 'intro', // intro, petType, hairLength, size, personality, results
+                // Only start with results if we have valid saved results. If not and a 'start' param exists, use it (e.g. 'petType').
+                currentStage: hasValidSavedResults ? 'results' : (requestedStart ? requestedStart : 'intro'), // intro, petType, hairLength, size, personality, results
                 petType: hasValidSavedResults ? savedResults.petType : null,
                 preferences: hasSavedResults ? savedResults.preferences : {
                     hairLength: null, // short, long
@@ -804,18 +808,24 @@
                         })
                     })
                     .then(response => response.json())
-                    .then(data => {
+                        .then(data => {
                         console.log('Assessment data cleared:', data);
                         // Force a hard reload with the reset parameter to ensure clean state
-                        window.location.href = '{{ route('assessment') }}?reset=true&t=' + new Date().getTime();
+                        // Add start=petType so the page jumps into the assessment flow after reset
+                        window.location.href = '{{ route('assessment') }}?reset=true&start=petType&t=' + new Date().getTime();
                     })
-                    .catch(error => {
+                        .catch(error => {
                         console.error('Error clearing assessment data:', error);
                         // Even if there's an error, try to reload with reset param
-                        window.location.href = '{{ route('assessment') }}?reset=true&t=' + new Date().getTime();
+                        window.location.href = '{{ route('assessment') }}?reset=true&start=petType&t=' + new Date().getTime();
                     });
                 }
             };
         }
+    </script>
+    <script>
+        // If a start query parameter is present (e.g. ?start=petType) make it available for the Alpine app
+        // This small helper ensures the quizApp can pick it up via URLSearchParams when initializing
+        // (No-op here; the main quizApp reads URLSearchParams directly.)
     </script>
 @endsection

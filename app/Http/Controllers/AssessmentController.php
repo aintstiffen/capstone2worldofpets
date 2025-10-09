@@ -94,13 +94,7 @@ class AssessmentController extends Controller
             $personalityMatch[] = 'highEmotionality';
         }
         
-        // Make sure we have at least 2 personality matches
-        if (count($personalityMatch) < 2) {
-            $personalityMatch[] = 'highExtraversion';
-        }
-        
-        // Get just the first 2 personality matches
-        return array_slice($personalityMatch, 0, 2);
+        return $personalityMatch;
     }
     
     /**
@@ -121,6 +115,16 @@ class AssessmentController extends Controller
         $traits = array_slice(explode(', ', $pet->temperament), 0, 3);
         $personalityMatch = $this->extractPersonalityMatches($pet->temperament);
         
+        // Use default personality if we don't have enough matches
+        if (empty($personalityMatch)) {
+            $personalityMatch = [$defaultPersonality, 'highAgreeableness'];
+        } elseif (count($personalityMatch) < 2) {
+            $personalityMatch[] = $defaultPersonality;
+        }
+        
+        // Get just the first 2 personality matches
+        $personalityMatch = array_slice($personalityMatch, 0, 2);
+        
         return [
             'id' => $pet->id,
             'slug' => $pet->slug,
@@ -136,6 +140,15 @@ class AssessmentController extends Controller
 
     public function index(Request $request, $id = null)
     {
+        // Check if reset parameter is present - HANDLE THIS FIRST
+            $resetDetected = false;
+            if ($request->has('reset')) {
+                $resetDetected = true;
+                Log::debug('Reset parameter detected, clearing assessment results');
+                Session::forget('assessment_results');
+                // Do NOT redirect here — keep processing and render the assessment view with cleared session.
+            }
+        
         // Check if an assessment ID is specified
         $assessmentId = $id ?: ($request->has('id') ? $request->input('id') : null);
         if ($assessmentId && auth()->check()) {
@@ -155,15 +168,6 @@ class AssessmentController extends Controller
             }
         }
         
-        // Check if reset parameter is present
-        if ($request->has('reset')) {
-            Log::debug('Reset parameter detected, clearing assessment results');
-            Session::forget('assessment_results');
-            if ($request->has('debug')) {
-                dd('Session reset complete, assessment_results removed from session');
-            }
-        }
-        
         // Get dog and cat breeds from database
         $dogBreeds = Pet::where('category', 'dog')->get()->map(function($pet) {
             return $this->formatPetData($pet, 'highExtraversion');
@@ -177,7 +181,8 @@ class AssessmentController extends Controller
         $savedResults = Session::get('assessment_results');
         
         // If no saved results in session but user is logged in, check for their most recent assessment
-        if ((!$savedResults || empty($savedResults)) && auth()->check()) {
+            // However, if a reset was requested, skip reloading the latest saved assessment so users can retake the quiz
+            if ((!$savedResults || empty($savedResults)) && auth()->check() && !$resetDetected) {
             $latestAssessment = Assessment::where('user_id', auth()->id())
                 ->latest()
                 ->first();
@@ -223,7 +228,8 @@ class AssessmentController extends Controller
 
                 if ($petInfo) {
                     // Use formatPetData to get ACTUAL characteristics, not preferences
-                    $savedResults['recommendedBreeds'][$index] = $this->formatPetData($petInfo);
+                    $defaultPersonality = $savedResults['petType'] === 'dog' ? 'highExtraversion' : 'highAgreeableness';
+                    $savedResults['recommendedBreeds'][$index] = $this->formatPetData($petInfo, $defaultPersonality);
                 }
             }
 
@@ -286,13 +292,15 @@ class AssessmentController extends Controller
         
         // Retrieve the complete information for each breed
         $fullBreedInfo = [];
+        $defaultPersonality = $petType === 'dog' ? 'highExtraversion' : 'highAgreeableness';
+        
         foreach ($recommendedBreeds as $breed) {
             $breedId = $breed['id'];
             $petInfo = Pet::find($breedId);
             
             if ($petInfo) {
                 // Use formatPetData for consistency
-                $fullBreedInfo[] = $this->formatPetData($petInfo);
+                $fullBreedInfo[] = $this->formatPetData($petInfo, $defaultPersonality);
             }
         }
         
