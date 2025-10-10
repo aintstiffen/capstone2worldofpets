@@ -23,31 +23,38 @@
     .pulse-animation {
         animation: pulse 2s infinite;
     }
+
+    /* Fade-in-up used by GIF modal */
+    @keyframes fade-in-up {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+        animation: fade-in-up 0.28s ease-out;
+    }
 </style>
 @endpush
 
 @section('content')
 
-
     {{-- Main --}}
-    <main class="flex-1">
+    <main class="flex-1" x-data="{ showGifModal: false }">
         <div class="container mx-auto px-4 py-6 md:px-6 md:py-12">
-
 
             <div class="grid gap-6 lg:grid-cols-2 lg:gap-12">
                 {{-- Left: Image & Info Cards --}}
                 <div class="space-y-4">
-            <div class="relative" x-data="{ 
-                activeTooltip: null, 
-                activeFact: '',
-                showAllHotspots: true,
-                            // Activate a hotspot — show the bottom info panel (no floating tooltip)
-                            setActive(feature, hotspotEl) {
-                                this.activeTooltip = feature;
-                                this.activeFact = hotspotEl.dataset.fact || '';
-                            },
-                            clearActive() { this.activeTooltip = null; this.activeFact = ''; }
-                        }">
+                    <div class="relative" x-data="{ 
+                        activeTooltip: null, 
+                        activeFact: '',
+                        showAllHotspots: true,
+                        // Activate a hotspot — show the bottom info panel (no floating tooltip)
+                        setActive(feature, hotspotEl) {
+                            this.activeTooltip = feature;
+                            this.activeFact = hotspotEl.dataset.fact || '';
+                        },
+                        clearActive() { this.activeTooltip = null; this.activeFact = ''; }
+                    }">
                         <!-- Keep image at its natural aspect ratio; tooltips are kept inside the container -->
                         <div class="rounded-lg overflow-hidden bg-[var(--color-muted)] relative inline-block w-full tooltip-image-container" x-ref="imageContainer">
                             <img src="{{ $pet->image ? $pet->image_url : '/placeholder.svg?height=600&width=600' }}"
@@ -86,98 +93,96 @@
                                 @endphp
 
                                 @foreach($hotspots as $hotspot)
-                                @php
-                                    $feature = $hotspot['feature'];
-                                    $color = $featureColors[$feature] ?? 'gray';
+                                    @php
+                                        $feature = $hotspot['feature'];
+                                        $color = $featureColors[$feature] ?? 'gray';
 
-                                    // Find matching fact if it exists in the database
-                                    $fact = null;
-                                    if (!empty($funFacts)) {
-                                        foreach ($funFacts as $funFact) {
-                                            if (isset($funFact['feature']) && $funFact['feature'] === $feature) {
-                                                $fact = $funFact['fact'];
-                                                break;
+                                        // Find matching fact if it exists in the database
+                                        $fact = null;
+                                        if (!empty($funFacts)) {
+                                            foreach ($funFacts as $funFact) {
+                                                if (isset($funFact['feature']) && $funFact['feature'] === $feature) {
+                                                    $fact = $funFact['fact'];
+                                                    break;
+                                                }
                                             }
                                         }
-                                    }
 
-                                    // Default facts if none are provided in the database
-                                    if (!$fact) {
-                                        $defaultFacts = [
-                                            'ears' => [
-                                                'Golden Retriever' => 'Their floppy ears help protect the ear canal from water and debris.',
-                                                'German Shepherd' => 'Their erect ears can rotate independently to locate sounds with precision.',
-                                                'default' => 'The ear shape is perfectly designed for their natural environment.'
-                                            ],
-                                            'eyes' => [
-                                                'Labrador Retriever' => 'Their eyes may sometimes appear red due to a reflective layer that helps them see better in dim light.',
-                                                'Husky' => 'They often have striking blue eyes due to a genetic trait that reduces melanin in the iris.',
-                                                'default' => 'Their eyes are specially adapted for their lifestyle and environment.'
-                                            ],
-                                            'tail' => [
-                                                'Border Collie' => 'Their tail acts as a rudder when making sharp turns while herding.',
-                                                'Beagle' => 'The white-tipped tail helped hunters spot them in tall grass.',
-                                                'default' => 'The tail helps with balance and is an important communication tool.'
-                                            ],
-                                            'paws' => [
-                                                'Newfoundland' => 'Their webbed feet make them excellent swimmers.',
-                                                'Greyhound' => 'Their padded feet absorb shock during high-speed runs.',
-                                                'default' => 'Their paw pads contain sweat glands that help regulate temperature.'
-                                            ],
-                                            'nose' => [
-                                                'default' => 'Their nose contains over 300 million scent receptors, compared to about 5–6 million in humans.'
-                                            ],
-                                            'coat' => [
-                                                'default' => 'Many breeds have a double coat: a soft undercoat for insulation and a protective outer layer.'
-                                            ],
-                                        ];
+                                        // Default facts if none are provided in the database
+                                        if (!$fact) {
+                                            $defaultFacts = [
+                                                'ears' => [
+                                                    'Golden Retriever' => 'Their floppy ears help protect the ear canal from water and debris.',
+                                                    'German Shepherd' => 'Their erect ears can rotate independently to locate sounds with precision.',
+                                                    'default' => 'The ear shape is perfectly designed for their natural environment.'
+                                                ],
+                                                'eyes' => [
+                                                    'Labrador Retriever' => 'Their eyes may sometimes appear red due to a reflective layer that helps them see better in dim light.',
+                                                    'Husky' => 'They often have striking blue eyes due to a genetic trait that reduces melanin in the iris.',
+                                                    'default' => 'Their eyes are specially adapted for their lifestyle and environment.'
+                                                ],
+                                                'tail' => [
+                                                    'Border Collie' => 'Their tail acts as a rudder when making sharp turns while herding.',
+                                                    'Beagle' => 'The white-tipped tail helped hunters spot them in tall grass.',
+                                                    'default' => 'The tail helps with balance and is an important communication tool.'
+                                                ],
+                                                'paws' => [
+                                                    'Newfoundland' => 'Their webbed feet make them excellent swimmers.',
+                                                    'Greyhound' => 'Their padded feet absorb shock during high-speed runs.',
+                                                    'default' => 'Their paw pads contain sweat glands that help regulate temperature.'
+                                                ],
+                                                'nose' => [
+                                                    'default' => 'Their nose contains over 300 million scent receptors, compared to about 5–6 million in humans.'
+                                                ],
+                                                'coat' => [
+                                                    'default' => 'Many breeds have a double coat: a soft undercoat for insulation and a protective outer layer.'
+                                                ],
+                                            ];
 
-                                        // Check if we have a breed-specific fact
-                                        if (isset($defaultFacts[$feature][$pet->name])) {
-                                            $fact = $defaultFacts[$feature][$pet->name];
-                                        } elseif (isset($defaultFacts[$feature]['default'])) {
-                                            $fact = $defaultFacts[$feature]['default'];
-                                        } else {
-                                            $fact = 'Interesting facts about this ' . $feature . '.';
+                                            if (isset($defaultFacts[$feature][$pet->name])) {
+                                                $fact = $defaultFacts[$feature][$pet->name];
+                                            } elseif (isset($defaultFacts[$feature]['default'])) {
+                                                $fact = $defaultFacts[$feature]['default'];
+                                            } else {
+                                                $fact = 'Interesting facts about this ' . $feature . '.';
+                                            }
                                         }
-                                    }
-                                @endphp
+                                    @endphp
 
-                          <!-- {{ $feature }} Tooltip -->
-                          <div class="absolute hotspot-wrapper"
-                              style="top: {{ $hotspot['position_y'] }}%; left: {{ $hotspot['position_x'] }}%; transform: translate(-50%, -50%);"
-                              @mouseenter="setActive('{{ $feature }}', $el)"
-                              @mouseleave="clearActive()"
-                              @click="setActive('{{ $feature }}', $el)"
-                              data-fact="{{ e($fact) }}"
-                              data-x="{{ $hotspot['position_x'] }}"
-                              data-y="{{ $hotspot['position_y'] }}">
-                                    <div class="cursor-pointer rounded-full border-2 tooltip-hotspot flex items-center justify-center backdrop-blur-sm text-pink-700 pulse-animation"
-                                         style="width: {{ max(40, $hotspot['width']) }}px; height: {{ max(40, $hotspot['height']) }}px;">
-                                        <span class="text-xs font-semibold select-none">{{ ucfirst($feature) }}</span>
+                                    <!-- {{ $feature }} Tooltip -->
+                                    <div class="absolute hotspot-wrapper"
+                                         style="top: {{ $hotspot['position_y'] }}%; left: {{ $hotspot['position_x'] }}%; transform: translate(-50%, -50%);"
+                                         @mouseenter="setActive('{{ $feature }}', $el)"
+                                         @mouseleave="clearActive()"
+                                         @click="setActive('{{ $feature }}', $el)"
+                                         data-fact="{{ e($fact) }}"
+                                         data-x="{{ $hotspot['position_x'] }}"
+                                         data-y="{{ $hotspot['position_y'] }}">
+                                        <div class="cursor-pointer rounded-full border-2 tooltip-hotspot flex items-center justify-center backdrop-blur-sm text-pink-700 pulse-animation"
+                                             style="width: {{ max(40, $hotspot['width']) }}px; height: {{ max(40, $hotspot['height']) }}px;">
+                                            <span class="text-xs font-semibold select-none">{{ ucfirst($feature) }}</span>
+                                        </div>
+
+                                        <div x-show="activeTooltip === '{{ $feature }}'"
+                                             x-transition:enter="transition ease-out duration-200"
+                                             x-transition:enter-start="opacity-0 scale-95"
+                                             x-transition:enter-end="opacity-100 scale-100"
+                                             class="absolute z-50 p-3 bg-white rounded-lg shadow-lg tooltip-content w-40 sm:w-48 text-sm"
+                                             @if($hotspot['position_x'] < 30)
+                                                 style="left: 100%; top: 0; margin-left: 12px;"
+                                             @elseif($hotspot['position_x'] > 70)
+                                                 style="right: 100%; top: 0; margin-right: 12px;"
+                                             @elseif($hotspot['position_y'] < 30)
+                                                 style="bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 12px;"
+                                             @else
+                                                 style="top: 100%; left: 50%; transform: translateX(-50%); margin-top: 12px;"
+                                             @endif
+                                        >
+                                            <strong class="block mb-1 text-{{ $color }}-600">{{ $pet->name }}'s {{ ucfirst($feature) }}</strong>
+                                            <p>{{ $fact }}</p>
+                                        </div>
                                     </div>
-                             <div x-show="activeTooltip === '{{ $feature }}'"
-                                         x-transition:enter="transition ease-out duration-200"
-                                         x-transition:enter-start="opacity-0 scale-95"
-                                         x-transition:enter-end="opacity-100 scale-100"
-                                         class="absolute z-50 p-3 bg-white rounded-lg shadow-lg tooltip-content w-40 sm:w-48 text-sm"
-                                         @if($hotspot['position_x'] < 30)
-                                             style="left: 100%; top: 0; margin-left: 12px;"
-                                         @elseif($hotspot['position_x'] > 70)
-                                             style="right: 100%; top: 0; margin-right: 12px;"
-                                         @elseif($hotspot['position_y'] < 30)
-                                             style="bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 12px;"
-                                         @else
-                                             style="top: 100%; left: 50%; transform: translateX(-50%); margin-top: 12px;"
-                                         @endif
-                                    >
-                                        <strong class="block mb-1 text-{{ $color }}-600">{{ $pet->name }}'s {{ ucfirst($feature) }}</strong>
-                                        <p>{{ $fact }}</p>
-                                    </div>
-                                </div>
                                 @endforeach
-
-                                <!-- Floating arrow removed — using the bottom info panel for all viewports -->
 
                                 <!-- Small hint badge (kept) -->
                                 <div class="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded"
@@ -190,6 +195,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <!-- Non-overlapping info panel below the image: shows the currently active hotspot fact -->
                         <div class="mt-3 info-panel" x-show="activeTooltip" x-cloak>
                             <div class="p-3 bg-white rounded-lg shadow">
@@ -220,9 +226,17 @@
                     <div>
                         <h1 class="text-3xl font-bold">{{ $pet->name }}</h1>
                         <p class="text-[--color-muted-foreground]">{{ $pet->temperament }}</p>
+
+                        @if($pet->gif_url)
+                            <div class="mt-2">
+                                <button
+                                    @click="showGifModal = true"
+                                    class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white text-sm font-medium rounded-md hover:bg-[color-mix(in_oklab,var(--color-primary)_90%,black)] transition">
+                                    🎬 View Fun GIF
+                                </button>
+                            </div>
+                        @endif
                     </div>
-                                       {{-- Quick Actions (Top) --}}
-                   
 
                     {{-- Overview --}}
                     <div class="space-y-4 pt-4">
@@ -268,6 +282,40 @@
                     </div>
                 </div>
             </div>
+
+            {{-- GIF Modal (Refined for design consistency & responsiveness) --}}
+            @if($pet->gif_url)
+                <div
+                    x-show="showGifModal"
+                    x-transition.opacity
+                    class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4 sm:px-6 md:px-8"
+                    @click.self="showGifModal = false"
+                    x-cloak
+                >
+                    <div class="relative bg-white rounded-xl shadow-xl max-w-3xl w-full overflow-hidden animate-fade-in-up">
+                        <button
+                            @click="showGifModal = false"
+                            class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
+                            aria-label="Close"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+
+                        <div class="p-4 sm:p-6">
+                            <h2 class="text-lg font-semibold mb-4 text-center">
+                                🎬 {{ $pet->name }} in Action
+                            </h2>
+                            <img src="{{ $pet->gif_url }}"
+                                 alt="GIF of {{ $pet->name }}"
+                                 class="w-full h-auto object-contain rounded-md max-h-[70vh] mx-auto transition" />
+                        </div>
+                    </div>
+                </div>
+            @endif
+
         </div>
     </main>
 </div>
