@@ -202,9 +202,7 @@
                         
                     </div>
                                        {{-- Quick Actions (Top) --}}
-                    <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('cats') }}" class="inline-flex items-center px-4 py-2 rounded-md bg-[color-mix(in_oklab,var(--color-primary)_8%,white)] hover:bg-[color-mix(in_oklab,var(--color-primary)_15%,white)] text-[var(--color-foreground)] border border-[var(--color-border)] transition hover-lift">← Back to Cat Breeds</a>
-                    </div>
+
 
                     {{-- Overview --}}
                     <div class="space-y-4 pt-4">
@@ -246,11 +244,8 @@
                     </div>
 
                     {{-- Buttons --}}
-                    <div class="flex gap-4">
-                        <button class="px-4 py-2 rounded-md text-white bg-[--color-primary] hover:bg-[--color-primary-dark] transition hover-lift">Add to Comparison</button>
-                        <a href="{{ route('cats') }}" class="px-4 py-2 rounded-md text-white bg-[--color-primary] hover:bg-[--color-primary-dark] transition hover-lift">
-                            Return to Cat Breeds
-                        </a>
+                      <div class="flex flex-wrap gap-3">
+                        <a href="{{ route('cats') }}" class="inline-flex items-center px-4 py-2 rounded-md bg-[color-mix(in_oklab,var(--color-primary)_8%,white)] hover:bg-[color-mix(in_oklab,var(--color-primary)_15%,white)] text-[var(--color-foreground)] border border-[var(--color-border)] transition hover-lift">← Back to Cat Breeds</a>
                     </div>
                 </div>
             </div>
