@@ -6,10 +6,20 @@
     <title>Reset Password - Pets of World</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <!-- You can include your current styling here -->
+    <style>
+        .pet-page-bg { background-color: #fff8f9; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cg fill='%23ffdfe6' fill-opacity='0.18'%3E%3Cpath d='M12 20c0 2.2-1.8 4-4 4s-4-1.8-4-4 1.8-4 4-4 4 1.8 4 4zM20 12c0 2.2-1.8 4-4 4s-4-1.8-4-4 1.8-4 4-4 4 1.8 4 4zM36 12c0 2.2-1.8 4-4 4s-4-1.8-4-4 1.8-4 4-4 4 1.8 4 4zM28 20c0 2.2-1.8 4-4 4s-4-1.8-4-4 1.8-4 4-4 4 1.8 4 4z'/%3E%3C/g%3E%3C/svg%3E"); background-repeat: repeat; background-size: 120px 120px; }
+        .pet-card { background: linear-gradient(180deg, #ffffff 0%, #fffafc 100%); border-radius: 12px; box-shadow: 0 10px 30px rgba(15,23,42,0.08); position: relative; overflow: hidden; border: 1px solid rgba(0,0,0,0.04); }
+        .pet-card::after { content: ''; position: absolute; right: -20%; top: -10%; width: 260px; height: 260px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cg fill='%23ffdfe6' fill-opacity='0.12'%3E%3Cpath d='M50 80c0 8.8-7.2 16-16 16s-16-7.2-16-16 7.2-16 16-16 16 7.2 16 16zM80 50c0 8.8-7.2 16-16 16s-16-7.2-16-16 7.2-16 16-16 16 7.2 16 16zM140 50c0 8.8-7.2 16-16 16s-16-7.2-16-16 7.2-16 16-16 16 7.2 16 16zM110 80c0 8.8-7.2 16-16 16s-16-7.2-16-16 7.2-16 16-16 16 7.2 16 16z'/%3E%3C/g%3E%3C/svg%3E"); background-repeat: no-repeat; opacity: 0.7; transform: rotate(-12deg) scale(1.05); pointer-events: none; }
+        .btn-pet-primary { background: linear-gradient(90deg, #ff6b8a 0%, #ff637f 100%); color: #fff; border: none; box-shadow: 0 6px 18px rgba(255,99,127,0.12); }
+        .btn-pet-primary { transition: transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms cubic-bezier(.2,.9,.2,1); }
+        .btn-pet-primary:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(255,99,127,0.18); }
+        @keyframes paw-shimmer { 0% { transform: rotate(-12deg) scale(1.03) translateY(0); opacity: 0.6; } 50% { transform: rotate(-10deg) scale(1.06) translateY(-4px); opacity: 0.8; } 100% { transform: rotate(-12deg) scale(1.03) translateY(0); opacity: 0.6; } }
+        .pet-card::after { animation: paw-shimmer 6s ease-in-out infinite; }
+    </style>
 </head>
 <body>
-    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-        <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+    <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 pet-page-bg">
+        <div class="w-full sm:max-w-md mt-6 px-6 py-4 pet-card">
             <form method="POST" action="{{ route('password.store') }}">
                 @csrf
 
@@ -44,7 +54,7 @@
                 </div>
 
                 <div class="flex items-center justify-end mt-4">
-                    <button type="submit" class="w-full text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-semibold rounded-lg text-base px-6 py-2.5 text-center transition duration-150 h-[46px] flex items-center justify-center">
+                    <button type="submit" class="w-full btn-pet-primary hover:opacity-95 focus:ring-4 focus:outline-none focus:ring-pink-200 font-semibold rounded-lg text-base px-6 py-2.5 text-center transition duration-150 h-[46px] flex items-center justify-center">
                         {{ __('Reset Password') }}
                     </button>
                 </div>

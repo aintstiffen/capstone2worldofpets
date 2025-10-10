@@ -65,11 +65,43 @@
                         {{-- Feature Card 1 --}}
                         <div class="border-0 shadow-md rounded-lg p-6 surface-card hover-lift">
                             <div class="mb-2 inline-flex h-12 w-12 items-center justify-center rounded-lg" style="background-color: color-mix(in oklab, var(--color-primary) 12%, white);">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[--color-primary] animate-wiggle" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M9 12l2-2 4 4M7 12a5 5 0 1110 0 5 5 0 01-10 0z" />
-                                </svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 120" class="w-12 h-12">
+  <!-- Dog -->
+  <g>
+    <!-- Head -->
+    <circle cx="60" cy="60" r="35" fill="#F4D19B" />
+    <!-- Ears -->
+    <ellipse cx="30" cy="50" rx="12" ry="20" fill="#C69763" />
+    <ellipse cx="90" cy="50" rx="12" ry="20" fill="#C69763" />
+    <!-- Eyes -->
+    <circle cx="50" cy="55" r="5" fill="#333" />
+    <circle cx="70" cy="55" r="5" fill="#333" />
+    <!-- Nose -->
+    <circle cx="60" cy="70" r="4" fill="#000" />
+    <!-- Mouth -->
+    <path d="M55 80 Q60 85 65 80" stroke="#333" stroke-width="2" fill="none" />
+  </g>
+
+  <!-- Cat -->
+  <g>
+    <!-- Head -->
+    <circle cx="160" cy="60" r="30" fill="#F7B6C2" />
+    <!-- Ears -->
+    <polygon points="140,40 145,20 155,45" fill="#F7B6C2" />
+    <polygon points="180,40 175,20 165,45" fill="#F7B6C2" />
+    <!-- Eyes -->
+    <circle cx="150" cy="55" r="4" fill="#333" />
+    <circle cx="170" cy="55" r="4" fill="#333" />
+    <!-- Nose -->
+    <circle cx="160" cy="70" r="3" fill="#000" />
+    <!-- Mouth -->
+    <path d="M155 78 Q160 83 165 78" stroke="#333" stroke-width="2" fill="none" />
+    <!-- Whiskers -->
+    <path d="M130 70 H145 M175 70 H190" stroke="#333" stroke-width="1" />
+  </g>
+</svg>
+
+
                             </div>
                             <h3 class="text-lg font-semibold">Breed Profiles</h3>
                             <p class="text-sm text-[var(--color-muted-foreground)] mt-2">
@@ -85,10 +117,28 @@
                         {{-- Feature Card 2 --}}
                         <div class="border-0 shadow-md rounded-lg p-6 surface-card hover-lift">
                             <div class="mb-2 inline-flex h-12 w-12 items-center justify-center rounded-lg" style="background-color: color-mix(in oklab, var(--color-primary) 12%, white);">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[--color-primary] animate-wiggle" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" />
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 150" class="w-16 h-16">
+  <!-- Dog (extrovert) -->
+  <g>
+    <circle cx="80" cy="60" r="30" fill="#F4D19B" />
+    <circle cx="68" cy="55" r="5" fill="#333" />
+    <circle cx="92" cy="55" r="5" fill="#333" />
+    <circle cx="80" cy="70" r="3" fill="#000" />
+    <path d="M70 80 Q80 90 90 80" stroke="#333" stroke-width="2" fill="none" />
+    <text x="80" y="115" font-size="14" text-anchor="middle" fill="#333">Dog = Extrovert</text>
+  </g>
+
+  <!-- Cat (introvert) -->
+  <g>
+    <circle cx="240" cy="60" r="28" fill="#F7B6C2" />
+    <circle cx="230" cy="55" r="4" fill="#333" />
+    <circle cx="250" cy="55" r="4" fill="#333" />
+    <circle cx="240" cy="68" r="2.5" fill="#000" />
+    <path d="M234 75 Q240 82 246 75" stroke="#333" stroke-width="2" fill="none" />
+    <text x="240" y="115" font-size="14" text-anchor="middle" fill="#333">Cat = Introvert</text>
+  </g>
+</svg>
+
                             </div>
                             <h3 class="text-lg font-semibold">Personality Assessment</h3>
                             <p class="text-sm text-[var(--color-muted-foreground)] mt-2">
@@ -102,10 +152,27 @@
                         {{-- Feature Card 3 --}}
                         <div class="border-0 shadow-md rounded-lg p-6 surface-card hover-lift">
                             <div class="mb-2 inline-flex h-12 w-12 items-center justify-center rounded-lg" style="background-color: color-mix(in oklab, var(--color-primary) 12%, white);">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[--color-primary] animate-wiggle" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                                </svg>
+                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" class="w-12 h-12">
+  <!-- Circle background -->
+  <circle cx="100" cy="100" r="95" stroke="#333" stroke-width="4" fill="none" />
+
+  <!-- Dog face -->
+  <circle cx="60" cy="100" r="30" fill="#F4D19B" />
+  <circle cx="50" cy="95" r="5" fill="#333" /> <!-- Left eye -->
+  <circle cx="70" cy="95" r="5" fill="#333" /> <!-- Right eye -->
+  <path d="M55 110 Q60 120 65 110" stroke="#333" stroke-width="2" fill="none" /> <!-- Smile -->
+  <path d="M30 85 Q35 65 50 75" stroke="#F4D19B" stroke-width="10" fill="none" /> <!-- Left ear -->
+  <path d="M90 85 Q85 65 70 75" stroke="#F4D19B" stroke-width="10" fill="none" /> <!-- Right ear -->
+
+  <!-- Cat face -->
+  <circle cx="140" cy="100" r="30" fill="#F7B6C2" />
+  <circle cx="130" cy="95" r="5" fill="#333" /> <!-- Left eye -->
+  <circle cx="150" cy="95" r="5" fill="#333" /> <!-- Right eye -->
+  <path d="M135 110 Q140 120 145 110" stroke="#333" stroke-width="2" fill="none" /> <!-- Smile -->
+  <path d="M115 85 L125 75" stroke="#F7B6C2" stroke-width="5" /> <!-- Left ear -->
+  <path d="M165 85 L155 75" stroke="#F7B6C2" stroke-width="5" /> <!-- Right ear -->
+</svg>
+
                             </div>
                             <h3 class="text-lg font-semibold">Breed Comparison</h3>
                             <p class="text-sm text-[var(--color-muted-foreground)] mt-2">
