@@ -7,6 +7,7 @@ use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\PrivateFileController;
+use Illuminate\Support\Facades\Mail;
 
 Route::get('/', function () {
     return view('homepage');
@@ -46,8 +47,9 @@ Route::get('/dogs/{slug}', [DogController::class, 'show'])->name('dogs.show');
 Route::get('/cats/{slug}', [CatController::class, 'show'])->name('cats.show');
 
 // Assessment routes
-Route::get('/assessment', [AssessmentController::class, 'index'])->name('assessment')->middleware(\App\Http\Middleware\CustomRedirectIfUnauthenticated::class);
-Route::post('/assessment/save', [AssessmentController::class, 'saveResults'])->name('assessment.save')->middleware('auth');
+// Allow an optional {id} parameter so named routes can generate a stable path like /assessment/24
+Route::get('/assessment/{id?}', [AssessmentController::class, 'index'])->name('assessment')->middleware(\App\Http\Middleware\CustomRedirectIfUnauthenticated::class);
+Route::post('/assessment/save', [AssessmentController::class, 'saveResults'])->name('assessment.save');
 
 // Compare routes (Authentication required)
 Route::get('/compare', [\App\Http\Controllers\CompareController::class, 'index'])->name('compare')->middleware(\App\Http\Middleware\CustomRedirectIfUnauthenticated::class);
@@ -76,3 +78,12 @@ Route::get('/debug/profile-test', [\App\Http\Controllers\DebugController::class,
 // Static pages routes
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
+
+Route::get('/test-email', function () {
+    Mail::raw('This is a test email from Laravel!', function ($message) {
+        $message->to('stiffendecastro48@gmail.com')
+                ->subject('Test Email');
+    });
+
+    return 'Test email sent!';
+});
