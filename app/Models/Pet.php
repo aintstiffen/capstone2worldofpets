@@ -27,6 +27,7 @@ class Pet extends Model
         'image',
         'hotspots',
         'fun_facts',
+        'gif_url',
     ];
 
     protected $casts = [

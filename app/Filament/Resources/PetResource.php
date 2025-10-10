@@ -343,6 +343,49 @@ class PetResource extends Resource
                         }
                     })
                     ->dehydrated(false),
+                    Forms\Components\Select::make('gif_url')
+    ->label('Select a GIF')
+    ->searchable()
+    ->reactive()
+    ->options(function (callable $get) {
+        try {
+            $query = $get('name') ?? 'cute pet';
+            $response = Http::get('https://api.giphy.com/v1/gifs/search', [
+                'api_key' => config('services.giphy.key'),
+                'q' => $query,
+                'limit' => 10,
+                'rating' => 'pg',
+            ]);
+
+            if ($response->ok()) {
+                $results = $response->json()['data'] ?? [];
+
+                return collect($results)->mapWithKeys(function ($gif) {
+                    return [$gif['images']['original']['url'] => $gif['title'] ?? 'GIF'];
+                })->toArray();
+            }
+        } catch (\Exception $e) {
+            \Log::error('Giphy API failed: ' . $e->getMessage());
+        }
+
+        return [];
+    })
+    ->helperText('Search and select a GIF related to this pet')
+    ->getSearchResultsUsing(function (string $search) {
+        $response = Http::get('https://api.giphy.com/v1/gifs/search', [
+            'api_key' => config('services.giphy.key'),
+            'q' => $search,
+            'limit' => 10,
+        ]);
+
+        if ($response->ok()) {
+            return collect($response->json()['data'] ?? [])->mapWithKeys(function ($gif) {
+                return [$gif['images']['original']['url'] => $gif['title'] ?? 'GIF'];
+            })->toArray();
+        }
+
+        return [];
+    }),
 
                 Forms\Components\TextInput::make('image')
                     ->label('Image URL')
