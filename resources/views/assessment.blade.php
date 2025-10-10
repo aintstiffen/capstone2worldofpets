@@ -4,7 +4,7 @@
 
 @section('content')
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <div class="flex flex-col min-h-screen" x-data="quizApp()">
+    <div class="flex flex-col min-h-screen px-4 sm:px-6 lg:px-8 pb-12" x-data="quizApp()">
         
         @if(Session::has('assessment_saved'))
         <!-- Flash message after saving results -->
@@ -16,22 +16,22 @@
         
         <!-- Main Content -->
         <main class="flex-1">
-            <div class="container py-8 max-w-3xl mx-auto">
+            <div class="container py-8 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Introduction -->
                 <template x-if="currentStage === 'intro'">
                     <div class="text-center">
                         <h2 class="text-3xl font-bold mb-6">Pet Personality Matcher</h2>
                         <p class="mb-8">Find the perfect pet match based on your personality and preferences</p>
                         
-                        <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
-                            <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30" 
+                        <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center px-2 sm:px-0">
+                            <button class="w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30" 
                                 @click="currentStage = 'petType'">
                                 Start New Assessment
                             </button>
                             
                             @auth
                                 @if(auth()->user()->assessments->count() > 0)
-                                    <a href="{{ route('profile.edit') }}" class="text-blue-600 bg-white border border-blue-600 hover:bg-blue-50 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center">
+                                    <a href="{{ route('profile.edit') }}" class="w-full sm:w-auto text-blue-600 bg-white border border-blue-600 hover:bg-blue-50 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5 text-center inline-flex items-center">
                                         View All Your Assessments
                                     </a>
                                 @endif
@@ -44,13 +44,13 @@
                 <template x-if="currentStage === 'petType'">
                     <div>
                         <h2 class="text-2xl font-bold mb-4">Step 1: Choose your preferred pet type</h2>
-                        <div class="grid grid-cols-2 gap-6">
-                            <button class="p-8 border rounded-lg hover:bg-blue-50 transition flex flex-col items-center" 
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <button class="p-6 sm:p-8 border rounded-lg hover:bg-blue-50 transition flex flex-col items-center w-full" 
                                 @click="selectPetType('dog')">
                                 <span class="text-5xl mb-3">🐶</span>
                                 <span class="font-medium">Dog</span>
                             </button>
-                            <button class="p-8 border rounded-lg hover:bg-blue-50 transition flex flex-col items-center" 
+                            <button class="p-6 sm:p-8 border rounded-lg hover:bg-blue-50 transition flex flex-col items-center w-full" 
                                 @click="selectPetType('cat')">
                                 <span class="text-5xl mb-3">🐱</span>
                                 <span class="font-medium">Cat</span>
@@ -63,25 +63,25 @@
                 <template x-if="currentStage === 'hairLength'">
                     <div>
                         <h2 class="text-2xl font-bold mb-4">Step 2: Preferred hair length?</h2>
-                        <div class="grid grid-cols-2 gap-6">
-                            <button class="p-6 border rounded-lg hover:bg-blue-50 transition" 
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <button class="p-4 sm:p-6 border rounded-lg hover:bg-blue-50 transition w-full" 
                                 @click="preferences.hairLength = 'short'; currentStage = 'size'">
-                                <div class="h-32 flex items-center justify-center mb-3">
+                                <div class="h-32 flex items-center justify-center mb-3 w-full">
                                     <img :src="petType === 'dog' ? 'https://topdogtips.com/wp-content/uploads/2017/04/Best-short-hair-dog-breeds-16.jpg' : 'https://www.petrescueblog.com/wp-content/uploads/2021/01/e8901c74e0ffaebaac19d375c30c39b8-1140x855.jpg'" 
-                                        alt="Short hair" class="h-full object-cover rounded">
+                                        alt="Short hair" class="h-full w-full object-cover rounded">
                                 </div>
                                 <p class="text-center font-medium">Short Hair</p>
                             </button>
-                            <button class="p-6 border rounded-lg hover:bg-blue-50 transition" 
+                            <button class="p-4 sm:p-6 border rounded-lg hover:bg-blue-50 transition w-full" 
                                 @click="preferences.hairLength = 'long'; currentStage = 'size'">
-                                <div class="h-32 flex items-center justify-center mb-3">
+                                <div class="h-32 flex items-center justify-center mb-3 w-full">
                                     <img :src="petType === 'dog' ? 'https://tse1.mm.bing.net/th/id/OIP.oj0himbKqq-E9Qz_x8EYrwHaHa?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3' : 'https://static9.depositphotos.com/1594920/1089/i/950/depositphotos_10893465-stock-photo-british-longhair-kitten-3-months.jpg'" 
-                                        alt="Long hair" class="h-full object-cover rounded">
+                                        alt="Long hair" class="h-full w-full object-cover rounded">
                                 </div>
                                 <p class="text-center font-medium">Long Hair</p>
                             </button>
                         </div>
-                        <button class="mt-5 text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
+                        <button class="mt-5 w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
                             @click="currentStage = 'petType'">Back</button>
                     </div>
                 </template>
@@ -90,7 +90,7 @@
                 <template x-if="currentStage === 'size'">
                     <div>
                         <h2 class="text-2xl font-bold mb-4">Step 3: Preferred size?</h2>
-                        <div class="grid grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <button class="p-6 border rounded-lg hover:bg-blue-50 transition" 
                                 @click="preferences.size = 'small'; currentStage = 'personality'">
                                 <div class="h-24 flex items-center justify-center mb-3">
@@ -113,7 +113,7 @@
                                 <p class="text-center font-medium">Large</p>
                             </button>
                         </div>
-                        <button class="mt-5 text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
+                        <button class="mt-5 w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
                             @click="currentStage = 'hairLength'">Back</button>
                     </div>
                 </template>
@@ -170,18 +170,18 @@
 
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                             <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                                <button class="w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5" 
+                                <button class="w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5" 
                                     @click="prevSet" x-show="currentSection > 0">
                                     Back
                                 </button>
-                                <button class="w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5" 
+                                <button class="w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5" 
                                     @click="currentStage = 'size'">
                                     Back to Preferences
                                 </button>
                             </div>
                             <div class="flex flex-col sm:flex-row gap-3 items-center w-full md:w-auto justify-between md:justify-end">
                                 <div class="text-sm text-[var(--color-muted-foreground)] order-1 sm:order-0">Set progress: <span x-text="sectionAnsweredCount()"></span>/<span x-text="questionsPerSection"></span></div>
-                                <button class="w-full sm:w-auto text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] focus:ring-4 focus:outline-none focus:ring-[var(--color-accent)] font-medium rounded-lg text-sm px-5 py-2.5" 
+                                <button class="w-full sm:w-auto text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] focus:ring-4 focus:outline-none focus:ring-[var(--color-accent)] font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5" 
                                     @click="isSectionComplete() ? nextSet() : attemptedNext = true">
                                     <span x-show="currentSection < totalSections - 1">Next Set</span>
                                     <span x-show="currentSection === totalSections - 1">See Results</span>
@@ -197,11 +197,11 @@
                         <h2 class="text-2xl font-bold mb-2">Your Perfect Pet Matches</h2>
                         <p class="mb-6">Based on your personality and preferences, here are the breeds we recommend:</p>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
                             <template x-for="(breed, index) in recommendedBreeds" :key="index">
                                 <div class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition h-full flex flex-col">
                                     <img :src="getBreedImage(breed)" :alt="breed.name"
-                                        class="w-full h-48 object-cover" loading="lazy">
+                                        class="w-full h-44 sm:h-48 md:h-48 object-cover" loading="lazy">
                                     <div class="p-4 flex flex-col flex-1">
                                         <h3 class="font-bold text-lg mb-1" x-text="breed.name"></h3>
                                         <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
