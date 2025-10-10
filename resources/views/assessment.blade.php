@@ -545,19 +545,54 @@
             const breeds = this.petType === 'dog' ? dogBreeds : catBreeds;
             console.log(`Analyzing ${breeds.length} ${this.petType} breeds`);
             console.log(`User preferences: size=${this.preferences.size}, hairLength=${this.preferences.hairLength}`);
+
+            // Small helper to compare preference values tolerantly (handles "longhair", "long hair", "Long", etc.)
+            const matchesPref = (actual, expected) => {
+                if (!expected) return false;
+                const a = String(actual || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ');
+                const e = String(expected || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ');
+                if (a === e) return true;
+                if (a.includes(e)) return true;
+                if (e.includes(a)) return true;
+                // handle singular/plural and short/long forms
+                if (a.indexOf('short') !== -1 && e.indexOf('short') !== -1) return true;
+                if (a.indexOf('long') !== -1 && e.indexOf('long') !== -1) return true;
+                return false;
+            };
+
+            // Enforce hair-length preference: prefer breeds that explicitly match the requested hair length.
+            // If any breeds explicitly match, use only those. If none explicitly match, allow all breeds
+            // but apply a strong penalty to breeds that explicitly conflict with the requested hair length.
+            let sourceBreeds = breeds;
+            let hairConflictPenalty = 0; // if >0, apply penalty during scoring for conflicting hair lengths
+            if (this.preferences && this.preferences.hairLength) {
+                const requested = String(this.preferences.hairLength).toLowerCase();
+                // breeds that explicitly indicate the requested hair length
+                const explicitMatches = breeds.filter(b => (b.hairLength || '') !== '' && matchesPref(b.hairLength, requested));
+                console.log(`Explicit hairLength matches for '${requested}': ${explicitMatches.length}`);
+                if (explicitMatches.length > 0) {
+                    sourceBreeds = explicitMatches;
+                } else {
+                    // No explicit matches: allow all breeds but penalize breeds that explicitly state the opposite
+                    hairConflictPenalty = 40; // large penalty to avoid recommending obvious mismatches
+                    console.log('No explicit hairLength matches; will penalize breeds whose hairLength conflicts with preference');
+                }
+            }
             
             // PHASE 1: Exact matches
-            let exactMatches = breeds.filter(breed => 
-                breed.hairLength === this.preferences.hairLength && 
-                breed.size === this.preferences.size
+            let exactMatches = sourceBreeds.filter(breed => 
+                // tolerant matching using matchesPref
+                matchesPref(breed.hairLength, this.preferences.hairLength) &&
+                matchesPref(breed.size, this.preferences.size)
             );
             console.log(`✓ Exact matches: ${exactMatches.length}`);
             
             // PHASE 2: Partial matches
             let partialMatches = [];
             if (exactMatches.length < 5) {
-                partialMatches = breeds.filter(breed => 
-                    (breed.hairLength === this.preferences.hairLength || breed.size === this.preferences.size) &&
+                partialMatches = sourceBreeds.filter(breed => 
+                    (matchesPref(breed.hairLength, this.preferences.hairLength) ||
+                     matchesPref(breed.size, this.preferences.size)) &&
                     !exactMatches.includes(breed)
                 );
                 console.log(`✓ Partial matches: ${partialMatches.length}`);
@@ -568,12 +603,16 @@
                 let score = 0;
                 let matchDetails = [];
                 
-                // Exact preference matches (50 points total)
-                if (breed.hairLength === this.preferences.hairLength) {
+                // Exact preference matches (50 points total) using tolerant matching
+                if (matchesPref(breed.hairLength, this.preferences.hairLength)) {
                     score += 25;
                     matchDetails.push('✓ Hair length');
+                } else if (hairConflictPenalty > 0 && (breed.hairLength || '') !== '' && !matchesPref(breed.hairLength, this.preferences.hairLength)) {
+                    // Apply heavy penalty for explicit conflict when we're in fallback mode
+                    score -= hairConflictPenalty;
+                    matchDetails.push('✗ Hair length conflict');
                 }
-                if (breed.size === this.preferences.size) {
+                if (matchesPref(breed.size, this.preferences.size)) {
                     score += 25;
                     matchDetails.push('✓ Size');
                 }
@@ -628,6 +667,8 @@
             
             // Last resort: score all breeds
             if (allCandidates.length < 5) {
+                // If we still have too few candidates, include additional breeds from the full list
+                // (this allows a graceful fallback when strict hair-length filtering left too few options)
                 const remaining = breeds.filter(b => !allCandidates.includes(b));
                 remaining.forEach(breed => {
                     const baseScore = scoreBreed(breed);
