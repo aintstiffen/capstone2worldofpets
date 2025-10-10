@@ -212,15 +212,18 @@
                     <h1 class="text-3xl font-bold">{{ $pet->name }}</h1>
                     <p class="text-[--color-muted-foreground]">{{ $pet->temperament }}</p>
 
-                    @if($pet->gif_url)
-                        <div class="mt-2">
+                    <div class="mt-3 flex items-center gap-3">
+                        <a href="{{ route('cats') }}" class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white text-sm font-medium rounded-md hover:bg-[color-mix(in_oklab,var(--color-primary)_90%,black)] transition">
+                            ← Back to Cat Breeds
+                        </a>
+                        @if($pet->gif_url)
                             <button
                                 @click="showGifModal = true"
                                 class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white text-sm font-medium rounded-md hover:bg-[color-mix(in_oklab,var(--color-primary)_90%,black)] transition">
                                 🎬 View Fun GIF
                             </button>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
 
                 {{-- Overview --}}
@@ -285,10 +288,6 @@
                             <div class="sr-only">{{ $label }}: {{ $value }} out of 5.</div>
                         </div>
                     @endforeach
-                </div>
-
-                <div class="flex flex-wrap gap-3">
-                    <a href="{{ route('cats') }}" class="inline-flex items-center px-4 py-2 rounded-md bg-[color-mix(in_oklab,var(--color-primary)_8%,white)] hover:bg-[color-mix(in_oklab,var(--color-primary)_15%,white)] text-[var(--color-foreground)] border border-[var(--color-border)] transition hover-lift">← Back to Cat Breeds</a>
                 </div>
             </div>
         </div>
