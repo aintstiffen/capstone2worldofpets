@@ -56,7 +56,11 @@
                        name="password" 
                        placeholder="Create a password"
                        required 
-                       autocomplete="new-password" />
+                       autocomplete="new-password"
+                       pattern="(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]+"
+                       title="Password must be alphanumeric and contain at least one letter and one number." />
+                <p id="password-help" class="text-xs text-gray-500 mt-2">Password must be alphanumeric and contain at least one letter and one number.</p>
+                <p id="password-error" class="text-red-500 text-sm mt-2 hidden">Password must be alphanumeric and contain at least one letter and one number.</p>
                 @error('password')
                     <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                 @enderror
@@ -84,6 +88,62 @@
                 </button>
             </div>
         </form>
+
+        @push('scripts')
+        <script>
+            (function(){
+                const form = document.querySelector('form[action="{{ route('register') }}"]');
+                if (!form) return;
+
+                const pwd = form.querySelector('#password');
+                const pwdConfirm = form.querySelector('#password_confirmation');
+                const pwdError = document.getElementById('password-error');
+
+                const alphaNumRegex = /^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]+$/;
+
+                function showPwdError(msg){
+                    pwdError.textContent = msg;
+                    pwdError.classList.remove('hidden');
+                }
+                function hidePwdError(){
+                    pwdError.classList.add('hidden');
+                }
+
+                form.addEventListener('submit', function(e){
+                    hidePwdError();
+
+                    const value = pwd.value || '';
+                    if (!alphaNumRegex.test(value)){
+                        e.preventDefault();
+                        showPwdError('Password must be alphanumeric and contain at least one letter and one number.');
+                        pwd.focus();
+                        return false;
+                    }
+
+                    if (pwdConfirm && pwdConfirm.value !== value){
+                        e.preventDefault();
+                        showPwdError('Password and confirmation do not match.');
+                        pwdConfirm.focus();
+                        return false;
+                    }
+                });
+
+                // Live feedback
+                pwd.addEventListener('input', function(){
+                    if (alphaNumRegex.test(pwd.value)){
+                        hidePwdError();
+                    }
+                });
+                if (pwdConfirm){
+                    pwdConfirm.addEventListener('input', function(){
+                        if (pwdConfirm.value === pwd.value){
+                            hidePwdError();
+                        }
+                    });
+                }
+            })();
+        </script>
+        @endpush
 
         <div class="mt-6 text-center">
             <p class="text-sm text-gray-600">
