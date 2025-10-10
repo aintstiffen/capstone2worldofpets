@@ -44,9 +44,15 @@ return [
         'key' => env('DOG_API_KEY'),
         'base_url' => 'https://api.thedogapi.com/v1',
     ],
-    'giphy' => [
-    'key' => env('GIPHY_API_KEY'),
-],
 
+    'giphy' => [
+        'key' => env('GIPHY_API_KEY'),
+    ],
+
+    // Tenor (Google) API for GIFs
+    'tenor' => [
+        'key' => env('TENOR_API_KEY'),
+        'base_url' => 'https://tenor.googleapis.com/v2',
+    ],
 
 ];

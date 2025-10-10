@@ -344,48 +344,81 @@ class PetResource extends Resource
                     })
                     ->dehydrated(false),
                     Forms\Components\Select::make('gif_url')
-    ->label('Select a GIF')
-    ->searchable()
-    ->reactive()
-    ->options(function (callable $get) {
-        try {
-            $query = $get('name') ?? 'cute pet';
-            $response = Http::get('https://api.giphy.com/v1/gifs/search', [
-                'api_key' => config('services.giphy.key'),
-                'q' => $query,
-                'limit' => 10,
-                'rating' => 'pg',
-            ]);
+                        ->label('Select a GIF (Tenor)')
+                        ->searchable()
+                        ->reactive()
+                        ->options(function (callable $get) {
+                            try {
+                                $query = $get('name') ?? 'cute pet';
+                                $response = Http::get('https://tenor.googleapis.com/v2/search', [
+                                    'key' => config('services.tenor.key'),
+                                    'q' => $query,
+                                    'limit' => 10,
+                                    'contentfilter' => 'high',
+                                ]);
 
-            if ($response->ok()) {
-                $results = $response->json()['data'] ?? [];
+                                if ($response->ok()) {
+                                    $results = $response->json()['results'] ?? [];
 
-                return collect($results)->mapWithKeys(function ($gif) {
-                    return [$gif['images']['original']['url'] => $gif['title'] ?? 'GIF'];
-                })->toArray();
-            }
-        } catch (\Exception $e) {
-            \Log::error('Giphy API failed: ' . $e->getMessage());
-        }
+                                    return collect($results)->mapWithKeys(function ($item) {
+                                        $media = $item['media_formats'] ?? [];
+                                        $url = $media['gif']['url'] 
+                                            ?? $media['mediumgif']['url'] 
+                                            ?? $media['mp4']['url'] 
+                                            ?? $media['tinygif']['url'] 
+                                            ?? $media['nanogif']['url'] 
+                                            ?? null;
 
-        return [];
-    })
-    ->helperText('Search and select a GIF related to this pet')
-    ->getSearchResultsUsing(function (string $search) {
-        $response = Http::get('https://api.giphy.com/v1/gifs/search', [
-            'api_key' => config('services.giphy.key'),
-            'q' => $search,
-            'limit' => 10,
-        ]);
+                                        if (! $url) {
+                                            return [];
+                                        }
 
-        if ($response->ok()) {
-            return collect($response->json()['data'] ?? [])->mapWithKeys(function ($gif) {
-                return [$gif['images']['original']['url'] => $gif['title'] ?? 'GIF'];
-            })->toArray();
-        }
+                                        $label = $item['content_description'] ?? ($item['title'] ?? 'GIF');
+                                        return [$url => $label];
+                                    })->filter()->toArray();
+                                }
+                            } catch (\Exception $e) {
+                                \Log::error('Tenor API failed: ' . $e->getMessage());
+                            }
 
-        return [];
-    }),
+                            return [];
+                        })
+                        ->helperText('Search Tenor and select a GIF URL to store on the pet record')
+                        ->getSearchResultsUsing(function (string $search) {
+                            try {
+                                $response = Http::get('https://tenor.googleapis.com/v2/search', [
+                                    'key' => config('services.tenor.key'),
+                                    'q' => $search,
+                                    'limit' => 10,
+                                    'contentfilter' => 'high',
+                                ]);
+
+                                if ($response->ok()) {
+                                    $results = $response->json()['results'] ?? [];
+
+                                    return collect($results)->mapWithKeys(function ($item) {
+                                        $media = $item['media_formats'] ?? [];
+                                        $url = $media['gif']['url'] 
+                                            ?? $media['mediumgif']['url'] 
+                                            ?? $media['mp4']['url'] 
+                                            ?? $media['tinygif']['url'] 
+                                            ?? $media['nanogif']['url'] 
+                                            ?? null;
+
+                                        if (! $url) {
+                                            return [];
+                                        }
+
+                                        $label = $item['content_description'] ?? ($item['title'] ?? 'GIF');
+                                        return [$url => $label];
+                                    })->filter()->toArray();
+                                }
+                            } catch (\Exception $e) {
+                                \Log::error('Tenor search failed: ' . $e->getMessage());
+                            }
+
+                            return [];
+                        }),
 
                 Forms\Components\TextInput::make('image')
                     ->label('Image URL')

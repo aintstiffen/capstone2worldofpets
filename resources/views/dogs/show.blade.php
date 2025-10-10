@@ -32,6 +32,25 @@
     .animate-fade-in-up {
         animation: fade-in-up 0.28s ease-out;
     }
+    
+    /* Cute paw pattern background */
+    .paw-pattern {
+        background-color: white;
+        background-image: 
+            radial-gradient(circle at 20% 20%, rgba(255, 182, 193, 0.15) 8px, transparent 8px),
+            radial-gradient(circle at 80% 80%, rgba(255, 182, 193, 0.15) 8px, transparent 8px),
+            radial-gradient(circle at 40% 60%, rgba(255, 182, 193, 0.15) 8px, transparent 8px),
+            radial-gradient(circle at 70% 30%, rgba(255, 182, 193, 0.15) 8px, transparent 8px);
+        background-size: 120px 120px;
+        background-position: 0 0, 40px 40px, 80px 20px, 20px 80px;
+    }
+    
+    .paw-icon {
+        opacity: 0.08;
+        position: absolute;
+        font-size: 2rem;
+        transform: rotate(-15deg);
+    }
 </style>
 @endpush
 
@@ -283,7 +302,7 @@
                 </div>
             </div>
 
-            {{-- GIF Modal (Refined for design consistency & responsiveness) --}}
+            {{-- GIF Modal with Paw Decorations --}}
             @if($pet->gif_url)
                 <div
                     x-show="showGifModal"
@@ -292,25 +311,96 @@
                     @click.self="showGifModal = false"
                     x-cloak
                 >
-                    <div class="relative bg-white rounded-xl shadow-xl max-w-3xl w-full overflow-hidden animate-fade-in-up">
+                    <div class="relative w-full mx-auto rounded-2xl shadow-2xl overflow-hidden bg-white animate-fade-in-up
+                                max-w-[min(1100px,calc(100vw-96px))] max-h-[90vh]">
+                        <!-- Decorative paws scattered throughout -->
+                        <div class="paw-icon" style="top: 8%; left: 5%;">🐾</div>
+                        <div class="paw-icon" style="top: 12%; right: 8%; transform: rotate(25deg);">🐾</div>
+                        <div class="paw-icon" style="top: 25%; left: 3%; transform: rotate(-45deg);">🐾</div>
+                        <div class="paw-icon" style="top: 35%; right: 12%; transform: rotate(10deg);">🐾</div>
+                        <div class="paw-icon" style="top: 45%; left: 8%; transform: rotate(35deg);">🐾</div>
+                        <div class="paw-icon" style="top: 55%; right: 5%; transform: rotate(-20deg);">🐾</div>
+                        <div class="paw-icon" style="top: 18%; left: 15%; transform: rotate(60deg); font-size: 1.5rem;">🐾</div>
+                        <div class="paw-icon" style="top: 42%; right: 18%; transform: rotate(-35deg); font-size: 1.5rem;">🐾</div>
+                        <div class="paw-icon" style="bottom: 15%; left: 10%; transform: rotate(-45deg);">🐾</div>
+                        <div class="paw-icon" style="bottom: 25%; right: 15%; transform: rotate(15deg);">🐾</div>
+                        <div class="paw-icon" style="bottom: 35%; left: 5%; transform: rotate(45deg);">🐾</div>
+                        <div class="paw-icon" style="bottom: 8%; right: 8%; transform: rotate(-10deg);">🐾</div>
+                        <div class="paw-icon" style="bottom: 45%; left: 12%; transform: rotate(20deg); font-size: 1.5rem;">🐾</div>
+                        <div class="paw-icon" style="bottom: 18%; right: 20%; transform: rotate(-55deg); font-size: 1.2rem;">🐾</div>
+                        <div class="paw-icon" style="top: 65%; left: 4%; transform: rotate(50deg); font-size: 1.8rem;">🐾</div>
+                        <div class="paw-icon" style="top: 75%; right: 10%; transform: rotate(-15deg); font-size: 1.3rem;">🐾</div>
+                        <div class="paw-icon" style="top: 5%; left: 25%; transform: rotate(30deg); font-size: 1.4rem;">🐾</div>
+                        <div class="paw-icon" style="top: 28%; right: 22%; transform: rotate(-40deg); font-size: 1.6rem;">🐾</div>
+                        <div class="paw-icon" style="bottom: 5%; left: 18%; transform: rotate(65deg); font-size: 1.7rem;">🐾</div>
+                        <div class="paw-icon" style="bottom: 52%; right: 6%; transform: rotate(-25deg); font-size: 1.1rem;">🐾</div>
+                        <div class="paw-icon" style="top: 82%; left: 22%; transform: rotate(15deg); font-size: 1.9rem;">🐾</div>
+                        <div class="paw-icon" style="top: 92%; right: 25%; transform: rotate(-50deg); font-size: 1.5rem;">🐾</div>
+                        <div class="paw-icon" style="top: 3%; right: 18%; transform: rotate(40deg); font-size: 1.3rem;">🐾</div>
+                        <div class="paw-icon" style="top: 20%; left: 9%; transform: rotate(-30deg); font-size: 1.6rem;">🐾</div>
+                        <div class="paw-icon" style="top: 32%; right: 4%; transform: rotate(55deg); font-size: 1.2rem;">🐾</div>
+                        <div class="paw-icon" style="top: 48%; left: 2%; transform: rotate(-60deg); font-size: 1.4rem;">🐾</div>
+                        <div class="paw-icon" style="top: 60%; right: 14%; transform: rotate(20deg); font-size: 1.7rem;">🐾</div>
+                        <div class="paw-icon" style="top: 70%; left: 18%; transform: rotate(-25deg); font-size: 1.1rem;">🐾</div>
+                        <div class="paw-icon" style="top: 88%; right: 12%; transform: rotate(45deg); font-size: 1.5rem;">🐾</div>
+                        <div class="paw-icon" style="bottom: 3%; left: 8%; transform: rotate(-40deg); font-size: 1.8rem;">🐾</div>
+                        <div class="paw-icon" style="bottom: 12%; right: 22%; transform: rotate(30deg); font-size: 1.3rem;">🐾</div>
+                        <div class="paw-icon" style="bottom: 28%; left: 20%; transform: rotate(-50deg); font-size: 1.6rem;">🐾</div>
+                        <div class="paw-icon" style="bottom: 40%; right: 10%; transform: rotate(60deg); font-size: 1.2rem;">🐾</div>
+                        <div class="paw-icon" style="bottom: 58%; left: 7%; transform: rotate(-15deg); font-size: 1.4rem;">🐾</div>
+                        <div class="paw-icon" style="top: 14%; left: 28%; transform: rotate(35deg); font-size: 1.5rem;">🐾</div>
+                        <div class="paw-icon" style="top: 38%; right: 28%; transform: rotate(-45deg); font-size: 1.3rem;">🐾</div>
+                        <div class="paw-icon" style="top: 52%; left: 24%; transform: rotate(50deg); font-size: 1.7rem;">🐾</div>
+                        <div class="paw-icon" style="bottom: 22%; right: 2%; transform: rotate(-35deg); font-size: 1.1rem;">🐾</div>
+                        <div class="paw-icon" style="bottom: 48%; left: 16%; transform: rotate(25deg); font-size: 1.6rem;">🐾</div>
+                        
                         <button
                             @click="showGifModal = false"
-                            class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
+                            class="absolute top-3 right-3 z-30 inline-flex items-center justify-center h-10 w-10 rounded-full bg-white hover:bg-gray-100 text-gray-700 shadow-lg transition"
                             aria-label="Close"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
 
-                        <div class="p-4 sm:p-6">
-                            <h2 class="text-lg font-semibold mb-4 text-center">
-                                🎬 {{ $pet->name }} in Action
-                            </h2>
-                            <img src="{{ $pet->gif_url }}"
-                                 alt="GIF of {{ $pet->name }}"
-                                 class="w-full h-auto object-contain rounded-md max-h-[70vh] mx-auto transition" />
+                        <div class="flex flex-col sm:flex-row gap-4 p-3 sm:p-5 h-full">
+                            <div class="flex-1 flex items-center justify-center bg-gray-100 rounded-md p-2 overflow-auto">
+                                <img
+                                    src="{{ $pet->gif_url }}"
+                                    alt="GIF of {{ $pet->name }}"
+                                    class="max-w-full w-auto max-h-[80vh] rounded-md object-contain"
+                                />
+                            </div>
+
+                            <div class="sm:w-64 flex flex-col justify-center gap-3 text-center sm:text-left bg-white/95 backdrop-blur-sm p-4 rounded-lg relative z-10 overflow-hidden">
+                                <!-- Decorative paws for text panel -->
+                                <div class="paw-icon" style="top: 5%; right: 10%; font-size: 1.5rem;">🐾</div>
+                                <div class="paw-icon" style="top: 15%; left: 8%; font-size: 1.2rem; transform: rotate(45deg);">🐾</div>
+                                <div class="paw-icon" style="top: 25%; right: 15%; font-size: 1rem; transform: rotate(-30deg);">🐾</div>
+                                <div class="paw-icon" style="top: 35%; left: 5%; font-size: 1.3rem; transform: rotate(60deg);">🐾</div>
+                                <div class="paw-icon" style="top: 45%; right: 8%; font-size: 1.4rem; transform: rotate(-15deg);">🐾</div>
+                                <div class="paw-icon" style="top: 55%; left: 12%; font-size: 1.1rem; transform: rotate(25deg);">🐾</div>
+                                <div class="paw-icon" style="top: 65%; right: 18%; font-size: 1.6rem; transform: rotate(-45deg);">🐾</div>
+                                <div class="paw-icon" style="top: 75%; left: 6%; font-size: 1.2rem; transform: rotate(35deg);">🐾</div>
+                                <div class="paw-icon" style="bottom: 10%; left: 5%; transform: rotate(-25deg); font-size: 1.2rem;">🐾</div>
+                                <div class="paw-icon" style="bottom: 20%; right: 12%; transform: rotate(50deg); font-size: 1.5rem;">🐾</div>
+                                <div class="paw-icon" style="bottom: 30%; left: 15%; transform: rotate(-10deg); font-size: 1.3rem;">🐾</div>
+                                <div class="paw-icon" style="bottom: 5%; right: 5%; transform: rotate(40deg); font-size: 1rem;">🐾</div>
+                                <div class="paw-icon" style="top: 10%; left: 20%; transform: rotate(-55deg); font-size: 1.4rem;">🐾</div>
+                                <div class="paw-icon" style="bottom: 15%; left: 22%; transform: rotate(20deg); font-size: 1.7rem;">🐾</div>
+                                
+                                <h2 class="text-lg font-semibold text-gray-900 relative z-20">🎬 {{ $pet->name }} in Action</h2>
+                                <p class="text-sm text-gray-600 relative z-20">A short cute clip of {{ $pet->name }}. Click outside or the close button to dismiss.</p>
+
+                                <div class="flex justify-center sm:justify-start gap-2 mt-2 relative z-20">
+                                    <button @click="showGifModal = false" class="px-3 py-2 rounded-md bg-[var(--color-primary)] text-white text-sm hover:opacity-90 transition">Close</button>
+                                    @if($pet->image_url)
+                                        <a href="{{ $pet->image_url }}" target="_blank" class="px-3 py-2 rounded-md border border-gray-300 text-sm hover:bg-gray-50 transition">Open image</a>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -318,5 +408,4 @@
 
         </div>
     </main>
-</div>
 @endsection
