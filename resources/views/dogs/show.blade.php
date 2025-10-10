@@ -272,8 +272,8 @@
                         @endif
                     </div>
 
-                    {{-- Characteristics --}}
-                    <div class="space-y-4 pt-4">
+                    {{-- Characteristics (stars + short descriptions) --}}
+                    <div class="space-y-6 pt-4">
                         @php
                             $characteristics = [
                                 'Friendliness' => $pet->friendliness,
@@ -281,17 +281,42 @@
                                 'Exercise Needs' => $pet->exerciseNeeds,
                                 'Grooming' => $pet->grooming
                             ];
+
+                            $characteristicDescriptions = [
+                                'Friendliness' => 'How sociable the breed is with people and other animals (higher = very friendly).',
+                                'Trainability' => 'How easy the breed is to train and respond to commands (higher = very trainable).',
+                                'Exercise Needs' => 'Approximate daily activity needs (higher = needs more exercise).',
+                                'Grooming' => 'Amount of grooming & coat maintenance required (higher = more grooming).',
+                            ];
                         @endphp
 
                         @foreach($characteristics as $label => $value)
+                            @php
+                                $value = (int) $value; // ensure int 0-5
+                                $description = $characteristicDescriptions[$label] ?? '';
+                            @endphp
+
                             <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-sm font-medium">{{ $label }}</span>
-                                    <span class="text-sm text-[--color-muted-foreground]">{{ $value }}/5</span>
+                                <div class="flex items-start justify-between mb-2">
+                                    <div>
+                                        <span class="text-sm font-medium block">{{ $label }}</span>
+                                        <p class="text-xs text-[--color-muted-foreground] mt-1">{{ $description }}</p>
+                                    </div>
+
+                                    <div class="ml-4 flex items-center" aria-hidden="true">
+                                        {{-- Stars (visual) --}}
+                                        @for($i = 1; $i <= 5; $i++)
+                                            @if($i <= $value)
+                                                <svg class="h-5 w-5 text-yellow-400 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.13 3.478a1 1 0 00.95.69h3.654c.969 0 1.371 1.24.588 1.81l-2.958 2.15a1 1 0 00-.364 1.118l1.13 3.478c.3.921-.755 1.688-1.54 1.118l-2.958-2.15a1 1 0 00-1.176 0l-2.958 2.15c-.784.57-1.838-.197-1.539-1.118l1.13-3.478a1 1 0 00-.364-1.118L2.38 8.905c-.783-.57-.38-1.81.588-1.81h3.654a1 1 0 00.95-.69l1.13-3.478z"/></svg>
+                                            @else
+                                                <svg class="h-5 w-5 text-gray-300 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.13 3.478a1 1 0 00.95.69h3.654c.969 0 1.371 1.24.588 1.81l-2.958 2.15a1 1 0 00-.364 1.118l1.13 3.478c.3.921-.755 1.688-1.54 1.118l-2.958-2.15a1 1 0 00-1.176 0l-2.958 2.15c-.784.57-1.838-.197-1.539-1.118l1.13-3.478a1 1 0 00-.364-1.118L2.38 8.905c-.783-.57-.38-1.81.588-1.81h3.654a1 1 0 00.95-.69l1.13-3.478z"/></svg>
+                                            @endif
+                                        @endfor
+                                    </div>
                                 </div>
-                                <div class="w-full rounded-full h-2.5" style="background-color: color-mix(in oklab, var(--color-muted) 60%, white);">
-                                    <div class="bg-primary h-2.5 rounded-full" style="width: {{ ($value / 5) * 100 }}%"></div>
-                                </div>
+
+                                {{-- Accessible textual fallback for screen readers --}}
+                                <div class="sr-only">{{ $label }}: {{ $value }} out of 5.</div>
                             </div>
                         @endforeach
                     </div>
