@@ -492,11 +492,11 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                         <template x-for="(breed, index) in recommendedBreeds" :key="index">
-                            <div class="mt-5 breed-result-card">
+                            <div class="mt-2 breed-result-card">
                                 <div class="overflow-hidden">
                                     <img :src="getBreedImage(breed)" :alt="breed.name" class="breed-image" loading="lazy">
                                 </div>
-                                <div class="p-6">
+                                <div class="mt-5 p-6">
                                     <h3 class="text-2xl font-bold text-gray-800 mb-2" x-text="breed.name"></h3>
                                     <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
                                         <span x-text="preferences.size.charAt(0).toUpperCase() + preferences.size.slice(1)"></span>
