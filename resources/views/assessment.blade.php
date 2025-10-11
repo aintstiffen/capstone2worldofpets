@@ -4,274 +4,564 @@
 
 @section('content')
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <div class="flex flex-col min-h-screen px-4 sm:px-6 lg:px-8 pb-12" x-data="quizApp()">
+    
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --pet-pink-50: #fff6f7;
+            --pet-pink-100: #ffeef1;
+            --pet-pink-200: #ffdfe6;
+            --pet-primary: #ff637f; /* main accent */
+            --pet-primary-600: #ff4f6b;
+            --pet-accent: #ff9db7;
+            --pet-muted: #6b7280;
+            --shadow-lg: 0 18px 48px rgba(15, 23, 42, 0.06);
+            --shadow-xl: 0 28px 72px rgba(15, 23, 42, 0.08);
+        }
+
+        body { background: var(--pet-pink-50); min-height: 100vh; }
+        
+        .quiz-container {
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,250,251,0.98));
+            border-radius: 18px;
+            box-shadow: var(--shadow-lg);
+            padding: 2rem;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, var(--pet-primary), var(--pet-accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(90deg, var(--pet-primary), var(--pet-primary-600));
+            color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight:700; font-size:15px; transition: all .22s ease; box-shadow: 0 8px 28px rgba(255,99,127,0.12);
+        }
+        
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .btn-secondary { background: white; color: var(--pet-primary); border: 2px solid rgba(255,99,127,0.12); padding: 10px 18px; border-radius: 12px; font-weight:600 }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .pet-card { background: white; border-radius: 16px; padding: 28px; transition: all .28s ease; cursor: pointer; border: 1px solid rgba(0,0,0,0.04); position: relative; overflow: hidden }
+        
+        .pet-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+        
+        .pet-card:hover::before {
+            opacity: 0.1;
+        }
+        
+        .pet-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #667eea;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .pet-card > * {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .progress-container { background: rgba(255,99,127,0.06); border-radius: 999px; height: 10px; overflow:hidden }
+        .progress-bar { background: linear-gradient(90deg,var(--pet-primary),var(--pet-accent)); height:100%; border-radius:999px; transition:width .45s ease }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .radio-label { position: relative; cursor:pointer; padding:8px; border-radius:12px; transition:all .18s ease; background:transparent }
+        .radio-label:hover { transform: translateY(-4px) }
+        .radio-label input[type="radio"] { accent-color: var(--pet-primary) }
+        
+        .question-card { background: linear-gradient(180deg, #fff 0%, #fffbfc 100%); border-radius:14px; padding:18px; margin-bottom:18px; box-shadow:0 6px 22px rgba(15,23,42,0.04) }
+        
+        .question-card:hover {
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .breed-result-card { background:white; border-radius:14px; overflow:hidden; box-shadow:var(--shadow-lg); transition:all .3s ease; height:100% }
+        
+        .breed-result-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .breed-image {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        
+        .breed-result-card:hover .breed-image {
+            transform: scale(1.1);
+        }
+        
+        .trait-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .trait-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .flash-message {
+            background: var(--gradient-success);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(67, 233, 123, 0.3);
+            animation: slideInDown 0.5s ease;
+        }
+        
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .animate-in {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .emoji-icon { font-size: 64px; transition: transform .25s ease; display:inline-block }
+        
+        .pet-card:hover .emoji-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+        
+        .section-badge { background: linear-gradient(90deg,#ffdfe6,#fff1f3); color:var(--pet-primary); padding:8px 16px; border-radius:999px; font-weight:700 }
+        
+        .notification-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--gradient-success);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            z-index: 9999;
+            animation: slideInRight 0.5s ease;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+        
+        .hair-option-card { position: relative; overflow:hidden; border-radius:12px; cursor:pointer }
+        
+        .hair-option-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .size-option {
+            transition: all 0.3s ease;
+        }
+        
+        .size-option:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .back-button { background: white; color: var(--pet-primary); border: 2px solid rgba(255,99,127,0.08); padding:10px 18px; border-radius:10px; font-weight:700 }
+        .back-button:hover { transform: translateX(-4px); border-color: rgba(255,99,127,0.18) }
+
+        /* Responsive tweaks */
+        @media (max-width: 768px) {
+            .quiz-container { padding: 1rem }
+            .pet-card { padding: 18px }
+            .question-card { padding: 12px }
+            .emoji-icon { font-size: 48px }
+            .btn-gradient, .btn-secondary { padding-left: 14px; padding-right: 14px }
+        }
+    </style>
+    
+    <div class="min-h-screen py-12 px-4" x-data="quizApp()">
         
         @if(Session::has('assessment_saved'))
-        <!-- Flash message after saving results -->
-        <div class="bg-green-100 p-4 my-4 rounded text-center" x-data="{ show: true }" x-init="setTimeout(() => { show = false }, 5000)" x-show="show" x-transition>
-            <h3 class="font-bold text-green-800">Assessment Saved!</h3>
-            <p class="text-green-700">Your assessment results have been successfully saved.</p>
+        <div class="max-w-3xl mx-auto mb-6">
+            <div class="flash-message" x-data="{ show: true }" x-init="setTimeout(() => { show = false }, 5000)" x-show="show" x-transition>
+                <div class="flex items-center gap-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <div>
+                        <h3 class="font-bold text-xl">Assessment Saved!</h3>
+                        <p class="opacity-90">Your assessment results have been successfully saved.</p>
+                    </div>
+                </div>
+            </div>
         </div>
         @endif
         
-        <!-- Main Content -->
-        <main class="flex-1">
-            <div class="container py-8 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Introduction -->
-                <template x-if="currentStage === 'intro'">
-                    <div class="text-center">
-                        <h2 class="text-3xl font-bold mb-6">Pet Personality Matcher</h2>
-                        <p class="mb-8">Find the perfect pet match based on your personality and preferences</p>
+        <div class="container max-w-5xl mx-auto">
+            
+            <!-- Introduction -->
+            <template x-if="currentStage === 'intro'">
+                <div class="quiz-container p-12 text-center animate-in">
+                    <div class="mb-8">
+                        <h1 class="text-6xl font-bold gradient-text mb-4">Pet Personality Matcher</h1>
+                        <p class="text-xl text-gray-600">Discover your perfect pet companion through our advanced personality assessment</p>
+                    </div>
+                    
+                    <div class="flex flex-col items-center gap-4 mt-12">
+                        <button class="btn-gradient w-full max-w-md" @click="currentStage = 'petType'">
+                            <span class="text-lg">Start Your Journey</span>
+                        </button>
                         
-                        <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center px-2 sm:px-0">
-                            <button class="w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30" 
-                                @click="currentStage = 'petType'">
-                                Start New Assessment
-                            </button>
-                            
-                            @auth
-                                @if(auth()->user()->assessments->count() > 0)
-                                    <a href="{{ route('profile.edit') }}" class="w-full sm:w-auto text-blue-600 bg-white border border-blue-600 hover:bg-blue-50 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5 text-center inline-flex items-center">
-                                        View All Your Assessments
-                                    </a>
-                                @endif
-                            @endauth
+                        @auth
+                            @if(auth()->user()->assessments->count() > 0)
+                                <a href="{{ route('profile.edit') }}" class="btn-secondary w-full max-w-md text-center">
+                                    View Your Past Results
+                                </a>
+                            @endif
+                        @endauth
+                    </div>
+                </div>
+            </template>
+
+            <!-- Step 1: Choose pet type -->
+            <template x-if="currentStage === 'petType'">
+                <div class="quiz-container p-12 animate-in">
+                    <div class="text-center mb-12">
+                        <span class="section-badge">Step 1 of 4</span>
+                        <h2 class="text-4xl font-bold gradient-text mt-4">Choose Your Pet Type</h2>
+                        <p class="text-gray-600 mt-2">Which companion speaks to your heart?</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="mt-5 pet-card" @click="selectPetType('dog')">
+                            <span class="emoji-icon">🐶</span>
+                            <h3 class="text-2xl font-bold mt-4 text-gray-800">Dogs</h3>
+                            <p class="text-gray-600 mt-2">Loyal, energetic, and always by your side</p>
+                        </div>
+                        
+                        <div class="mt-5 pet-card" @click="selectPetType('cat')">
+                            <span class="emoji-icon">🐱</span>
+                            <h3 class="text-2xl font-bold mt-4 text-gray-800">Cats</h3>
+                            <p class="text-gray-600 mt-2">Independent, graceful, and affectionate</p>
                         </div>
                     </div>
-                </template>
+                </div>
+            </template>
 
-                <!-- Step 1: Choose pet type -->
-                <template x-if="currentStage === 'petType'">
-                    <div>
-                        <h2 class="text-2xl font-bold mb-4">Step 1: Choose your preferred pet type</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <button class="p-6 sm:p-8 border rounded-lg hover:bg-blue-50 transition flex flex-col items-center w-full" 
-                                @click="selectPetType('dog')">
-                                <span class="text-5xl mb-3">🐶</span>
-                                <span class="font-medium">Dog</span>
-                            </button>
-                            <button class="p-6 sm:p-8 border rounded-lg hover:bg-blue-50 transition flex flex-col items-center w-full" 
-                                @click="selectPetType('cat')">
-                                <span class="text-5xl mb-3">🐱</span>
-                                <span class="font-medium">Cat</span>
-                            </button>
+            <!-- Step 2: Choose hair length -->
+            <template x-if="currentStage === 'hairLength'">
+                <div class="quiz-container p-12 animate-in">
+                    <div class="text-center mb-12">
+                        <span class="section-badge">Step 2 of 4</span>
+                        <h2 class="text-4xl font-bold gradient-text mt-4">Select Hair Length</h2>
+                        <p class="text-gray-600 mt-2">What grooming commitment fits your lifestyle?</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="mt-5 hair-option-card bg-white border-4 border-transparent hover:border-purple-500" 
+                             @click="preferences.hairLength = 'short'; currentStage = 'size'">
+                            <div class="overflow-hidden rounded-t-lg">
+                                <img :src="petType === 'dog' ? 'https://topdogtips.com/wp-content/uploads/2017/04/Best-short-hair-dog-breeds-16.jpg' : 'https://www.petrescueblog.com/wp-content/uploads/2021/01/e8901c74e0ffaebaac19d375c30c39b8-1140x855.jpg'" 
+                                    alt="Short hair" class="w-full h-64 object-cover transition-transform duration-500 hover:scale-110">
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold text-gray-800">Short Hair</h3>
+                                <p class="text-gray-600 mt-2">Low maintenance, easy grooming</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-5 hair-option-card bg-white border-4 border-transparent hover:border-purple-500" 
+                             @click="preferences.hairLength = 'long'; currentStage = 'size'">
+                            <div class="overflow-hidden rounded-t-lg">
+                                <img :src="petType === 'dog' ? 'https://tse1.mm.bing.net/th/id/OIP.oj0himbKqq-E9Qz_x8EYrwHaHa?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3' : 'https://static9.depositphotos.com/1594920/1089/i/950/depositphotos_10893465-stock-photo-british-longhair-kitten-3-months.jpg'" 
+                                    alt="Long hair" class="w-full h-64 object-cover transition-transform duration-500 hover:scale-110">
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold text-gray-800">Long Hair</h3>
+                                <p class="text-gray-600 mt-2">Luxurious coat, regular grooming needed</p>
+                            </div>
                         </div>
                     </div>
-                </template>
-
-                <!-- Step 2: Choose hair length -->
-                <template x-if="currentStage === 'hairLength'">
-                    <div>
-                        <h2 class="text-2xl font-bold mb-4">Step 2: Preferred hair length?</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <button class="p-4 sm:p-6 border rounded-lg hover:bg-blue-50 transition w-full" 
-                                @click="preferences.hairLength = 'short'; currentStage = 'size'">
-                                <div class="h-32 flex items-center justify-center mb-3 w-full">
-                                    <img :src="petType === 'dog' ? 'https://topdogtips.com/wp-content/uploads/2017/04/Best-short-hair-dog-breeds-16.jpg' : 'https://www.petrescueblog.com/wp-content/uploads/2021/01/e8901c74e0ffaebaac19d375c30c39b8-1140x855.jpg'" 
-                                        alt="Short hair" class="h-full w-full object-cover rounded">
-                                </div>
-                                <p class="text-center font-medium">Short Hair</p>
-                            </button>
-                            <button class="p-4 sm:p-6 border rounded-lg hover:bg-blue-50 transition w-full" 
-                                @click="preferences.hairLength = 'long'; currentStage = 'size'">
-                                <div class="h-32 flex items-center justify-center mb-3 w-full">
-                                    <img :src="petType === 'dog' ? 'https://tse1.mm.bing.net/th/id/OIP.oj0himbKqq-E9Qz_x8EYrwHaHa?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3' : 'https://static9.depositphotos.com/1594920/1089/i/950/depositphotos_10893465-stock-photo-british-longhair-kitten-3-months.jpg'" 
-                                        alt="Long hair" class="h-full w-full object-cover rounded">
-                                </div>
-                                <p class="text-center font-medium">Long Hair</p>
-                            </button>
-                        </div>
-                        <button class="mt-5 w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
-                            @click="currentStage = 'petType'">Back</button>
+                    
+                    <div class="mt-8">
+                        <button class="back-button" @click="currentStage = 'petType'">
+                            ← Back
+                        </button>
                     </div>
-                </template>
+                </div>
+            </template>
 
-                <!-- Step 3: Choose size -->
-                <template x-if="currentStage === 'size'">
-                    <div>
-                        <h2 class="text-2xl font-bold mb-4">Step 3: Preferred size?</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <button class="p-6 border rounded-lg hover:bg-blue-50 transition" 
-                                @click="preferences.size = 'small'; currentStage = 'personality'">
-                                <div class="h-24 flex items-center justify-center mb-3">
-                                    <span class="text-4xl">🐕</span>
-                                </div>
-                                <p class="text-center font-medium">Small</p>
-                            </button>
-                            <button class="p-6 border rounded-lg hover:bg-blue-50 transition" 
-                                @click="preferences.size = 'medium'; currentStage = 'personality'">
-                                <div class="h-24 flex items-center justify-center mb-3">
-                                    <span class="text-5xl">🐕</span>
-                                </div>
-                                <p class="text-center font-medium">Medium</p>
-                            </button>
-                            <button class="p-6 border rounded-lg hover:bg-blue-50 transition" 
-                                @click="preferences.size = 'large'; currentStage = 'personality'">
-                                <div class="h-24 flex items-center justify-center mb-3">
-                                    <span class="text-6xl">🐕</span>
-                                </div>
-                                <p class="text-center font-medium">Large</p>
-                            </button>
-                        </div>
-                        <button class="mt-5 w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
-                            @click="currentStage = 'hairLength'">Back</button>
+            <!-- Step 3: Choose size -->
+            <template x-if="currentStage === 'size'">
+                <div class="quiz-container p-12 animate-in">
+                    <div class="text-center mb-12">
+                        <span class="section-badge">Step 3 of 4</span>
+                        <h2 class="text-4xl font-bold gradient-text mt-4">Choose Your Size</h2>
+                        <p class="text-gray-600 mt-2">What size pet fits your living space?</p>
                     </div>
-                </template>
-
-                <!-- Step 4: Personality Questions (3 sets of 10 with transitions) -->
-                <template x-if="currentStage === 'personality'">
-                    <div>
-                        <h2 class="text-2xl font-bold mb-2">Personality Assessment</h2>
-                        <p class="text-[var(--color-muted-foreground)] mb-4">Set <span x-text="currentSection + 1"></span> of <span x-text="totalSections"></span> · Questions <span x-text="(currentSection*questionsPerSection)+1"></span>-<span x-text="Math.min((currentSection+1)*questionsPerSection, personalityQuestions.length)"></span></p>
-                        <p class="text-sm text-[var(--color-muted-foreground)] mb-4">All questions in this set are required.</p>
-
-                        <!-- Overall Progress Bar -->
-                        <div class="w-full rounded-full h-2.5 mb-6" style="background-color: color-mix(in oklab, var(--color-muted) 60%, white);">
-                            <div class="h-2.5 rounded-full bg-[var(--color-primary)]" :style="`width: ${Math.round((answeredCount()/personalityQuestions.length)*100)}%`"></div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="mt-5 pet-card" @click="preferences.size = 'small'; currentStage = 'personality'">
+                            <span class="emoji-icon size-option text-5xl">🐶🐱</span>
+                            <h3 class="text-2xl font-bold mt-4 text-gray-800">Small</h3>
+                            <p class="text-gray-600 mt-2">Perfect for apartments</p>
                         </div>
+                        
+                        <div class="mt-5 pet-card" @click="preferences.size = 'medium'; currentStage = 'personality'">
+                            <span class="emoji-icon size-option text-6xl">🐕🐈</span>
+                            <h3 class="text-2xl font-bold mt-4 text-gray-800">Medium</h3>
+                            <p class="text-gray-600 mt-2">Balanced and versatile</p>
+                        </div>
+                        
+                        <div class="mt-5 pet-card" @click="preferences.size = 'large'; currentStage = 'personality'">
+                            <span class="emoji-icon size-option text-7xl">🐕🐕‍🦺🐈‍⬛</span>
+                            <h3 class="text-2xl font-bold mt-4 text-gray-800">Large</h3>
+                            <p class="text-gray-600 mt-2">Needs spacious home</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <button class="back-button" @click="currentStage = 'hairLength'">
+                            ← Back
+                        </button>
+                    </div>
+                </div>
+            </template>
 
-                        <!-- Section Card with animated transition -->
-                        <div class="border rounded-lg p-6 mb-6 bg-white shadow-sm overflow-hidden"
-                             x-transition:enter="transition ease-out duration-300"
-                             x-transition:enter-start="opacity-0 transform translate-y-2"
-                             x-transition:enter-end="opacity-100 transform translate-y-0"
-                             x-transition:leave="transition ease-in duration-200"
-                             x-transition:leave-start="opacity-100 transform translate-y-0"
-                             x-transition:leave-end="opacity-0 transform -translate-y-2">
-                            <template x-for="(q, i) in sectionQuestions()" :key="currentSection + '-' + i">
-                                <div class="mb-5">
-                                    <h3 class="text-base font-medium mb-3" x-text="q.question"></h3>
-                                    <div class="grid grid-cols-5 gap-2 text-center text-xs text-[var(--color-muted-foreground)] mb-1">
-                                        <div>Strongly Disagree</div>
-                                        <div class="col-span-3"></div>
-                                        <div>Strongly Agree</div>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <template x-for="n in 5" :key="n">
-                                            <label class="flex flex-col items-center cursor-pointer select-none">
-                                                <input type="radio" :name="'q'+(sectionBaseIndex()+i)" :value="n"
-                                                    x-model="personalityAnswers[sectionBaseIndex()+i]"
-                                                    class="mb-1 h-4 w-4 accent-[var(--color-primary)] transition duration-200">
-                                                <span class="text-sm" x-text="n"></span>
-                                            </label>
-                                        </template>
-                                    </div>
+            <!-- Step 4: Personality Questions -->
+            <template x-if="currentStage === 'personality'">
+                <div class="quiz-container p-8 md:p-12 animate-in">
+                    <div class="mb-8">
+                        <span class="section-badge">Step 4 of 4</span>
+                        <h2 class="text-3xl md:text-4xl font-bold gradient-text mt-4">Personality Assessment</h2>
+                        <p class="text-gray-600 mt-2">
+                            Set <span x-text="currentSection + 1"></span> of <span x-text="totalSections"></span> · 
+                            Questions <span x-text="(currentSection*questionsPerSection)+1"></span>-<span x-text="Math.min((currentSection+1)*questionsPerSection, personalityQuestions.length)"></span>
+                        </p>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-8">
+                        <div class="flex justify-between text-sm text-gray-600 mb-2">
+                            <span>Overall Progress</span>
+                            <span x-text="Math.round((answeredCount()/personalityQuestions.length)*100) + '%'"></span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar" :style="`width: ${Math.round((answeredCount()/personalityQuestions.length)*100)}%`"></div>
+                        </div>
+                    </div>
+
+                    <!-- Questions -->
+                    <div class="space-y-6">
+                        <template x-for="(q, i) in sectionQuestions()" :key="currentSection + '-' + i">
+                            <div class="question-card">
+                                <h3 class="text-lg font-semibold mb-4 text-gray-800" x-text="q.question"></h3>
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs text-gray-500 mb-3">
+                                    <div class="text-left">Strongly Disagree</div>
+                                    <div class="hidden md:block col-span-3"></div>
+                                    <div class="text-right md:text-center">Strongly Agree</div>
                                 </div>
-                            </template>
+                                <div class="flex justify-between gap-2">
+                                    <template x-for="n in 5" :key="n">
+                                        <label class="radio-label flex-1 text-center">
+                                            <input type="radio" 
+                                                   :name="'q'+(sectionBaseIndex()+i)" 
+                                                   :value="n"
+                                                   x-model="personalityAnswers[sectionBaseIndex()+i]"
+                                                   class="mb-2 h-5 w-5">
+                                            <span class="text-sm font-semibold" x-text="n"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
 
-                            <!-- Section completion hint -->
-                            <p class="text-sm text-amber-600" x-show="attemptedNext && !isSectionComplete()"
-                               x-transition:enter="transition ease-out duration-300"
-                               x-transition:enter-start="opacity-0 transform translate-y-2"
-                               x-transition:enter-end="opacity-100 transform translate-y-0">
-                               Please answer all questions in this set before continuing.
+                    <!-- Warning Message -->
+                    <div class="mt-6" x-show="attemptedNext && !isSectionComplete()">
+                        <div class="bg-amber-100 border-l-4 border-amber-500 p-4 rounded-lg">
+                            <p class="text-amber-800 font-semibold">
+                                ⚠️ Please answer all questions in this set before continuing.
                             </p>
                         </div>
+                    </div>
 
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                                <button class="w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5" 
-                                    @click="prevSet" x-show="currentSection > 0">
-                                    Back
-                                </button>
-                                <button class="w-full sm:w-auto text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5" 
-                                    @click="currentStage = 'size'">
-                                    Back to Preferences
-                                </button>
-                            </div>
-                            <div class="flex flex-col sm:flex-row gap-3 items-center w-full md:w-auto justify-between md:justify-end">
-                                <div class="text-sm text-[var(--color-muted-foreground)] order-1 sm:order-0">Set progress: <span x-text="sectionAnsweredCount()"></span>/<span x-text="questionsPerSection"></span></div>
-                                <button class="w-full sm:w-auto text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] focus:ring-4 focus:outline-none focus:ring-[var(--color-accent)] font-medium rounded-lg text-sm px-5 py-3 sm:py-2.5" 
-                                    @click="isSectionComplete() ? nextSet() : attemptedNext = true">
-                                    <span x-show="currentSection < totalSections - 1">Next Set</span>
-                                    <span x-show="currentSection === totalSections - 1">See Results</span>
-                                </button>
-                            </div>
+                    <!-- Navigation -->
+                    <div class="mt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex gap-3">
+                            <button class="back-button" @click="prevSet" x-show="currentSection > 0">
+                                ← Back
+                            </button>
+                            <button class="back-button" @click="currentStage = 'size'">
+                                Back to Preferences
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm text-gray-600">
+                                Progress: <span x-text="sectionAnsweredCount()"></span>/<span x-text="questionsPerSection"></span>
+                            </span>
+                            <button class="btn-gradient" @click="isSectionComplete() ? nextSet() : attemptedNext = true">
+                                <span x-show="currentSection < totalSections - 1">Next Set →</span>
+                                <span x-show="currentSection === totalSections - 1">See Results ✨</span>
+                            </button>
                         </div>
                     </div>
-                </template>
+                </div>
+            </template>
 
-                <!-- Results -->
-                <template x-if="currentStage === 'results'">
-                    <div>
-                        <h2 class="text-2xl font-bold mb-2">Your Perfect Pet Matches</h2>
-                        <p class="mb-6">Based on your personality and preferences, here are the breeds we recommend:</p>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-                            <template x-for="(breed, index) in recommendedBreeds" :key="index">
-                                <div class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition h-full flex flex-col">
-                                    <img :src="getBreedImage(breed)" :alt="breed.name"
-                                        class="w-full h-44 sm:h-48 md:h-48 object-cover" loading="lazy">
-                                    <div class="p-4 flex flex-col flex-1">
-                                        <h3 class="font-bold text-lg mb-1" x-text="breed.name"></h3>
-                                        <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                                            <span x-text="preferences.size.charAt(0).toUpperCase() + preferences.size.slice(1)"></span>
-                                            <span>•</span>
-                                            <span x-text="preferences.hairLength.charAt(0).toUpperCase() + preferences.hairLength.slice(1) + ' Hair'"></span>
-                                        </div>
-                                        <p class="text-sm text-gray-700 h-20 overflow-hidden" x-text="breed.description.length > 100 ? breed.description.substring(0, 100) + '...' : breed.description"></p>
-                                        <div class="mt-3 pt-3 border-t">
-                                            <div class="text-sm font-medium mb-1">Your Personality Traits:</div>
-                                            <div class="flex flex-wrap gap-2">
-                                                <template x-for="(trait, i) in breed.traits" :key="i">
-                                                    <span class="text-xs px-2 py-1 rounded bg-[color-mix(in_oklab,var(--color-primary)_12%,white)] text-[var(--color-primary)] border border-[var(--color-border)]" x-text="trait"></span>
-                                                </template>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Add link to view more details -->
-                                        <div class="mt-auto pt-4 text-center">
-                                            <a :href="'/' + petType + 's/' + breed.slug" 
-                                               class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2">
-                                               View Details
-                                            </a>
+            <!-- Results -->
+            <template x-if="currentStage === 'results'">
+                <div class="quiz-container p-8 md:p-12 animate-in">
+                    <div class="text-center mb-12">
+                        <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-4">Your Perfect Matches! 🎉</h2>
+                        <p class="text-xl text-gray-600">Based on your unique personality, here are your ideal companions</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                        <template x-for="(breed, index) in recommendedBreeds" :key="index">
+                            <div class="mt-5 breed-result-card">
+                                <div class="overflow-hidden">
+                                    <img :src="getBreedImage(breed)" :alt="breed.name" class="breed-image" loading="lazy">
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-2xl font-bold text-gray-800 mb-2" x-text="breed.name"></h3>
+                                    <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                                        <span x-text="preferences.size.charAt(0).toUpperCase() + preferences.size.slice(1)"></span>
+                                        <span>•</span>
+                                        <span x-text="preferences.hairLength.charAt(0).toUpperCase() + preferences.hairLength.slice(1) + ' Hair'"></span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm mb-4" x-text="breed.description.length > 100 ? breed.description.substring(0, 100) + '...' : breed.description"></p>
+                                    
+                                    <div class="mb-4">
+                                        <div class="text-sm font-semibold text-gray-700 mb-2">Your Personality Traits:</div>
+                                        <div class="flex flex-wrap gap-2">
+                                            <template x-for="(trait, i) in breed.traits" :key="i">
+                                                <span class="trait-badge" x-text="trait"></span>
+                                            </template>
                                         </div>
                                     </div>
-                                </div>
-                            </template>
-                        </div>
-
-                        <div class="text-center mb-4">
-                            @auth
-                                <!-- Only show save button if results aren't already saved and user is logged in -->
-                                <button x-show="!resultsSaved && !hasSavedResults" class="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-4" 
-                                    @click="saveResults">Save Results</button>
                                     
-                                <!-- Show "Saved!" indicator only when user just saved results, not when returning to page -->
-                                <span x-show="resultsSaved && !hasSavedResults" class="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Results Saved
-                                </span>
-                            @else
-                                <!-- Show login button if user is not authenticated -->
-                                <a href="{{ route('login') }}" class="text-white bg-[#050708] hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-semibold rounded-lg text-base px-6 py-2.5 h-[46px] items-center justify-center mr-4 inline-flex transition duration-150">
-                                    Login to Save Results
-                                </a>
-                            @endauth
-                            
-                            <button class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 me-2 mb-2" 
-                                @click="restart">Retake Personality Breed Assessment</button>
-                        </div>
-                        
-                        <!-- Only show the "Your results have been saved" message when user just saved results, not when returning -->
-                        <div class="mt-4 p-4 bg-green-100 text-green-800 rounded-lg" 
-                            x-show="resultsSaved && !hasSavedResults"
-                            x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 transform translate-y-2"
-                            x-transition:enter-end="opacity-100 transform translate-y-0">
-                            <p class="font-medium">Your results have been saved!</p>
-                            <p class="text-sm mt-1">You can access them anytime you return to this assessment page.</p>
-                        </div>
+                                    <a :href="'/' + petType + 's/' + breed.slug" 
+                                       class="btn-gradient w-full block text-center">
+                                       Learn More
+                                    </a>
+                                </div>
+                            </div>
+                        </template>
                     </div>
-                </template>
 
-            </div>
-        </main>
+                    <div class="text-center space-y-4">
+                        @auth
+                            <button x-show="!resultsSaved && !hasSavedResults" 
+                                    class="mt-3 btn-gradient" 
+                                    @click="saveResults">
+                                💾 Save My Results
+                            </button>
+                            
+                            <div x-show="resultsSaved && !hasSavedResults" 
+                                 class="mt-3 inline-flex items-center gap-2 bg-green-500 text-white px-8 py-4 rounded-xl font-semibold">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Results Saved Successfully!
+                            </div>
+                        @else
+                            <a href="{{ route('login') }}" class="btn-gradient inline-block">
+                                🔐 Login to Save Your Results
+                            </a>
+                        @endauth
+                        
+                        <button class="btn-secondary ml-4 mt-5" @click="restart">
+                            🔄 Retake Assessment
+                        </button>
+                    </div>
+                    
+                    <div class="mt-8 p-6 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl" 
+                         x-show="resultsSaved && !hasSavedResults"
+                         x-transition>
+                        <h4 class="font-bold text-lg text-gray-800 mb-2">🎊 Success!</h4>
+                        <p class="text-gray-700">Your perfect pet matches have been saved. You can access them anytime!</p>
+                    </div>
+                </div>
+            </template>
+
+        </div>
     </div>
 
-    <!-- Alpine.js State & Logic -->
+    <!-- Alpine.js Logic (keeping your original JavaScript) -->
     <script>
         function quizApp() {
     // Safe initialization with try/catch
@@ -546,7 +836,6 @@
             console.log(`Analyzing ${breeds.length} ${this.petType} breeds`);
             console.log(`User preferences: size=${this.preferences.size}, hairLength=${this.preferences.hairLength}`);
 
-            // Small helper to compare preference values tolerantly (handles "longhair", "long hair", "Long", etc.)
             const matchesPref = (actual, expected) => {
                 if (!expected) return false;
                 const a = String(actual || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ');
@@ -554,40 +843,31 @@
                 if (a === e) return true;
                 if (a.includes(e)) return true;
                 if (e.includes(a)) return true;
-                // handle singular/plural and short/long forms
                 if (a.indexOf('short') !== -1 && e.indexOf('short') !== -1) return true;
                 if (a.indexOf('long') !== -1 && e.indexOf('long') !== -1) return true;
                 return false;
             };
 
-            // Enforce hair-length preference: prefer breeds that explicitly match the requested hair length.
-            // If any breeds explicitly match, use only those. If none explicitly match, allow all breeds
-            // but apply a strong penalty to breeds that explicitly conflict with the requested hair length.
             let sourceBreeds = breeds;
-            let hairConflictPenalty = 0; // if >0, apply penalty during scoring for conflicting hair lengths
+            let hairConflictPenalty = 0;
             if (this.preferences && this.preferences.hairLength) {
                 const requested = String(this.preferences.hairLength).toLowerCase();
-                // breeds that explicitly indicate the requested hair length
                 const explicitMatches = breeds.filter(b => (b.hairLength || '') !== '' && matchesPref(b.hairLength, requested));
                 console.log(`Explicit hairLength matches for '${requested}': ${explicitMatches.length}`);
                 if (explicitMatches.length > 0) {
                     sourceBreeds = explicitMatches;
                 } else {
-                    // No explicit matches: allow all breeds but penalize breeds that explicitly state the opposite
-                    hairConflictPenalty = 40; // large penalty to avoid recommending obvious mismatches
+                    hairConflictPenalty = 40;
                     console.log('No explicit hairLength matches; will penalize breeds whose hairLength conflicts with preference');
                 }
             }
             
-            // PHASE 1: Exact matches
             let exactMatches = sourceBreeds.filter(breed => 
-                // tolerant matching using matchesPref
                 matchesPref(breed.hairLength, this.preferences.hairLength) &&
                 matchesPref(breed.size, this.preferences.size)
             );
             console.log(`✓ Exact matches: ${exactMatches.length}`);
             
-            // PHASE 2: Partial matches
             let partialMatches = [];
             if (exactMatches.length < 5) {
                 partialMatches = sourceBreeds.filter(breed => 
@@ -598,17 +878,14 @@
                 console.log(`✓ Partial matches: ${partialMatches.length}`);
             }
             
-            // PHASE 3: Enhanced scoring algorithm
             const scoreBreed = (breed) => {
                 let score = 0;
                 let matchDetails = [];
                 
-                // Exact preference matches (50 points total) using tolerant matching
                 if (matchesPref(breed.hairLength, this.preferences.hairLength)) {
                     score += 25;
                     matchDetails.push('✓ Hair length');
                 } else if (hairConflictPenalty > 0 && (breed.hairLength || '') !== '' && !matchesPref(breed.hairLength, this.preferences.hairLength)) {
-                    // Apply heavy penalty for explicit conflict when we're in fallback mode
                     score -= hairConflictPenalty;
                     matchDetails.push('✗ Hair length conflict');
                 }
@@ -617,16 +894,13 @@
                     matchDetails.push('✓ Size');
                 }
                 
-                // Personality matching (50+ points possible)
                 if (breed.personalityMatch && Array.isArray(breed.personalityMatch)) {
                     breed.personalityMatch.forEach(trait => {
-                        // Binary match: 15 points each
                         if (profile[trait]) {
                             score += 15;
                             matchDetails.push(`✓ ${trait}`);
                         }
                         
-                        // Proportional scoring: up to 5 additional points
                         const traitScoreMap = {
                             'highHonesty': profile.honestyScore,
                             'highEmotionality': profile.emotionalityScore,
@@ -641,7 +915,6 @@
                     });
                 }
                 
-                // Bonus for multiple matches
                 const personalityMatchCount = (breed.personalityMatch || []).filter(t => profile[t]).length;
                 if (personalityMatchCount >= 3) {
                     score += 10;
@@ -656,7 +929,6 @@
                 return score;
             };
             
-            // Score all matches
             exactMatches.forEach(breed => scoreBreed(breed));
             partialMatches.forEach(breed => {
                 const baseScore = scoreBreed(breed);
@@ -665,10 +937,7 @@
             
             let allCandidates = [...exactMatches, ...partialMatches];
             
-            // Last resort: score all breeds
             if (allCandidates.length < 5) {
-                // If we still have too few candidates, include additional breeds from the full list
-                // (this allows a graceful fallback when strict hair-length filtering left too few options)
                 const remaining = breeds.filter(b => !allCandidates.includes(b));
                 remaining.forEach(breed => {
                     const baseScore = scoreBreed(breed);
@@ -677,39 +946,30 @@
                 allCandidates = [...allCandidates, ...remaining];
             }
             
-            // Sort by score
             allCandidates.sort((a, b) => b.matchScore - a.matchScore);
 
-            // Determine dynamic selection threshold so we don't always return 3 items
             const topScore = allCandidates.length ? allCandidates[0].matchScore : 0;
-            // base threshold: 70% of top score, but at least 30 (arbitrary floor)
             const dynamicThreshold = Math.max(30, topScore * 0.7);
 
-            // If there are exact matches, prefer them and require a tighter threshold (80% of top exact score)
             let selected = [];
             if (exactMatches.length > 0) {
                 exactMatches.sort((a, b) => b.matchScore - a.matchScore);
                 const topExact = exactMatches[0].matchScore;
                 const exactThreshold = Math.max(dynamicThreshold, topExact * 0.8);
                 selected = exactMatches.filter(b => b.matchScore >= exactThreshold);
-                // If no exact passes the tighter threshold, fall back to the top exact match only
                 if (selected.length === 0 && exactMatches.length > 0) {
                     selected = [exactMatches[0]];
                 }
             } else {
-                // Otherwise select across allCandidates using the dynamic threshold
                 selected = allCandidates.filter(b => b.matchScore >= dynamicThreshold);
             }
 
-            // If selection is empty (very low scores), always include the top candidate
             if (selected.length === 0 && allCandidates.length > 0) {
                 selected = [allCandidates[0]];
             }
 
-            // Limit to at most 3 recommendations to avoid overwhelming the user
             selected = selected.slice(0, 3);
 
-            // Debug output
             console.log('═══ SELECTED MATCHES (dynamic) ═══');
             selected.forEach((breed, i) => {
                 console.log(`${i + 1}. ${breed.name} (Score: ${breed.matchScore})`);
@@ -720,7 +980,6 @@
 
             this.recommendedBreeds = selected;
             
-            // Ensure complete data
             this.recommendedBreeds.forEach(breed => {
                 if (!breed.traits || !Array.isArray(breed.traits)) {
                     breed.traits = [];
@@ -763,17 +1022,14 @@
                     hairLength: breed.hairLength,
                     matchScore: breed.matchScore
                 })),
-                // Map internal personality dimensions to the server-expected fields and scale to 1..7
                 personalityScores: (function(dims){
                     const to7 = (score, max) => {
                         const s = Number(score) || 0;
                         const m = Number(max) || 1;
-                        // scale 0..max -> 1..7
                         const scaled = Math.round((s / m) * 6) + 1;
                         return Math.min(Math.max(scaled, 1), 7);
                     };
                     return {
-                        // server expects 'honesty' key (not honestyHumility)
                         honesty: to7(dims.honestyHumility.score, dims.honestyHumility.max),
                         emotionality: to7(dims.emotionality.score, dims.emotionality.max),
                         extraversion: to7(dims.extraversion.score, dims.extraversion.max),
@@ -811,11 +1067,9 @@
                     return;
                 }
 
-                // success
                 this.resultsSaved = true;
                 const notification = document.createElement('div');
-                notification.className = 'fixed bottom-5 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-xl z-50';
-                notification.style.animation = 'slideIn 0.3s ease-out';
+                notification.className = 'notification-toast';
                 notification.innerHTML = `
                     <div class="flex items-center gap-3">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -830,8 +1084,8 @@
                 document.body.appendChild(notification);
 
                 setTimeout(() => {
-                    notification.style.animation = 'slideOut 0.3s ease-in';
-                    setTimeout(() => notification.remove(), 300);
+                    notification.style.animation = 'slideOutRight 0.5s ease';
+                    setTimeout(() => notification.remove(), 500);
                 }, 3000);
             } catch (error) {
                 console.error('Error saving results:', error);
@@ -877,37 +1131,5 @@
         }
     };
 }
-
-// Add CSS animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(100px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    @keyframes slideOut {
-        from {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        to {
-            opacity: 0;
-            transform: translateX(100px);
-        }
-    }
-`;
-document.head.appendChild(style);
-    </script>
-    <script>
-        // If a start query parameter is present (e.g. ?start=petType) make it available for the Alpine app
-        // This small helper ensures the quizApp can pick it up via URLSearchParams when initializing
-        // (No-op here; the main quizApp reads URLSearchParams directly.)
     </script>
 @endsection
