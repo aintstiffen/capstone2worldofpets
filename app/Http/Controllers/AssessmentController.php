@@ -285,7 +285,29 @@ class AssessmentController extends Controller
      */
     private function formatPetData($pet)
     {
-        $mappedSize = $this->determineSize($pet);
+        // Prefer the database size field when available and normalize it to
+        // one of: 'small', 'medium', 'large'. Fall back to the heuristic
+        // determineSize() only if the DB value is missing or unrecognized.
+        $dbSizeRaw = trim(strtolower($pet->size ?? ''));
+        $sizeMap = [
+            'toy' => 'small',
+            'small' => 'small',
+            'small to medium' => 'small',
+            'medium' => 'medium',
+            'medium to large' => 'large',
+            'large' => 'large',
+            'extra large' => 'large',
+            'giant' => 'large',
+        ];
+
+        if ($dbSizeRaw !== '' && isset($sizeMap[$dbSizeRaw])) {
+            $mappedSize = $sizeMap[$dbSizeRaw];
+            // Helpful debug log during development to confirm DB-driven sizes
+            Log::debug('AssessmentController: using DB size for pet', ['id' => $pet->id, 'name' => $pet->name, 'db_size' => $pet->size, 'mapped' => $mappedSize]);
+        } else {
+            $mappedSize = $this->determineSize($pet);
+        }
+
         $hairLength = $this->determineHairLength($pet);
         $traits = array_slice(explode(', ', $pet->temperament), 0, 3);
         $personalityMatch = $this->extractPersonalityMatches($pet);
@@ -310,6 +332,7 @@ class AssessmentController extends Controller
             'slug' => $pet->slug,
             'name' => $pet->name,
             'size' => $mappedSize,
+            'db_size' => $pet->size ?? null,
             'hairLength' => $hairLength,
             'image' => $pet->image_url ?: '/placeholder.svg?height=300&width=400',
             'description' => $pet->description,
@@ -396,6 +419,11 @@ class AssessmentController extends Controller
                 }
                 if (!$petInfo && !empty($breed['slug'])) {
                     $petInfo = Pet::where('slug', $breed['slug'])->first();
+                }
+
+                // Fallback: older saved results may not include id/slug — try matching by name
+                if (!$petInfo && !empty($breed['name'])) {
+                    $petInfo = Pet::whereRaw('LOWER(name) = ?', [strtolower($breed['name'])])->first();
                 }
 
                 if ($petInfo) {
