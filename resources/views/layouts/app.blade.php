@@ -28,14 +28,18 @@
         <script src="{{ asset('js/mobile-interactions.js') }}"></script>
         <script src="{{ asset('js/navigation.js') }}"></script>
         
-        @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/animations.css') }}">
+    <script src="{{ asset('js/animations.js') }}" defer></script>
+    @stack('styles')
     </head>
 
     <body class="font-sans antialiased bg-[var(--color-background)] text-[var(--color-foreground)] paw-pattern">
 
         {{-- Main Content --}}
         @include('navs.navs')
-        @yield('content')
+        <main class="animated-fade-in">
+            @yield('content')
+        </main>
         @include('footer.footer')
         
         @stack('scripts')
