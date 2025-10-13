@@ -14,6 +14,9 @@
         transition: opacity 200ms ease, transform 200ms ease;
         pointer-events: none;
         max-width: 220px;
+        max-height: 180px; /* taller for mobile */
+        overflow-y: auto;  /* allow scrolling if needed */
+        font-size: clamp(12px, 1.6vw, 16px);
     }
     .tooltip-content[x-cloak] { display: none; }
     .tooltip-content.show {
@@ -140,8 +143,9 @@
                                 left = Math.max(padding, (w - tooltipW) / 2);
                             }
 
-                            // Clamp tooltip so it never overlaps the bottom edge
-                            const tooltipH = 80; // estimated tooltip height
+                            // Clamp tooltip so it never overlaps the bottom edge (mobile and desktop)
+                            let tooltipH = 180; // allow taller tooltip for mobile
+                            if (w > 600) tooltipH = 80; // desktop: shorter tooltip
                             let top = cy;
                             // Clamp top so tooltip stays inside container
                             top = Math.max(padding, Math.min(top, h - tooltipH - padding));
