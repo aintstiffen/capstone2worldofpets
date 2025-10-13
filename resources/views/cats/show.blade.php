@@ -3,12 +3,45 @@
 @push('styles')
 <style>
     .tooltip-hotspot {
-        transition: all 0.2s ease;
+        transition: transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms ease, opacity 220ms ease;
+        will-change: transform, box-shadow, opacity;
     }
+    /* Allow floating tooltip pop-ups with smooth transitions. Controlled via Alpine x-show/x-transition. */
     .tooltip-content {
-        /* Floating tooltips removed — use the bottom info panel for all viewports */
-        display: none !important;
+        display: block; /* visibility controlled by Alpine x-show */
+        opacity: 0;
+        transform: translateY(6px) scale(.98);
+        transition: opacity 200ms ease, transform 200ms ease;
+        pointer-events: none;
     }
+    .tooltip-content[x-cloak] { display: none; }
+    .tooltip-content.show {
+        opacity: 1 !important;
+        transform: none !important;
+        pointer-events: auto;
+    }
+
+    /* Hover / tap visual affordances for hotspots */
+    .tooltip-hotspot:hover, .tooltip-hotspot:focus {
+        transform: scale(1.06);
+        box-shadow: 0 10px 20px rgba(17,24,39,0.12);
+        opacity: 1;
+    }
+    .tooltip-hotspot:active {
+        transform: scale(0.98);
+    }
+
+    /* Small ring pulse using pseudo-element (subtle) */
+    .tooltip-hotspot::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 9999px;
+        box-shadow: 0 0 0 0 rgba(59,130,246,0.12);
+        transition: box-shadow 420ms ease;
+        pointer-events: none;
+    }
+    .tooltip-hotspot:hover::after { box-shadow: 0 0 18px 6px rgba(59,130,246,0.06); }
     /* Responsive hotspot sizing so the interactive circles scale with viewport */
     .hotspot-wrapper .tooltip-hotspot {
         width: clamp(32px, 6vw, 64px) !important;
