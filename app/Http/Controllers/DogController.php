@@ -19,6 +19,12 @@ class DogController extends Controller
     public function show($slug)
     {
         $pet = Pet::where('slug', $slug)->where('category', 'dog')->firstOrFail();
+
+        // Ensure gallery is an array so the view can safely iterate/count it
+        if (is_null($pet->gallery)) {
+            $pet->gallery = [];
+        }
+
         return view('dogs.show', compact('pet'));
     }
 }
