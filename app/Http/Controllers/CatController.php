@@ -19,6 +19,10 @@ class CatController extends Controller
     public function show($slug)
     {
         $pet = Pet::where('slug', $slug)->where('category', 'cat')->firstOrFail();
+        // Eloquent already casts gallery to array via $casts in Pet model
+        if (is_null($pet->gallery)) {
+            $pet->gallery = [];
+        }
         return view('cats.show', compact('pet'));
     }
 }

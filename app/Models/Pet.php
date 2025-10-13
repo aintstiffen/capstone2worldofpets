@@ -28,12 +28,14 @@ class Pet extends Model
         'hotspots',
         'fun_facts',
         'gif_url',
+        'gallery',
     ];
 
     protected $casts = [
         'colors' => 'array',
         'hotspots' => 'array',
         'fun_facts' => 'array',
+        'gallery' => 'array',
     ];
 
     // Accessor for image URL - supports direct URLs or legacy stored paths

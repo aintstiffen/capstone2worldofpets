@@ -93,7 +93,19 @@ class PetResource extends Resource
 
                 Forms\Components\TagsInput::make('colors'),
 
-                // Replace upload with external image URL resolved from breed API
+                // Gallery image URLs for carousel (up to 4 images)
+                Forms\Components\Repeater::make('gallery')
+                    ->label('Gallery Images (up to 4)')
+                    ->schema([
+                        Forms\Components\TextInput::make('url')
+                            ->label('Image URL')
+                            ->url()
+                            ->required()
+                            ->helperText('Paste a direct image URL from TheCatAPI or elsewhere.')
+                    ])
+                    ->maxItems(4)
+                    ->columns(1)
+                    ->helperText('These images will appear in the breed carousel. You can add up to 4.'),
 
                 Forms\Components\Select::make('breed_lookup')
                     ->label('Breed (search from API)')
