@@ -93,9 +93,9 @@ class PetResource extends Resource
 
                 Forms\Components\TagsInput::make('colors'),
 
-                // Gallery image URLs for carousel (up to 4 images)
+                // Gallery image URLs for carousel (up to 10 images)
                 Forms\Components\Repeater::make('gallery')
-                    ->label('Gallery Images (up to 4)')
+                    ->label('Gallery Images (up to 10)')
                     ->schema([
                         Forms\Components\TextInput::make('url')
                             ->label('Image URL')
@@ -103,9 +103,9 @@ class PetResource extends Resource
                             ->required()
                             ->helperText('Paste a direct image URL from TheCatAPI or elsewhere.')
                     ])
-                    ->maxItems(4)
+                    ->maxItems(10)
                     ->columns(1)
-                    ->helperText('These images will appear in the breed carousel. You can add up to 4.'),
+                    ->helperText('These images will appear in the breed carousel. You can add up to 10.'),
 
                 Forms\Components\Select::make('breed_lookup')
                     ->label('Breed (search from API)')
