@@ -13,6 +13,7 @@
         transform: translateY(6px) scale(.98);
         transition: opacity 200ms ease, transform 200ms ease;
         pointer-events: none;
+        max-width: 220px;
     }
     .tooltip-content[x-cloak] { display: none; }
     .tooltip-content.show {
@@ -42,6 +43,19 @@
         pointer-events: none;
     }
     .tooltip-hotspot:hover::after { box-shadow: 0 0 18px 6px rgba(59,130,246,0.06); }
+    /* Tooltip caret */
+    .tooltip-arrow {
+        width: 12px;
+        height: 12px;
+        background: white;
+        position: absolute;
+        transform: rotate(45deg);
+        box-shadow: 0 6px 10px rgba(0,0,0,0.06);
+    }
+    .tooltip-arrow.top { bottom: -6px; left: 50%; transform: translateX(-50%) rotate(45deg); }
+    .tooltip-arrow.bottom { top: -6px; left: 50%; transform: translateX(-50%) rotate(45deg); }
+    .tooltip-arrow.left { right: -6px; top: 50%; transform: translateY(-50%) rotate(45deg); }
+    .tooltip-arrow.right { left: -6px; top: 50%; transform: translateY(-50%) rotate(45deg); }
     /* Responsive hotspot sizing so the interactive circles scale with viewport */
     .hotspot-wrapper .tooltip-hotspot {
         width: clamp(32px, 6vw, 64px) !important;
@@ -100,12 +114,42 @@
                         activeTooltip: null, 
                         activeFact: '',
                         showAllHotspots: true,
-                        // Activate a hotspot — show the bottom info panel (no floating tooltip)
+                        tooltipStyle: {},
+                        tooltipPlacement: null,
+                        // Activate a hotspot — show the bottom info panel or a floating tooltip
                         setActive(feature, hotspotEl) {
                             this.activeTooltip = feature;
                             this.activeFact = hotspotEl.dataset.fact || '';
+
+                            const container = this.$refs.imageContainer;
+                            if (!container) return;
+                            const containerRect = container.getBoundingClientRect();
+                            const elRect = hotspotEl.getBoundingClientRect();
+                            const cx = (elRect.left - containerRect.left) + (elRect.width / 2);
+                            const cy = (elRect.top - containerRect.top) + (elRect.height / 2);
+                            const w = containerRect.width;
+                            const h = containerRect.height;
+
+                            // Force tooltip into the right-center of the image container so it's always visible.
+                            const padding = 12;
+                            const tooltipW = 220;
+                            let left;
+                            if (w > (tooltipW + padding * 2)) {
+                                left = w - tooltipW - padding; // align inside right edge
+                            } else {
+                                left = Math.max(padding, (w - tooltipW) / 2);
+                            }
+
+                            // Clamp tooltip so it never overlaps the bottom edge
+                            const tooltipH = 80; // estimated tooltip height
+                            let top = cy;
+                            // Clamp top so tooltip stays inside container
+                            top = Math.max(padding, Math.min(top, h - tooltipH - padding));
+
+                            this.tooltipStyle = { left: left + 'px', top: top + 'px', transform: 'translateY(0)' };
+                            this.tooltipPlacement = 'left';
                         },
-                        clearActive() { this.activeTooltip = null; this.activeFact = ''; }
+                        clearActive() { this.activeTooltip = null; this.activeFact = ''; this.tooltipStyle = {}; this.tooltipPlacement = null; }
                     }">
                         <!-- Keep image at its natural aspect ratio; tooltips are kept inside the container -->
                         <div class="rounded-lg overflow-hidden bg-[var(--color-muted)] relative inline-block w-full tooltip-image-container" x-ref="imageContainer">
@@ -203,38 +247,32 @@
 
                                     <!-- {{ $feature }} Tooltip -->
                                     <div class="absolute hotspot-wrapper"
-                                         style="top: {{ $hotspot['position_y'] }}%; left: {{ $hotspot['position_x'] }}%; transform: translate(-50%, -50%);"
-                                         @mouseenter="setActive('{{ $feature }}', $el)"
-                                         @mouseleave="clearActive()"
-                                         @click="setActive('{{ $feature }}', $el)"
-                                         data-fact="{{ e($fact) }}"
-                                         data-x="{{ $hotspot['position_x'] }}"
-                                         data-y="{{ $hotspot['position_y'] }}">
-                                        <div class="cursor-pointer rounded-full border-2 tooltip-hotspot flex items-center justify-center backdrop-blur-sm text-pink-700 pulse-animation"
-                                             style="width: {{ max(40, $hotspot['width']) }}px; height: {{ max(40, $hotspot['height']) }}px;">
-                                            <span class="text-xs font-semibold select-none">{{ ucfirst($feature) }}</span>
+                                             style="top: {{ $hotspot['position_y'] }}%; left: {{ $hotspot['position_x'] }}%; transform: translate(-50%, -50%);"
+                                             @mouseenter="setActive('{{ $feature }}', $el)"
+                                             @mouseleave="clearActive()"
+                                             @click="setActive('{{ $feature }}', $el)"
+                                             data-fact="{{ e($fact) }}"
+                                             data-x="{{ $hotspot['position_x'] }}"
+                                             data-y="{{ $hotspot['position_y'] }}">
+                                            <div class="cursor-pointer rounded-full border-2 tooltip-hotspot flex items-center justify-center backdrop-blur-sm text-pink-700 pulse-animation"
+                                                 style="width: {{ max(40, $hotspot['width']) }}px; height: {{ max(40, $hotspot['height']) }}px;">
+                                                <span class="text-xs font-semibold select-none">{{ ucfirst($feature) }}</span>
+                                            </div>
                                         </div>
-
-                                        <div x-show="activeTooltip === '{{ $feature }}'"
-                                             x-transition:enter="transition ease-out duration-200"
-                                             x-transition:enter-start="opacity-0 scale-95"
-                                             x-transition:enter-end="opacity-100 scale-100"
-                                             class="absolute z-50 p-3 bg-white rounded-lg shadow-lg tooltip-content w-40 sm:w-48 text-sm"
-                                             @if($hotspot['position_x'] < 30)
-                                                 style="left: 100%; top: 0; margin-left: 12px;"
-                                             @elseif($hotspot['position_x'] > 70)
-                                                 style="right: 100%; top: 0; margin-right: 12px;"
-                                             @elseif($hotspot['position_y'] < 30)
-                                                 style="bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 12px;"
-                                             @else
-                                                 style="top: 100%; left: 50%; transform: translateX(-50%); margin-top: 12px;"
-                                             @endif
-                                        >
-                                            <strong class="block mb-1 text-{{ $color }}-600">{{ $pet->name }}'s {{ ucfirst($feature) }}</strong>
-                                            <p>{{ $fact }}</p>
-                                        </div>
-                                    </div>
                                 @endforeach
+
+                                    {{-- Shared tooltip element inside the image container so it never leaves the bounds --}}
+                                    <div x-show="activeTooltip" x-cloak
+                                         x-transition:enter="transition ease-out duration-200"
+                                         x-transition:enter-start="opacity-0 translate-y-1"
+                                         x-transition:enter-end="opacity-100 translate-y-0"
+                                         :style="tooltipStyle"
+                                         :class="{'tooltip-content': true, 'show': activeTooltip !== null}"
+                                         class="absolute z-50 p-3 bg-white rounded-lg shadow-lg w-40 sm:w-72 text-sm pointer-events-auto">
+                                        <div :class="tooltipPlacement ? 'tooltip-arrow ' + tooltipPlacement : 'tooltip-arrow left'" aria-hidden="true"></div>
+                                        <strong class="block mb-1 text-[--color-primary]" x-text="(activeTooltip ? ('{{ $pet->name }}\'s ' + activeTooltip) : '')"></strong>
+                                        <p x-text="activeFact"></p>
+                                    </div>
 
                                 <!-- Small hint badge (kept) -->
                                 <div class="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded"
