@@ -101,12 +101,202 @@
         font-size: 2rem;
         transform: rotate(-15deg);
     }
+
+    /* Gallery Carousel Styles */
+    .gallery-carousel {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .gallery-track {
+        display: flex;
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform;
+    }
+    
+    .gallery-slide {
+        flex: 0 0 100%;
+        min-width: 0;
+    }
+    
+    @media (min-width: 640px) {
+        .gallery-slide {
+            flex: 0 0 50%;
+        }
+    }
+    
+    @media (min-width: 768px) {
+        .gallery-slide {
+            flex: 0 0 33.333333%;
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        .gallery-slide {
+            flex: 0 0 25%;
+        }
+    }
+    
+    .gallery-image {
+        aspect-ratio: 4/3;
+        object-fit: cover;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .gallery-image:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.95);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+    }
+    
+    .carousel-btn:hover {
+        background: white;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        transform: translateY(-50%) scale(1.1);
+    }
+    
+    .carousel-btn:active {
+        transform: translateY(-50%) scale(0.95);
+    }
+    
+    .carousel-btn.prev {
+        left: 10px;
+    }
+    
+    .carousel-btn.next {
+        right: 10px;
+    }
+    
+    .carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 16px;
+    }
+    
+    .carousel-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #d1d5db;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        padding: 0;
+    }
+    
+    .carousel-dot:hover {
+        background: #9ca3af;
+        transform: scale(1.2);
+    }
+    
+    .carousel-dot.active {
+        background: var(--color-primary, #3b82f6);
+        width: 24px;
+        border-radius: 5px;
+    }
+
+/* Lightbox Modal */
+    .lightbox-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .lightbox-image {
+        max-width: 90vw;
+        max-height: 80vh;
+        width: auto;
+        height: auto;
+        object-fit: contain !important;
+        border-radius: 8px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    }
+    
+    .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: white;
+        border: none;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .lightbox-close:hover {
+        transform: scale(1.1);
+        background: #f3f4f6;
+    }
 </style>
 @endpush
 
 @section('content')
 
-<main class="flex-1" x-data="{ showGifModal: false }">
+<main class="flex-1" x-data="{ 
+    showGifModal: false,
+    lightboxOpen: false,
+    lightboxImage: '',
+    currentSlide: 0,
+    totalSlides: {{ count($pet->gallery ?? []) }},
+    get maxSlideIndex() {
+        if (window.innerWidth >= 1024) return Math.max(0, this.totalSlides - 4);
+        if (window.innerWidth >= 768) return Math.max(0, this.totalSlides - 3);
+        if (window.innerWidth >= 640) return Math.max(0, this.totalSlides - 2);
+        return Math.max(0, this.totalSlides - 1);
+    },
+    nextSlide() {
+        if (this.currentSlide < this.maxSlideIndex) {
+            this.currentSlide++;
+        }
+    },
+    prevSlide() {
+        if (this.currentSlide > 0) {
+            this.currentSlide--;
+        }
+    },
+    goToSlide(index) {
+        this.currentSlide = Math.min(index, this.maxSlideIndex);
+    },
+    openLightbox(url) {
+        this.lightboxImage = url;
+        this.lightboxOpen = true;
+        document.body.style.overflow = 'hidden';
+    },
+    closeLightbox() {
+        this.lightboxOpen = false;
+        document.body.style.overflow = '';
+    }
+}" @resize.window="currentSlide = Math.min(currentSlide, maxSlideIndex)">
     <div class="container mx-auto px-4 py-6 md:px-6 md:py-12">
 
         <div class="grid gap-6 lg:grid-cols-2 lg:gap-12">
@@ -373,6 +563,72 @@
                 </div>
             </div>
         </div>
+
+        {{-- Image Gallery Carousel --}}
+        @if(!empty($pet->gallery) && count($pet->gallery) > 0)
+            <div class="mt-12">
+                <h2 class="text-2xl font-bold mb-6">{{ $pet->name }} Gallery</h2>
+                
+                <div class="relative gallery-carousel">
+                    {{-- Previous Button --}}
+                    <button 
+                        @click="prevSlide()"
+                        :disabled="currentSlide === 0"
+                        :class="{ 'opacity-50 cursor-not-allowed': currentSlide === 0 }"
+                        class="carousel-btn prev"
+                        aria-label="Previous images">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    {{-- Gallery Track --}}
+                    <div class="overflow-hidden rounded-lg">
+                        <div 
+                            class="gallery-track"
+                            :style="{ transform: `translateX(-${currentSlide * (100 / totalSlides)}%)` }">
+                            @foreach($pet->gallery as $index => $galleryItem)
+                                <div class="gallery-slide px-2">
+                                    <img 
+                                        src="{{ $galleryItem['url'] ?? $galleryItem }}"
+                                        alt="{{ $pet->name }} - Image {{ $index + 1 }}"
+                                        class="gallery-image w-full rounded-lg"
+                                        @click="openLightbox('{{ $galleryItem['url'] ?? $galleryItem }}')"
+                                        loading="lazy">
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Next Button --}}
+                    <button 
+                        @click="nextSlide()"
+                        :disabled="currentSlide >= maxSlideIndex"
+                        :class="{ 'opacity-50 cursor-not-allowed': currentSlide >= maxSlideIndex }"
+                        class="carousel-btn next"
+                        aria-label="Next images">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Carousel Dots --}}
+                <div class="carousel-dots">
+                    @foreach($pet->gallery as $index => $galleryItem)
+                        <button 
+                            @click="goToSlide({{ $index }})"
+                            :class="{ 'active': currentSlide === {{ $index }} }"
+                            class="carousel-dot"
+                            aria-label="Go to image {{ $index + 1 }}">
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        {{-- Lightbox Modal for Gallery --}}
+        {{-- Preview image removed as requested --}}
 
         {{-- GIF Modal --}}
         @if($pet->gif_url)
