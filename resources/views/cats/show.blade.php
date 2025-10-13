@@ -245,7 +245,7 @@
                                  :class="{'tooltip-content': true, 'show': activeTooltip !== null}"
                                  class="absolute z-50 p-3 bg-white rounded-lg shadow-lg w-40 sm:w-72 text-sm pointer-events-auto">
                                 <div :class="tooltipPlacement ? 'tooltip-arrow ' + tooltipPlacement : 'tooltip-arrow left'" aria-hidden="true"></div>
-                                <strong class="block mb-1 text-[--color-primary]" x-text="(activeTooltip ? ('{{ $pet->name }}\'s ' + activeTooltip) : '')"></strong>
+                                    <strong class="block mb-1 text-[--color-primary]" x-text="(activeTooltip ? ('{{ $pet->name }}\'s ' + activeTooltip) : '')"></strong>
                                 <p x-text="activeFact"></p>
                             </div>
 
