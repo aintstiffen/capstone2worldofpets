@@ -12,18 +12,30 @@
         opacity: 0;
         transform: translateY(6px) scale(.98);
         transition: opacity 200ms ease, transform 200ms ease;
-        pointer-events: none;
-        max-width: 220px;
-        max-height: 180px; /* taller for mobile */
+        pointer-events: none; /* disabled by default; enabled when .show is added */
+        max-width: 320px;
+        max-height: 220px; /* allow taller tooltip so content can scroll on mobile */
         overflow-y: auto;  /* allow scrolling if needed */
+        -webkit-overflow-scrolling: touch;
         font-size: clamp(12px, 1.6vw, 16px);
     }
     .tooltip-content[x-cloak] { display: none; }
     .tooltip-content.show {
         opacity: 1 !important;
         transform: none !important;
-        /* Don't capture pointer events: prevents the tooltip from sitting over hotspots and causing rapid mouseleave/enter flicker */
-        pointer-events: none;
+        /* Enable interaction so users can scroll the tooltip on touch devices and hover it on desktop */
+        pointer-events: auto;
+    }
+
+    /* Custom simple scrollbar styling for modern browsers */
+    .tooltip-content::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    .tooltip-content::-webkit-scrollbar-track { background: transparent; }
+    .tooltip-content::-webkit-scrollbar-thumb {
+        background: rgba(0,0,0,0.12);
+        border-radius: 999px;
     }
 
     /* Hover / tap visual affordances for hotspots */
@@ -313,6 +325,7 @@
                     showAllHotspots: true,
                     tooltipStyle: {},
                     tooltipPlacement: null,
+                    tooltipHovered: false,
                     setActive(feature, hotspotEl) {
                         this.activeTooltip = feature;
                         // read fact from the element dataset for accessibility
@@ -353,7 +366,17 @@
                         this.tooltipStyle = { left: left + 'px', top: top + 'px', transform: 'translateY(0)' };
                         this.tooltipPlacement = 'left';
                     },
-                    clearActive() { this.activeTooltip = null; this.activeFact = ''; this.tooltipStyle = {}; this.tooltipPlacement = null; }
+                    clearActive() {
+                        // small debounce so that entering the tooltip keeps it open
+                        setTimeout(() => {
+                            if (!this.tooltipHovered) {
+                                this.activeTooltip = null;
+                                this.activeFact = '';
+                                this.tooltipStyle = {};
+                                this.tooltipPlacement = null;
+                            }
+                        }, 120);
+                    }
                 }">
                     <div class="rounded-lg overflow-hidden bg-[var(--color-muted)] relative inline-block w-full tooltip-image-container" x-ref="imageContainer">
                         <img src="{{ $pet->image ? $pet->image_url : '/placeholder.svg?height=600&width=600' }}"
@@ -436,16 +459,20 @@
                             @endforeach
 
                             {{-- Shared tooltip element inside the image container so it never leaves the bounds --}}
-                            <div x-show="activeTooltip" x-cloak
-                                 x-transition:enter="transition ease-out duration-200"
-                                 x-transition:enter-start="opacity-0 translate-y-1"
-                                 x-transition:enter-end="opacity-100 translate-y-0"
-                                 :style="tooltipStyle"
-                                 :class="{'tooltip-content': true, 'show': activeTooltip !== null}"
-                                 class="absolute z-50 p-3 bg-white rounded-lg shadow-lg w-40 sm:w-72 text-sm pointer-events-auto">
+                       <div x-show="activeTooltip" x-cloak
+                           @mouseenter="tooltipHovered = true"
+                           @mouseleave="tooltipHovered = false; clearActive()"
+                           x-transition:enter="transition ease-out duration-200"
+                           x-transition:enter-start="opacity-0 translate-y-1"
+                           x-transition:enter-end="opacity-100 translate-y-0"
+                           :style="tooltipStyle"
+                           :class="{'tooltip-content': true, 'show': activeTooltip !== null}"
+                           class="absolute z-50 p-0 bg-white rounded-lg shadow-lg w-40 sm:w-72 text-sm pointer-events-auto">
                                 <div :class="tooltipPlacement ? 'tooltip-arrow ' + tooltipPlacement : 'tooltip-arrow left'" aria-hidden="true"></div>
+                                <div class="p-3 max-h-[200px] overflow-y-auto">
                                     <strong class="block mb-1 text-[--color-primary]" x-text="(activeTooltip ? ('{{ $pet->name }}\'s ' + activeTooltip) : '')"></strong>
-                                <p x-text="activeFact"></p>
+                                    <p x-text="activeFact"></p>
+                                </div>
                             </div>
 
                             <div class="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded"
