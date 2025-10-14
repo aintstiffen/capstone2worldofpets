@@ -485,9 +485,9 @@
 
             {{-- Right: Tabs & Details --}}
             <div class="space-y-6">
-                        <div 
-                            class="gallery-track"
-                            :style="{ transform: `translateX(-${currentSlide * (100 / visibleSlides)}%)` }">
+                    <div>
+                        <h1 class="text-3xl font-bold">{{ $pet->name }}</h1>
+                        <p class="text-[--color-muted-foreground]">{{ $pet->temperament ?? 'Friendly, affectionate, playful' }}</p>
 
                     <div class="mt-3 flex items-center gap-3">
                         <a href="{{ route('cats') }}" class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white text-sm font-medium rounded-md hover:bg-[color-mix(in_oklab,var(--color-primary)_90%,black)] transition">
