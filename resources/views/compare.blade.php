@@ -63,7 +63,7 @@
                                 class="appearance-none w-full px-4 py-4 pr-12 text-base border-2 border-[var(--color-border)] rounded-xl shadow-sm bg-white hover:border-[var(--color-primary)] focus:outline-none focus:ring-4 focus:ring-[color-mix(in_oklab,var(--color-primary)_20%,white)] focus:border-[var(--color-primary)] transition-all duration-200 text-[var(--color-foreground)] font-medium cursor-pointer">
                                 <option value="" class="text-[var(--color-muted-foreground)]">🔎 Choose your first breed...</option>
                                 <template x-for="breed in breeds" :key="breed.id">
-                                    <option :value="breed.id" x-text="breed.name" class="py-2 text-[var(--color-foreground)]"></option>
+                                    <option :value="breed.id" x-text="breed.name" class="py-2 text-[var(--color-foreground]"></option>
                                 </template>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
@@ -88,7 +88,7 @@
                                 class="appearance-none w-full px-4 py-4 pr-12 text-base border-2 border-[var(--color-border)] rounded-xl shadow-sm bg-white hover:border-[var(--color-primary)] focus:outline-none focus:ring-4 focus:ring-[color-mix(in_oklab,var(--color-primary)_20%,white)] focus:border-[var(--color-primary)] transition-all duration-200 text-[var(--color-foreground)] font-medium cursor-pointer">
                                 <option value="" class="text-[var(--color-muted-foreground)]">🔎 Choose your second breed...</option>
                                 <template x-for="breed in breeds" :key="breed.id">
-                                    <option :value="breed.id" x-text="breed.name" class="py-2 text-[var(--color-foreground)]"></option>
+                                    <option :value="breed.id" x-text="breed.name" class="py-2 text-[var(--color-foreground]"></option>
                                 </template>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
@@ -183,53 +183,62 @@
                             <div class="mt-5 p-6">
                                 <h3 class="text-2xl font-bold text-gray-800 mb-2" x-text="comparison.breed1.info?.name || 'Unknown'"></h3>
                                 <div class="space-y-3 text-sm">
-                                    <div class="flex flex-col">
+                                    <div class="flex flex-col mb-2">
                                         <span class="font-semibold text-gray-700">Temperament:</span>
                                         <span class="text-gray-600" x-text="comparison.breed1.info?.temperament || 'Not specified'"></span>
+                                        <span class="text-xs text-gray-400 mt-1">Typical personality traits and behavior of this breed.</span>
                                     </div>
-                                    <div class="flex justify-between">
+                                    <div class="flex justify-between mb-2">
                                         <span class="font-semibold text-gray-700">Weight:</span>
                                         <span class="text-gray-600" x-text="(comparison.breed1.info?.weight?.metric || 'Not specified') + (comparison.breed1.info?.weight?.metric ? ' kg' : '')"></span>
                                     </div>
-                                    <div class="flex justify-between">
+                                    <span class="text-xs text-gray-400 block mb-2">Average adult weight range.</span>
+                                    <div class="flex justify-between mb-2">
                                         <span class="font-semibold text-gray-700">Life Span:</span>
                                         <span class="text-gray-600" x-text="(comparison.breed1.info?.life_span || 'Not specified') + (comparison.breed1.info?.life_span ? ' years' : '')"></span>
                                     </div>
+                                    <span class="text-xs text-gray-400 block mb-2">Typical expected lifespan for this breed.</span>
                                     <!-- Cat-specific fields -->
                                     <template x-if="animalType === 'cat'">
                                         <div class="space-y-3 border-t pt-3">
-                                            <div class="flex justify-between">
+                                            <div class="flex justify-between mb-2">
                                                 <span class="font-semibold text-gray-700">Origin:</span>
                                                 <span class="text-gray-600" x-text="comparison.breed1.info?.origin || 'Not specified'"></span>
                                             </div>
-                                            <div class="flex justify-between">
+                                            <span class="text-xs text-gray-400 block mb-2">Country or region where the breed originated.</span>
+                                            <div class="flex justify-between mb-2">
                                                 <span class="font-semibold text-gray-700">Intelligence:</span>
                                                 <span class="text-gray-600" x-text="comparison.breed1.info?.intelligence ? comparison.breed1.info.intelligence + '/5' : 'Not specified'"></span>
                                             </div>
+                                            <span class="text-xs text-gray-400 block mb-2">How quickly the breed learns and solves problems (rated out of 5).</span>
                                             <template x-if="comparison.breed1.info?.energy_level">
-                                                <div class="flex justify-between">
+                                                <div class="flex justify-between mb-2">
                                                     <span class="font-semibold text-gray-700">Energy Level:</span>
                                                     <span class="text-gray-600" x-text="comparison.breed1.info.energy_level + '/5'"></span>
                                                 </div>
+                                                <span class="text-xs text-gray-400 block mb-2">How active and playful the breed is (rated out of 5).</span>
                                             </template>
                                         </div>
                                     </template>
                                     <!-- Dog-specific fields -->
                                     <template x-if="animalType === 'dog'">
                                         <div class="space-y-3 border-t pt-3">
-                                            <div class="flex flex-col">
+                                            <div class="flex flex-col mb-2">
                                                 <span class="font-semibold text-gray-700">Breed Group:</span>
                                                 <span class="text-gray-600" x-text="comparison.breed1.info?.breed_group || 'Not specified'"></span>
+                                                <span class="text-xs text-gray-400 mt-1">Category based on the breed's original purpose (e.g., Herding, Sporting).</span>
                                             </div>
-                                            <div class="flex flex-col">
+                                            <div class="flex flex-col mb-2">
                                                 <span class="font-semibold text-gray-700">Bred For:</span>
                                                 <span class="text-gray-600" x-text="comparison.breed1.info?.bred_for || 'Not specified'"></span>
+                                                <span class="text-xs text-gray-400 mt-1">The original job or function this breed was developed for.</span>
                                             </div>
                                             <template x-if="comparison.breed1.info?.height">
-                                                <div class="flex justify-between">
+                                                <div class="flex justify-between mb-2">
                                                     <span class="font-semibold text-gray-700">Height:</span>
                                                     <span class="text-gray-600" x-text="(comparison.breed1.info.height.metric || 'Not specified') + (comparison.breed1.info.height.metric ? ' cm' : '')"></span>
                                                 </div>
+                                                <span class="text-xs text-gray-400 block mb-2">Average adult height for this breed.</span>
                                             </template>
                                         </div>
                                     </template>
@@ -258,53 +267,62 @@
                             <div class="mt-5 p-6">
                                 <h3 class="text-2xl font-bold text-gray-800 mb-2" x-text="comparison.breed2.info?.name || 'Unknown'"></h3>
                                 <div class="space-y-3 text-sm">
-                                    <div class="flex flex-col">
+                                    <div class="flex flex-col mb-2">
                                         <span class="font-semibold text-gray-700">Temperament:</span>
                                         <span class="text-gray-600" x-text="comparison.breed2.info?.temperament || 'Not specified'"></span>
+                                        <span class="text-xs text-gray-400 mt-1">Typical personality traits and behavior of this breed.</span>
                                     </div>
-                                    <div class="flex justify-between">
+                                    <div class="flex justify-between mb-2">
                                         <span class="font-semibold text-gray-700">Weight:</span>
                                         <span class="text-gray-600" x-text="(comparison.breed2.info?.weight?.metric || 'Not specified') + (comparison.breed2.info?.weight?.metric ? ' kg' : '')"></span>
                                     </div>
-                                    <div class="flex justify-between">
+                                    <span class="text-xs text-gray-400 block mb-2">Average adult weight range.</span>
+                                    <div class="flex justify-between mb-2">
                                         <span class="font-semibold text-gray-700">Life Span:</span>
                                         <span class="text-gray-600" x-text="(comparison.breed2.info?.life_span || 'Not specified') + (comparison.breed2.info?.life_span ? ' years' : '')"></span>
                                     </div>
+                                    <span class="text-xs text-gray-400 block mb-2">Typical expected lifespan for this breed.</span>
                                     <!-- Cat-specific fields -->
                                     <template x-if="animalType === 'cat'">
                                         <div class="space-y-3 border-t pt-3">
-                                            <div class="flex justify-between">
+                                            <div class="flex justify-between mb-2">
                                                 <span class="font-semibold text-gray-700">Origin:</span>
                                                 <span class="text-gray-600" x-text="comparison.breed2.info?.origin || 'Not specified'"></span>
                                             </div>
-                                            <div class="flex justify-between">
+                                            <span class="text-xs text-gray-400 block mb-2">Country or region where the breed originated.</span>
+                                            <div class="flex justify-between mb-2">
                                                 <span class="font-semibold text-gray-700">Intelligence:</span>
                                                 <span class="text-gray-600" x-text="comparison.breed2.info?.intelligence ? comparison.breed2.info.intelligence + '/5' : 'Not specified'"></span>
                                             </div>
+                                            <span class="text-xs text-gray-400 block mb-2">How quickly the breed learns and solves problems (rated out of 5).</span>
                                             <template x-if="comparison.breed2.info?.energy_level">
-                                                <div class="flex justify-between">
+                                                <div class="flex justify-between mb-2">
                                                     <span class="font-semibold text-gray-700">Energy Level:</span>
                                                     <span class="text-gray-600" x-text="comparison.breed2.info.energy_level + '/5'"></span>
                                                 </div>
+                                                <span class="text-xs text-gray-400 block mb-2">How active and playful the breed is (rated out of 5).</span>
                                             </template>
                                         </div>
                                     </template>
                                     <!-- Dog-specific fields -->
                                     <template x-if="animalType === 'dog'">
                                         <div class="space-y-3 border-t pt-3">
-                                            <div class="flex flex-col">
+                                            <div class="flex flex-col mb-2">
                                                 <span class="font-semibold text-gray-700">Breed Group:</span>
                                                 <span class="text-gray-600" x-text="comparison.breed2.info?.breed_group || 'Not specified'"></span>
+                                                <span class="text-xs text-gray-400 mt-1">Category based on the breed's original purpose (e.g., Herding, Sporting).</span>
                                             </div>
-                                            <div class="flex flex-col">
+                                            <div class="flex flex-col mb-2">
                                                 <span class="font-semibold text-gray-700">Bred For:</span>
                                                 <span class="text-gray-600" x-text="comparison.breed2.info?.bred_for || 'Not specified'"></span>
+                                                <span class="text-xs text-gray-400 mt-1">The original job or function this breed was developed for.</span>
                                             </div>
                                             <template x-if="comparison.breed2.info?.height">
-                                                <div class="flex justify-between">
+                                                <div class="flex justify-between mb-2">
                                                     <span class="font-semibold text-gray-700">Height:</span>
                                                     <span class="text-gray-600" x-text="(comparison.breed2.info.height.metric || 'Not specified') + (comparison.breed2.info.height.metric ? ' cm' : '')"></span>
                                                 </div>
+                                                <span class="text-xs text-gray-400 block mb-2">Average adult height for this breed.</span>
                                             </template>
                                         </div>
                                     </template>
