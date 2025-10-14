@@ -245,6 +245,38 @@
                                 </div>
                             </div>
                             <span class="paw-icon absolute right-4 top-4">🐾</span>
+
+                            <!-- GIF Button and Modal -->
+                            <div class="mt-4 flex justify-center mb-4">
+                                <button 
+                                    class="compare-btn btn-bounce px-4 py-2 rounded-lg font-semibold"
+                                    @click="showGifModal('breed1')"
+                                    x-show="comparison.breed1"
+                                >
+                                    View Fun GIF
+                                </button>
+                            </div>
+                            <!-- GIF Modal for breed1 -->
+                            <div 
+                                x-show="gifModalVisible && gifModalBreed === 'breed1'" 
+                                style="display: none;" 
+                                class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                            >
+                                <div class="bg-white rounded-lg p-6 shadow-lg max-w-lg w-full relative">
+                                    <button 
+                                        class="image-popup-close absolute top-2 right-2"
+                                        @click="gifModalVisible = false"
+                                    >Close</button>
+                                    <div class="flex flex-col items-center">
+                                        <template x-if="gifUrl">
+                                            <img :src="gifUrl" alt="Fun GIF" class="mb-4 rounded-lg max-h-80">
+                                        </template>
+                                        <template x-if="!gifUrl">
+                                            <div class="text-gray-500">Loading GIF...</div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Second Breed -->
@@ -329,8 +361,39 @@
                                 </div>
                             </div>
                             <span class="paw-icon absolute right-4 top-4">🐾</span>
+
+                            <!-- GIF Button and Modal -->
+                            <div class="mt-4 flex justify-center">
+                                <button 
+                                    class="compare-btn btn-bounce px-4 py-2 rounded-lg font-semibold"
+                                    @click="showGifModal('breed2')"
+                                    x-show="comparison.breed2"
+                                >
+                                    View Fun GIF
+                                </button>
+                            </div>
+                            <!-- GIF Modal for breed2 -->
+                            <div 
+                                x-show="gifModalVisible && gifModalBreed === 'breed2'" 
+                                style="display: none;" 
+                                class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                            >
+                                <div class="bg-white rounded-lg p-6 shadow-lg max-w-lg w-full relative">
+                                    <button 
+                                        class="image-popup-close absolute top-2 right-2"
+                                        @click="gifModalVisible = false"
+                                    >Close</button>
+                                    <div class="flex flex-col items-center">
+                                        <template x-if="gifUrl">
+                                            <img :src="gifUrl" alt="Fun GIF" class="mb-4 rounded-lg max-h-80">
+                                        </template>
+                                        <template x-if="!gifUrl">
+                                            <div class="text-gray-500">Loading GIF...</div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
                     </div>
                     
                     <!-- Reset Button -->
@@ -360,6 +423,9 @@ function compareData() {
         loading: false,
         error: null,
         recentComparisons: [],
+        gifModalVisible: false,
+        gifModalBreed: '',
+        gifUrl: '',
 
         init() {
             // Load recent comparisons into reactive data
@@ -508,6 +574,22 @@ function compareData() {
             const userIdMeta = document.querySelector('meta[name="user-id"]');
             const userId = userIdMeta ? userIdMeta.content : 'guest';
             return `recentComparisons_${userId}`;
+        },
+
+        async showGifModal(breedKey) {
+            this.gifModalVisible = true;
+            this.gifModalBreed = breedKey;
+            this.gifUrl = '';
+            let breedName = this.comparison[breedKey]?.info?.name || '';
+            if (!breedName) return;
+            // Fetch GIF from Tenor API
+            try {
+                let res = await fetch(`https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(breedName)}&key=AIzaSyDt9RwM_CZx4p9wrp72V4hQ24MTvvAzNyU&limit=1`);
+                let data = await res.json();
+                this.gifUrl = data.results?.[0]?.media_formats?.gif?.url || '';
+            } catch (e) {
+                this.gifUrl = '';
+            }
         }
     }
 }
