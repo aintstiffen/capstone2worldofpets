@@ -119,17 +119,17 @@
             <!-- Password -->
             <div>
                 <label for="password" class="block font-medium text-sm text-gray-700 mb-2">Password</label>
-                <input id="password" 
+          <input id="password" 
                        class="block w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-150" 
                        type="password" 
                        name="password" 
                        placeholder="Create a password"
                        required 
                        autocomplete="new-password"
-                       pattern="(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]+"
-                       title="Password must be alphanumeric and contain at least one letter and one number." />
-                <p id="password-help" class="text-xs text-gray-500 mt-2">Password must be alphanumeric and contain at least one letter and one number.</p>
-                <p id="password-error" class="text-red-500 text-sm mt-2 hidden">Password must be alphanumeric and contain at least one letter and one number.</p>
+              minlength="8"
+              title="Password must be at least 8 characters long." />
+          <p id="password-help" class="text-xs text-gray-500 mt-2">Password must be at least 8 characters.</p>
+          <p id="password-error" class="text-red-500 text-sm mt-2 hidden">Password must be at least 8 characters.</p>
                 @error('password')
                     <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                 @enderror
@@ -168,7 +168,7 @@
                 const pwdConfirm = form.querySelector('#password_confirmation');
                 const pwdError = document.getElementById('password-error');
 
-                const alphaNumRegex = /^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]+$/;
+                const minLength = 8;
 
                 function showPwdError(msg){
                     pwdError.textContent = msg;
@@ -182,9 +182,9 @@
                     hidePwdError();
 
                     const value = pwd.value || '';
-                    if (!alphaNumRegex.test(value)){
+                    if (value.length < minLength) {
                         e.preventDefault();
-                        showPwdError('Password must be alphanumeric and contain at least one letter and one number.');
+                        showPwdError(`Password must be at least ${minLength} characters.`);
                         pwd.focus();
                         return false;
                     }
@@ -199,7 +199,7 @@
 
                 // Live feedback
                 pwd.addEventListener('input', function(){
-                    if (alphaNumRegex.test(pwd.value)){
+                    if ((pwd.value || '').length >= minLength){
                         hidePwdError();
                     }
                 });
