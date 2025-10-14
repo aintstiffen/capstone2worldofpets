@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div x-data="{ ...compareData(), showImagePopup: false, popupImage: '', popupName: '' }" @show-image.window="popupImage = $event.detail.url; popupName = $event.detail.name; showImagePopup = true" class="min-h-screen bg-[var(--color-background)] py-8">
+<div x-data="compareData()" class="min-h-screen bg-[var(--color-background)] py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-[var(--color-card)] rounded-lg shadow-sm p-6 border border-[var(--color-border)]">
             <h1 class="text-3xl font-bold text-center mb-8 text-[var(--color-foreground)]">Compare Breeds</h1>
@@ -326,18 +326,9 @@
                 </div>
             </template>
         </div>
-        <!-- Image Popup Modal -->
-        <template x-if="showImagePopup">
-            <div class="image-popup-bg" @click.self="showImagePopup = false">
-                <div class="image-popup-content">
-                    <img :src="popupImage" :alt="popupName">
-                    <div class="mb-2 font-bold text-lg text-gray-800" x-text="popupName"></div>
-                    <button class="image-popup-close" @click="showImagePopup = false">Close</button>
-                </div>
-            </div>
-        </template>
     </div>
-
+</div>
+@endsection
 
 @push('scripts')
 <script>
@@ -627,16 +618,12 @@ function compareData() {
     /* Popup image modal styles */
     .image-popup-bg {
         position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0,0,0,0.45);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        animation: fadeIn 0.4s cubic-bezier(.2,.9,.2,1);
-    }
-    .image-popup-content {
-        background: white;
+        top: 0; left: 0        max-width: 60vw;
+        max-height: 60vh;
+        border-radius: 12px;
+        box-shadow: 0 4px 18px rgba(67,233,123,0.10);
+        margin-bottom: 18px;
+ackground: white;
         border-radius: 18px;
         box-shadow: 0 8px 32px rgba(67,233,123,0.18);
         padding: 24px;
@@ -648,11 +635,16 @@ function compareData() {
         animation: cardIn 0.5s cubic-bezier(.2,.9,.2,1);
     }
     .image-popup-content img {
-        max-width: 60vw;
+        width: auto;
+        height: auto;
+        max-width: 90vw;
+        max-height: 80vh;
+        object-fit:        max-width: 60vw;
         max-height: 60vh;
         border-radius: 12px;
         box-shadow: 0 4px 18px rgba(67,233,123,0.10);
         margin-bottom: 18px;
+: block;
     }
     .image-popup-close {
         background: #ffb6b9;
