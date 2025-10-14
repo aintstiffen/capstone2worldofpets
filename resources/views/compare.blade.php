@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div x-data="compareData()" class="min-h-screen bg-[var(--color-background)] py-8">
+<div x-data="{ ...compareData(), showImagePopup: false, popupImage: '', popupName: '' }" @show-image.window="popupImage = $event.detail.url; popupName = $event.detail.name; showImagePopup = true" class="min-h-screen bg-[var(--color-background)] py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-[var(--color-card)] rounded-lg shadow-sm p-6 border border-[var(--color-border)]">
             <h1 class="text-3xl font-bold text-center mb-8 text-[var(--color-foreground)]">Compare Breeds</h1>
@@ -131,7 +131,7 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <template x-for="recent in getRecentComparisons().slice(0, 6)" :key="recent.id">
-                            <div class="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer" 
+                            <div class="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer recent-card animate-card" 
                                  @click="loadRecentComparison(recent)">
                                 <div class="flex items-center space-x-3 mb-2">
                                     <span class="text-sm font-medium text-gray-600 capitalize" x-text="recent.animalType"></span>
@@ -151,6 +151,7 @@
                                         <p class="text-xs text-gray-700 truncate" x-text="recent.breed2Name"></p>
                                     </div>
                                 </div>
+                                <span class="paw-icon">🐾</span>
                             </div>
                         </template>
                     </div>
@@ -163,13 +164,13 @@
                     <h2 class="text-2xl font-bold text-center mb-8 text-[var(--color-foreground)]">Comparison Results</h2>
                     <div class="grid md:grid-cols-2 gap-8">
                         <!-- First Breed -->
-                        <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
-                            <div class="h-64 bg-gradient-to-br from-gray-100 to-gray-200">
+                        <div class="breed-result-card animate-in group relative">
+                            <div class="overflow-hidden h-64 bg-gradient-to-br from-gray-100 to-gray-200 cursor-pointer" @click="$dispatch('show-image', { url: comparison.breed1.image?.url, name: comparison.breed1.info?.name })">
                                 <template x-if="comparison.breed1.image?.url">
                                     <img 
                                         :src="comparison.breed1.image.url" 
                                         :alt="comparison.breed1.info?.name"
-                                        class="w-full h-full object-cover">
+                                        class="breed-image w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                                 </template>
                                 <template x-if="!comparison.breed1.image?.url">
                                     <div class="w-full h-full flex items-center justify-center text-gray-400">
@@ -179,22 +180,21 @@
                                     </div>
                                 </template>
                             </div>
-                            <div class="p-6 space-y-4">
-                                <h3 class="text-xl font-bold text-[var(--color-foreground)]" x-text="comparison.breed1.info?.name || 'Unknown'"></h3>
+                            <div class="mt-5 p-6">
+                                <h3 class="text-2xl font-bold text-gray-800 mb-2" x-text="comparison.breed1.info?.name || 'Unknown'"></h3>
                                 <div class="space-y-3 text-sm">
                                     <div class="flex flex-col">
-                                        <span class="font-semibold text-[var(--color-foreground)]">Temperament:</span>
-                                        <span class="text-[var(--color-muted-foreground)]" x-text="comparison.breed1.info?.temperament || 'Not specified'"></span>
+                                        <span class="font-semibold text-gray-700">Temperament:</span>
+                                        <span class="text-gray-600" x-text="comparison.breed1.info?.temperament || 'Not specified'"></span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="font-semibold text-[var(--color-foreground)]">Weight:</span>
-                                        <span class="text-[var(--color-muted-foreground)]" x-text="(comparison.breed1.info?.weight?.metric || 'Not specified') + (comparison.breed1.info?.weight?.metric ? ' kg' : '')"></span>
+                                        <span class="font-semibold text-gray-700">Weight:</span>
+                                        <span class="text-gray-600" x-text="(comparison.breed1.info?.weight?.metric || 'Not specified') + (comparison.breed1.info?.weight?.metric ? ' kg' : '')"></span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="font-semibold text-[var(--color-foreground)]">Life Span:</span>
-                                        <span class="text-[var(--color-muted-foreground)]" x-text="(comparison.breed1.info?.life_span || 'Not specified') + (comparison.breed1.info?.life_span ? ' years' : '')"></span>
+                                        <span class="font-semibold text-gray-700">Life Span:</span>
+                                        <span class="text-gray-600" x-text="(comparison.breed1.info?.life_span || 'Not specified') + (comparison.breed1.info?.life_span ? ' years' : '')"></span>
                                     </div>
-                                    
                                     <!-- Cat-specific fields -->
                                     <template x-if="animalType === 'cat'">
                                         <div class="space-y-3 border-t pt-3">
@@ -214,7 +214,6 @@
                                             </template>
                                         </div>
                                     </template>
-                                    
                                     <!-- Dog-specific fields -->
                                     <template x-if="animalType === 'dog'">
                                         <div class="space-y-3 border-t pt-3">
@@ -236,16 +235,17 @@
                                     </template>
                                 </div>
                             </div>
+                            <span class="paw-icon absolute right-4 top-4">🐾</span>
                         </div>
 
                         <!-- Second Breed -->
-                        <div class="bg-[var(--color-card)] rounded-lg shadow-lg overflow-hidden border border-[var(--color-border)] hover:shadow-xl transition-shadow">
-                            <div class="h-64 bg-gradient-to-br from-[color-mix(in_oklab,var(--color-primary)_5%,white)] to-[color-mix(in_oklab,var(--color-primary)_15%,white)]">
+                        <div class="breed-result-card animate-in group relative">
+                            <div class="overflow-hidden h-64 bg-gradient-to-br from-gray-100 to-gray-200 cursor-pointer" @click="$dispatch('show-image', { url: comparison.breed2.image?.url, name: comparison.breed2.info?.name })">
                                 <template x-if="comparison.breed2.image?.url">
                                     <img 
                                         :src="comparison.breed2.image.url" 
                                         :alt="comparison.breed2.info?.name"
-                                        class="w-full h-full object-cover">
+                                        class="breed-image w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                                 </template>
                                 <template x-if="!comparison.breed2.image?.url">
                                     <div class="w-full h-full flex items-center justify-center text-gray-400">
@@ -255,22 +255,21 @@
                                     </div>
                                 </template>
                             </div>
-                            <div class="p-6 space-y-4">
-                                <h3 class="text-xl font-bold text-[var(--color-foreground)]" x-text="comparison.breed2.info?.name || 'Unknown'"></h3>
+                            <div class="mt-5 p-6">
+                                <h3 class="text-2xl font-bold text-gray-800 mb-2" x-text="comparison.breed2.info?.name || 'Unknown'"></h3>
                                 <div class="space-y-3 text-sm">
                                     <div class="flex flex-col">
-                                        <span class="font-semibold text-[var(--color-foreground)]">Temperament:</span>
-                                        <span class="text-[var(--color-muted-foreground)]" x-text="comparison.breed2.info?.temperament || 'Not specified'"></span>
+                                        <span class="font-semibold text-gray-700">Temperament:</span>
+                                        <span class="text-gray-600" x-text="comparison.breed2.info?.temperament || 'Not specified'"></span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="font-semibold text-[var(--color-foreground)]">Weight:</span>
-                                        <span class="text-[var(--color-muted-foreground)]" x-text="(comparison.breed2.info?.weight?.metric || 'Not specified') + (comparison.breed2.info?.weight?.metric ? ' kg' : '')"></span>
+                                        <span class="font-semibold text-gray-700">Weight:</span>
+                                        <span class="text-gray-600" x-text="(comparison.breed2.info?.weight?.metric || 'Not specified') + (comparison.breed2.info?.weight?.metric ? ' kg' : '')"></span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="font-semibold text-[var(--color-foreground)]">Life Span:</span>
-                                        <span class="text-[var(--color-muted-foreground)]" x-text="(comparison.breed2.info?.life_span || 'Not specified') + (comparison.breed2.info?.life_span ? ' years' : '')"></span>
+                                        <span class="font-semibold text-gray-700">Life Span:</span>
+                                        <span class="text-gray-600" x-text="(comparison.breed2.info?.life_span || 'Not specified') + (comparison.breed2.info?.life_span ? ' years' : '')"></span>
                                     </div>
-                                    
                                     <!-- Cat-specific fields -->
                                     <template x-if="animalType === 'cat'">
                                         <div class="space-y-3 border-t pt-3">
@@ -290,7 +289,6 @@
                                             </template>
                                         </div>
                                     </template>
-                                    
                                     <!-- Dog-specific fields -->
                                     <template x-if="animalType === 'dog'">
                                         <div class="space-y-3 border-t pt-3">
@@ -312,7 +310,9 @@
                                     </template>
                                 </div>
                             </div>
+                            <span class="paw-icon absolute right-4 top-4">🐾</span>
                         </div>
+                    </div>
                     </div>
                     
                     <!-- Reset Button -->
@@ -326,9 +326,18 @@
                 </div>
             </template>
         </div>
+        <!-- Image Popup Modal -->
+        <template x-if="showImagePopup">
+            <div class="image-popup-bg" @click.self="showImagePopup = false">
+                <div class="image-popup-content">
+                    <img :src="popupImage" :alt="popupName">
+                    <div class="mb-2 font-bold text-lg text-gray-800" x-text="popupName"></div>
+                    <button class="image-popup-close" @click="showImagePopup = false">Close</button>
+                </div>
+            </div>
+        </template>
     </div>
-</div>
-@endsection
+
 
 @push('scripts')
 <script>
@@ -498,138 +507,173 @@ function compareData() {
 
 @push('styles')
 <style>
-.animate-spin {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
+    /* Paw background pattern for pet-friendly vibe */
+    body.compare-bg {
+        background-image: url('/images/paw-bg.svg');
+        background-repeat: repeat;
+        background-size: 120px 120px;
+        background-color: #fdf6f0;
     }
-    to {
-        transform: rotate(360deg);
+    .paw-icon {
+        position: absolute;
+        opacity: 0.12;
+        font-size: 2.5rem;
+        pointer-events: none;
+        z-index: 0;
     }
-}
-
-/* Enhanced dropdown styling */
-select {
-    background-image: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-select:focus {
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-    transform: translateY(-1px);
-}
-
-select:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Custom option styling */
-select option {
-    padding: 12px 16px;
-    background: white;
-    color: #374151;
-    font-weight: 500;
-}
-
-select option:hover {
-    background: #f3f4f6;
-}
-
-select option:checked {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: white;
-}
-
-/* Custom scrollbar for select elements */
-select::-webkit-scrollbar {
-    width: 8px;
-}
-
-select::-webkit-scrollbar-track {
-    background: #f8fafc;
-    border-radius: 10px;
-}
-
-select::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
-    border-radius: 10px;
-    border: 1px solid #f1f5f9;
-}
-
-select::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #cbd5e1, #94a3b8);
-}
-
-/* Floating label effect */
-.select-container {
-    position: relative;
-}
-
-.select-container label {
-    transition: all 0.3s ease;
-}
-
-/* Dropdown animation */
-select {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Focus ring enhancement */
-select:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 
-        0 0 0 4px rgba(59, 130, 246, 0.1),
-        0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-/* Hover effects */
-.select-container:hover select {
-    border-color: #6b7280;
-}
-
-/* Custom arrow styling */
-.select-container svg {
-    transition: transform 0.2s ease;
-}
-
-select:focus + div svg,
-.select-container:hover svg {
-    transform: rotate(180deg);
-    color: #3b82f6;
-}
-
-/* Mobile responsive */
-@media (max-width: 768px) {
-    select {
-        padding: 16px 12px;
-        font-size: 16px; /* Prevents zoom on iOS */
+    /* Animated card entrance */
+    .animate-card {
+        animation: cardIn 0.7s cubic-bezier(.2,.9,.2,1);
     }
-}
-
-/* Gradient borders for enhanced look */
-.select-container::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    padding: 2px;
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
-    border-radius: 12px;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.select-container:hover::before {
-    opacity: 1;
-}
+    @keyframes cardIn {
+        0% { opacity: 0; transform: scale(0.95) translateY(30px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    /* Button bounce on hover */
+    .btn-bounce:hover {
+        animation: bounce 0.4s;
+    }
+    @keyframes bounce {
+        0% { transform: scale(1); }
+        30% { transform: scale(1.08); }
+        50% { transform: scale(0.96); }
+        70% { transform: scale(1.04); }
+        100% { transform: scale(1); }
+    }
+    /* Pet color palette */
+    .pet-primary {
+        background: linear-gradient(90deg, #ffb6b9 0%, #fcd5ce 100%);
+        color: #4b2e2e;
+    }
+    .pet-secondary {
+        background: linear-gradient(90deg, #b5ead7 0%, #c7ceea 100%);
+        color: #2e4b4b;
+    }
+    .pet-accent {
+        background: linear-gradient(90deg, #ffdac1 0%, #fff1e6 100%);
+        color: #4b4b2e;
+    }
+    .pet-card {
+        border: 2px solid #ffe5d9;
+        box-shadow: 0 8px 32px rgba(255,182,185,0.08);
+        border-radius: 18px;
+        position: relative;
+        overflow: hidden;
+    }
+    .pet-card .paw-icon {
+        top: 10px;
+        right: 10px;
+        font-size: 2rem;
+        opacity: 0.18;
+    }
+    /* Animate compare button */
+    .compare-btn {
+        background: linear-gradient(90deg, #ffb6b9 0%, #fcd5ce 100%);
+        color: #4b2e2e;
+        border: none;
+        box-shadow: 0 2px 12px rgba(255,182,185,0.12);
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .compare-btn:hover {
+        box-shadow: 0 6px 24px rgba(255,182,185,0.18);
+        transform: scale(1.05);
+    }
+    /* Animate recent cards */
+    .recent-card {
+        animation: cardIn 0.6s cubic-bezier(.2,.9,.2,1);
+        border-radius: 14px;
+        border: 2px solid #b5ead7;
+        background: #fff;
+        box-shadow: 0 2px 10px rgba(181,234,215,0.08);
+        position: relative;
+        overflow: hidden;
+    }
+    .recent-card .paw-icon {
+        left: 8px;
+        bottom: 8px;
+        font-size: 1.5rem;
+        opacity: 0.14;
+    }
+    /* Assessment-style breed result card animation and image hover */
+    .breed-result-card {
+        background: white;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(67, 233, 123, 0.12);
+        transition: all .3s cubic-bezier(.2,.9,.2,1);
+        height: 100%;
+        position: relative;
+        border: 2px solid #c7ceea;
+        animation: cardIn 0.8s cubic-bezier(.2,.9,.2,1);
+    }
+    .breed-result-card:hover {
+        box-shadow: 0 12px 36px rgba(67, 233, 123, 0.18);
+        transform: translateY(-4px) scale(1.03);
+    }
+    .breed-image {
+        transition: transform .5s cubic-bezier(.2,.9,.2,1);
+    }
+    .breed-result-card:hover .breed-image {
+        transform: scale(1.08) rotate(2deg);
+    }
+    .breed-result-card .paw-icon {
+        right: 12px;
+        top: 12px;
+        font-size: 2rem;
+        opacity: 0.14;
+        position: absolute;
+        pointer-events: none;
+    }
+    /* Popup image modal styles */
+    .image-popup-bg {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.45);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.4s cubic-bezier(.2,.9,.2,1);
+    }
+    .image-popup-content {
+        background: white;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(67,233,123,0.18);
+        padding: 24px;
+        max-width: 90vw;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: cardIn 0.5s cubic-bezier(.2,.9,.2,1);
+    }
+    .image-popup-content img {
+        max-width: 60vw;
+        max-height: 60vh;
+        border-radius: 12px;
+        box-shadow: 0 4px 18px rgba(67,233,123,0.10);
+        margin-bottom: 18px;
+    }
+    .image-popup-close {
+        background: #ffb6b9;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 18px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(255,182,185,0.12);
+        transition: background 0.2s;
+    }
+    .image-popup-close:hover {
+        background: #fcd5ce;
+        color: #4b2e2e;
+    }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+document.body.classList.add('compare-bg');
+</script>
 @endpush
