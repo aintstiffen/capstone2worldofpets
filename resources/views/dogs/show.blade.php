@@ -279,11 +279,14 @@
         lightboxImage: '',
         currentSlide: 0,
         totalSlides: {{ count($pet->gallery ?? []) }},
+        get visibleSlides() {
+            if (window.innerWidth >= 1024) return 4;
+            if (window.innerWidth >= 768) return 3;
+            if (window.innerWidth >= 640) return 2;
+            return 1; // mobile: 1 slide per view
+        },
         get maxSlideIndex() {
-            if (window.innerWidth >= 1024) return Math.max(0, this.totalSlides - 4);
-            if (window.innerWidth >= 768) return Math.max(0, this.totalSlides - 3);
-            if (window.innerWidth >= 640) return Math.max(0, this.totalSlides - 2);
-            return Math.max(0, this.totalSlides - 1);
+            return Math.max(0, this.totalSlides - this.visibleSlides);
         },
         nextSlide() {
             if (this.currentSlide < this.maxSlideIndex) {
@@ -625,7 +628,7 @@
                         <div class="overflow-hidden rounded-lg">
                             <div 
                                 class="gallery-track"
-                                :style="{ transform: `translateX(-${currentSlide * (100 / totalSlides)}%)` }">
+                                :style="{ transform: `translateX(-${currentSlide * (100 / visibleSlides)}%)` }">
                                 @foreach($pet->gallery as $index => $galleryItem)
                                     <div class="gallery-slide px-2">
                         <img 

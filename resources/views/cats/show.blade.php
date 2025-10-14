@@ -269,11 +269,15 @@
     lightboxImage: '',
     currentSlide: 0,
     totalSlides: {{ count($pet->gallery ?? []) }},
+    // Number of slides visible at once (keeps parity with the CSS breakpoints above).
+    get visibleSlides() {
+        if (window.innerWidth >= 1024) return 4;
+        if (window.innerWidth >= 768) return 3;
+        if (window.innerWidth >= 640) return 2;
+        return 1; // mobile: 1 slide per view
+    },
     get maxSlideIndex() {
-        if (window.innerWidth >= 1024) return Math.max(0, this.totalSlides - 4);
-        if (window.innerWidth >= 768) return Math.max(0, this.totalSlides - 3);
-        if (window.innerWidth >= 640) return Math.max(0, this.totalSlides - 2);
-        return Math.max(0, this.totalSlides - 1);
+        return Math.max(0, this.totalSlides - this.visibleSlides);
     },
     nextSlide() {
         if (this.currentSlide < this.maxSlideIndex) {
@@ -481,9 +485,9 @@
 
             {{-- Right: Tabs & Details --}}
             <div class="space-y-6">
-                <div>
-                    <h1 class="text-3xl font-bold">{{ $pet->name }}</h1>
-                    <p class="text-[--color-muted-foreground]">{{ $pet->temperament }}</p>
+                        <div 
+                            class="gallery-track"
+                            :style="{ transform: `translateX(-${currentSlide * (100 / visibleSlides)}%)` }">
 
                     <div class="mt-3 flex items-center gap-3">
                         <a href="{{ route('cats') }}" class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white text-sm font-medium rounded-md hover:bg-[color-mix(in_oklab,var(--color-primary)_90%,black)] transition">
@@ -587,7 +591,7 @@
                     <div class="overflow-hidden rounded-lg">
                         <div 
                             class="gallery-track"
-                            :style="{ transform: `translateX(-${currentSlide * (100 / totalSlides)}%)` }">
+                            :style="{ transform: `translateX(-${currentSlide * (100 / visibleSlides)}%)` }">
                             @foreach($pet->gallery as $index => $galleryItem)
                                 <div class="gallery-slide px-2">
                                     <img 
