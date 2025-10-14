@@ -367,20 +367,27 @@
 
                             // Force tooltip into the right-center of the image container so it's always visible.
                             const padding = 12;
-                            const tooltipW = 220;
+                            // Dynamically get tooltip width from CSS for desktop
+                            let tooltipW = 320;
+                            if (window.innerWidth >= 1024) tooltipW = 380;
                             let left;
                             if (w > (tooltipW + padding * 2)) {
-                                left = w - tooltipW - padding; // align inside right edge
+                                left = w - tooltipW - padding - 32; // align inside right edge, extra margin for desktop
                             } else {
                                 left = Math.max(padding, (w - tooltipW) / 2);
                             }
 
                             // Clamp tooltip so it never overlaps the bottom edge (mobile and desktop)
-                            let tooltipH = 180; // allow taller tooltip for mobile
-                            if (w > 600) tooltipH = 80; // desktop: shorter tooltip
+                            let tooltipH = 180;
+                            if (window.innerWidth >= 1024) tooltipH = 260;
                             let top = cy;
-                            // Clamp top so tooltip stays inside container
                             top = Math.max(padding, Math.min(top, h - tooltipH - padding));
+
+                            // Prevent overflow on right edge (deployed envs may have different box models)
+                            if (left + tooltipW + 32 > w) {
+                                left = w - tooltipW - 32;
+                            }
+                            if (left < 0) left = 0;
 
                             this.tooltipStyle = { left: left + 'px', top: top + 'px', transform: 'translateY(0)' };
                             this.tooltipPlacement = 'left';
