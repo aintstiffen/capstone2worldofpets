@@ -22,7 +22,8 @@
     .tooltip-content.show {
         opacity: 1 !important;
         transform: none !important;
-        pointer-events: auto;
+        /* Don't capture pointer events: prevents the tooltip from sitting over hotspots and causing rapid mouseleave/enter flicker */
+        pointer-events: none;
     }
 
     /* Hover / tap visual affordances for hotspots */

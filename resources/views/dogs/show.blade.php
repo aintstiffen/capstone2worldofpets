@@ -5,6 +5,12 @@
     .tooltip-hotspot {
         transition: transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms ease, opacity 220ms ease;
         will-change: transform, box-shadow, opacity;
+        /* Improve compositing to avoid hover flicker on desktop */
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        -webkit-tap-highlight-color: transparent;
     }
     /* Allow floating tooltip pop-ups with smooth transitions. Controlled via Alpine x-show/x-transition. */
     .tooltip-content {
@@ -22,14 +28,18 @@
     .tooltip-content.show {
         opacity: 1 !important;
         transform: none !important;
-        pointer-events: auto;
+        /* allow visual interaction but don't capture pointer events */
+        pointer-events: none;
     }
 
     /* Hover / tap visual affordances for hotspots */
     .tooltip-hotspot:hover, .tooltip-hotspot:focus {
-        transform: scale(1.06);
+        /* slightly smaller scale to reduce overlap with nearby hotspots */
+        transform: scale(1.04);
         box-shadow: 0 10px 20px rgba(17,24,39,0.12);
         opacity: 1;
+        z-index: 40; /* keep hovered hotspot above neighbors to avoid pointer handoff */
+        position: relative;
     }
     .tooltip-hotspot:active {
         transform: scale(0.98);
