@@ -603,6 +603,11 @@ function compareData() {
     }
     .breed-image {
         transition: transform .5s cubic-bezier(.2,.9,.2,1);
+        object-fit: contain;
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        display: block;
     }
     .breed-result-card:hover .breed-image {
         transform: scale(1.08) rotate(2deg);
