@@ -141,7 +141,7 @@
         aspect-ratio: 4/3;
         object-fit: cover;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        cursor: pointer;
+        cursor: default; /* not clickable, only hover-zoom */
     }
     
     .gallery-image:hover {
@@ -618,12 +618,11 @@
                                 :style="{ transform: `translateX(-${currentSlide * (100 / totalSlides)}%)` }">
                                 @foreach($pet->gallery as $index => $galleryItem)
                                     <div class="gallery-slide px-2">
-                                        <img 
-                                            src="{{ $galleryItem['url'] ?? $galleryItem }}"
-                                            alt="{{ $pet->name }} - Image {{ $index + 1 }}"
-                                            class="gallery-image w-full rounded-lg"
-                                            @click="openLightbox('{{ $galleryItem['url'] ?? $galleryItem }}')"
-                                            loading="lazy">
+                        <img 
+                            src="{{ $galleryItem['url'] ?? $galleryItem }}"
+                            alt="{{ $pet->name }} - Image {{ $index + 1 }}"
+                            class="gallery-image w-full rounded-lg"
+                            loading="lazy">
                                     </div>
                                 @endforeach
                             </div>
