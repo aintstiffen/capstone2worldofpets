@@ -19,11 +19,28 @@
         transform: translateY(6px) scale(.98);
         transition: opacity 200ms ease, transform 200ms ease;
         pointer-events: none; /* disabled by default; enabled when .show is added */
-        max-width: 320px;
-        max-height: 220px; /* allow taller tooltip so content can scroll on mobile */
+        max-width: 270px;
+        max-height: 180px; /* allow taller tooltip so content can scroll on mobile */
         overflow-y: auto;  /* allow scrolling if needed */
         -webkit-overflow-scrolling: touch;
-        font-size: clamp(12px, 1.6vw, 16px);
+        font-size: clamp(12px, 1.3vw, 15px);
+        padding: 12px 16px 12px 12px;
+        margin: 8px 0 8px 0;
+        box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10);
+        background: #fff;
+        border-radius: 10px;
+        word-break: break-word;
+        z-index: 100;
+    }
+
+    @media (min-width: 1024px) {
+        .tooltip-content {
+            max-width: 320px !important;
+            max-height: 200px;
+            padding: 16px 20px 16px 16px;
+            margin-right: 24px !important;
+            border-radius: 12px;
+        }
     }
     .tooltip-content[x-cloak] { display: none; }
     .tooltip-content.show {
