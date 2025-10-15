@@ -680,16 +680,7 @@
                                 Describes how active and playful the breed usually is.<br>
                             </div>
                         </div>
-                        <div
-                            class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transition-all duration-300 hover:scale-105 hover:shadow-yellow-200 hover:bg-yellow-50 relative overflow-hidden">
-                            <span
-                                class="absolute bottom-2 right-2 text-yellow-200 text-2xl paw-icon pulse-animation">🐾</span>
-                            <div class="text-sm font-semibold text-yellow-600 mb-1">Bred For</div>
-                            <div class="text-base font-bold text-gray-900 mb-1 text-center">{{ $pet->bred_for }}</div>
-                            <div class="text-xs text-gray-500 text-center leading-tight">
-                                The original purpose or function this breed was developed for.<br>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
 
