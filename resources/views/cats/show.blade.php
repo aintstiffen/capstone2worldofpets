@@ -512,22 +512,25 @@
 
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-    <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center transition hover:scale-105 hover:shadow-lg">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+    <div class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transition-all duration-300 hover:scale-105 hover:shadow-pink-200 hover:bg-pink-50 relative overflow-hidden">
+        <span class="absolute top-2 left-2 text-pink-200 text-2xl paw-icon pulse-animation">🐾</span>
         <div class="text-sm font-semibold text-pink-600 mb-1">Size</div>
         <div class="text-lg font-extrabold text-gray-900 mb-1">{{ $pet->size }}</div>
         <div class="text-xs text-gray-500 text-center leading-tight">
             Indicates the general adult body size of the breed.<br>
         </div>
     </div>
-    <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center transition hover:scale-105 hover:shadow-lg">
+    <div class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transition-all duration-300 hover:scale-105 hover:shadow-blue-200 hover:bg-blue-50 relative overflow-hidden">
+        <span class="absolute top-2 left-2 text-blue-200 text-2xl paw-icon pulse-animation">🐾</span>
         <div class="text-sm font-semibold text-blue-600 mb-1">Lifespan</div>
         <div class="text-lg font-extrabold text-gray-900 mb-1">{{ $pet->lifespan }}</div>
         <div class="text-xs text-gray-500 text-center leading-tight">
             Average expected years the breed typically lives.
         </div>
     </div>
-    <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center transition hover:scale-105 hover:shadow-lg">
+    <div class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transition-all duration-300 hover:scale-105 hover:shadow-green-200 hover:bg-green-50 relative overflow-hidden">
+        <span class="absolute bottom-2 left-2 text-green-200 text-2xl paw-icon pulse-animation">🐾</span>
         <div class="text-sm font-semibold text-green-600 mb-1">Energy</div>
         <div class="text-lg font-extrabold text-gray-900 mb-1">
             @if(is_numeric($pet->energy))
@@ -540,8 +543,14 @@
             Describes how active and playful the breed usually is.<br>
         </div>
     </div>
-    
-    
+    <div class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transition-all duration-300 hover:scale-105 hover:shadow-yellow-200 hover:bg-yellow-50 relative overflow-hidden">
+        <span class="absolute bottom-2 right-2 text-yellow-200 text-2xl paw-icon pulse-animation">🐾</span>
+        <div class="text-sm font-semibold text-yellow-600 mb-1">Bred For</div>
+        <div class="text-base font-bold text-gray-900 mb-1 text-center">{{ $pet->bred_for }}</div>
+        <div class="text-xs text-gray-500 text-center leading-tight">
+            The original purpose or function this breed was developed for.<br>
+        </div>
+    </div>
 </div>
             </div>
 
