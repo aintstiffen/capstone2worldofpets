@@ -509,28 +509,40 @@
                         </div>
                     </div>
 
-                    <div class="mt-3 info-panel" x-show="activeTooltip" x-cloak>
-                        <div class="p-3 bg-white rounded-lg shadow">
-                            <strong class="block text-lg text-[--color-primary] mb-1">{{ $pet->name }}'s <span x-text="activeTooltip"></span></strong>
-                            <p class="text-sm text-[--color-muted-foreground]" x-text="activeFact"></p>
-                        </div>
-                    </div>
+
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    <div class="p-3 border rounded surface-card">
-                        <p class="text-sm text-[--color-muted-foreground]">Size</p>
-                        <p class="text-base font-bold">{{ $pet->size }}</p>
-                    </div>
-                    <div class="p-3 border rounded surface-card">
-                        <p class="text-sm text-[--color-muted-foreground]">Lifespan</p>
-                        <p class="text-base font-bold">{{ $pet->lifespan }} years</p>
-                    </div>
-                    <div class="p-3 border rounded surface-card">
-                        <p class="text-sm text-[--color-muted-foreground]">Energy</p>
-                        <p class="text-base font-bold">{{ $pet->energy }}</p>
-                    </div>
-                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+    <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center transition hover:scale-105 hover:shadow-lg">
+        <div class="text-sm font-semibold text-pink-600 mb-1">Size</div>
+        <div class="text-lg font-extrabold text-gray-900 mb-1">{{ $pet->size }}</div>
+        <div class="text-xs text-gray-500 text-center leading-tight">
+            Indicates the general adult body size of the breed.<br>
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center transition hover:scale-105 hover:shadow-lg">
+        <div class="text-sm font-semibold text-blue-600 mb-1">Lifespan</div>
+        <div class="text-lg font-extrabold text-gray-900 mb-1">{{ $pet->lifespan }}</div>
+        <div class="text-xs text-gray-500 text-center leading-tight">
+            Average expected years the breed typically lives.
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center transition hover:scale-105 hover:shadow-lg">
+        <div class="text-sm font-semibold text-green-600 mb-1">Energy</div>
+        <div class="text-lg font-extrabold text-gray-900 mb-1">
+            @if(is_numeric($pet->energy))
+                {{ $pet->energy }}/5
+            @else
+                {{ $pet->energy }}
+            @endif
+        </div>
+        <div class="text-xs text-gray-500 text-center leading-tight">
+            Describes how active and playful the breed usually is.<br>
+        </div>
+    </div>
+    
+    
+</div>
             </div>
 
             {{-- Right: Tabs & Details --}}
