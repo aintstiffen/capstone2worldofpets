@@ -585,20 +585,23 @@
                         <h1 class="text-3xl font-bold">{{ $pet->name }}</h1>
                         <p class="text-[--color-muted-foreground]">{{ $pet->temperament }}</p>
 
-                        <div class="mt-3 flex items-center gap-3">
-                            <a href="{{ route('dogs') }}" class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white text-sm font-medium rounded-md hover:bg-[color-mix(in_oklab,var(--color-primary)_90%,black)] transition">
-                                ← Back to Dog Breeds
-                            </a>
-                            @if($pet->gif_url)
-                                <button
-                                    @click="showGifModal = true"
-                                    class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white text-sm font-medium rounded-md hover:bg-[color-mix(in_oklab,var(--color-primary)_90%,black)] transition">
-                                    🎬 View Fun GIF
-                                </button>
-                            @endif
-
-
-                        </div>
+<div class="mt-3 flex items-center gap-3">
+    <a href="{{ route('dogs') }}"
+       class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white text-sm font-medium rounded-md transition
+              hover:scale-105 hover:bg-pink-500 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-pink-300 active:scale-95"
+       style="will-change: transform, box-shadow;">
+        ← Back to Dog Breeds
+    </a>
+    @if($pet->gif_url)
+        <button
+            @click="showGifModal = true"
+            class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white text-sm font-medium rounded-md transition
+                   hover:scale-105 hover:bg-yellow-400 hover:text-pink-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 active:scale-95"
+            style="will-change: transform, box-shadow;">
+            🎬 View Fun GIF
+        </button>
+    @endif
+</div>
                     </div>
 
                     {{-- Overview --}}
