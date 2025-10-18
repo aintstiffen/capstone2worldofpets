@@ -19,13 +19,14 @@
             --shadow-xl: 0 28px 72px rgba(15, 23, 42, 0.08);
         }
 
-        body { background: var(--pet-pink-50); min-height: 100vh; }
+    body { background: var(--pet-pink-50); min-height: 100vh; overflow-x: hidden; }
         
         .quiz-container {
             background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,250,251,0.98));
             border-radius: 18px;
             box-shadow: var(--shadow-lg);
             padding: 2rem;
+            overflow-x: hidden;
         }
         
         .gradient-text {
