@@ -3,6 +3,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
   const animatedEls = document.querySelectorAll('.animated-fade-in');
+  // account for sticky header (~64px) so elements near the top become visible
   const observer = new window.IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -12,7 +13,10 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }, {
-    threshold: 0.1
+    // threshold low so partial visibility triggers; rootMargin top negative to
+    // treat elements below the sticky header as visible earlier on mobile.
+    threshold: 0.05,
+    rootMargin: '-80px 0px 0px 0px'
   });
 
   animatedEls.forEach(el => observer.observe(el));
