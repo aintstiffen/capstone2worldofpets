@@ -41,7 +41,7 @@
 
         {{-- Main Content --}}
         @include('navs.navs')
-        <main class="animated-fade-in">
+        <main class="animated-fade-in pt-16 md:pt-0">
             @yield('content')
         </main>
         @include('footer.footer')
