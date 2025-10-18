@@ -19,7 +19,11 @@
             --shadow-xl: 0 28px 72px rgba(15, 23, 42, 0.08);
         }
 
-    body { background: var(--pet-pink-50); min-height: 100vh; overflow-x: hidden; }
+        body { 
+            background: var(--pet-pink-50); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
         
         .quiz-container {
             background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,250,251,0.98));
@@ -27,16 +31,27 @@
             box-shadow: var(--shadow-lg);
             padding: 2rem;
             overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
         }
         
         .gradient-text {
             background: linear-gradient(90deg, var(--pet-primary), var(--pet-accent));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text;
         }
         
         .btn-gradient {
             background: linear-gradient(90deg, var(--pet-primary), var(--pet-primary-600));
-            color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight:700; font-size:15px; transition: all .22s ease; box-shadow: 0 8px 28px rgba(255,99,127,0.12);
+            color: white; 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 12px; 
+            font-weight:700; 
+            font-size:15px; 
+            transition: all .22s ease; 
+            box-shadow: 0 8px 28px rgba(255,99,127,0.12);
         }
         
         .btn-gradient:hover {
@@ -44,7 +59,14 @@
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
         }
         
-        .btn-secondary { background: white; color: var(--pet-primary); border: 2px solid rgba(255,99,127,0.12); padding: 10px 18px; border-radius: 12px; font-weight:600 }
+        .btn-secondary { 
+            background: white; 
+            color: var(--pet-primary); 
+            border: 2px solid rgba(255,99,127,0.12); 
+            padding: 10px 18px; 
+            border-radius: 12px; 
+            font-weight:600;
+        }
         
         .btn-secondary:hover {
             background: #667eea;
@@ -52,7 +74,16 @@
             transform: translateY(-2px);
         }
         
-        .pet-card { background: white; border-radius: 16px; padding: 28px; transition: all .28s ease; cursor: pointer; border: 1px solid rgba(0,0,0,0.04); position: relative; overflow: hidden }
+        .pet-card { 
+            background: white; 
+            border-radius: 16px; 
+            padding: 28px; 
+            transition: all .28s ease; 
+            cursor: pointer; 
+            border: 1px solid rgba(0,0,0,0.04); 
+            position: relative; 
+            overflow: hidden;
+        }
         
         .pet-card::before {
             content: '';
@@ -82,8 +113,20 @@
             z-index: 1;
         }
         
-        .progress-container { background: rgba(255,99,127,0.06); border-radius: 999px; height: 10px; overflow:hidden }
-        .progress-bar { background: linear-gradient(90deg,var(--pet-primary),var(--pet-accent)); height:100%; border-radius:999px; transition:width .45s ease }
+        .progress-container { 
+            background: rgba(255,99,127,0.06); 
+            border-radius: 999px; 
+            height: 10px; 
+            overflow:hidden;
+        }
+        
+        .progress-bar { 
+            background: linear-gradient(90deg,var(--pet-primary),var(--pet-accent)); 
+            height:100%; 
+            border-radius:999px; 
+            transition:width .45s ease;
+            position: relative;
+        }
         
         .progress-bar::after {
             content: '';
@@ -101,23 +144,93 @@
             100% { transform: translateX(100%); }
         }
         
-        .radio-label { position: relative; cursor:pointer; padding:8px; border-radius:12px; transition:all .18s ease; background:transparent; overscroll-behavior: contain; }
-        .radio-label:hover { transform: translateY(-4px); overscroll-behavior: contain; }
-        .radio-label input[type="radio"] { accent-color: var(--pet-primary); overscroll-behavior: contain; }
-        /* Prevent radio focus/hover from scrolling into view on any device */
-        .radio-label input[type="radio"]:focus, .radio-label input[type="radio"]:hover {
+        .radio-label { 
+            position: relative; 
+            cursor:pointer; 
+            padding: 10px 8px; 
+            border-radius:12px; 
+            transition:all .18s ease; 
+            background:transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+        
+        .radio-label:hover { 
+            background: rgba(255,99,127,0.05);
+            transform: translateY(-2px);
+        }
+        
+        .radio-label input[type="radio"] { 
+            accent-color: var(--pet-primary);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .radio-label input[type="radio"]:focus, 
+        .radio-label input[type="radio"]:hover {
             outline: none;
             box-shadow: none;
             scroll-margin: 0 !important;
         }
         
-        .question-card { background: linear-gradient(180deg, #fff 0%, #fffbfc 100%); border-radius:14px; padding:18px; margin-bottom:18px; box-shadow:0 6px 22px rgba(15,23,42,0.04) }
+        .question-card { 
+            background: linear-gradient(180deg, #fff 0%, #fffbfc 100%); 
+            border-radius:14px; 
+            padding: 24px; 
+            margin-bottom: 24px; 
+            box-shadow:0 6px 22px rgba(15,23,42,0.04);
+            width: 100%;
+            overflow: visible;
+        }
         
         .question-card:hover {
             box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
         }
         
-        .breed-result-card { background:white; border-radius:14px; overflow:hidden; box-shadow:var(--shadow-lg); transition:all .3s ease; height:100% }
+        .question-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-weight: 500;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .radio-options-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .radio-options {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            min-width: 100%;
+        }
+        
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: var(--pet-muted);
+            font-weight: 500;
+        }
+        
+        .breed-result-card { 
+            background:white; 
+            border-radius:14px; 
+            overflow:hidden; 
+            box-shadow:var(--shadow-lg); 
+            transition:all .3s ease; 
+            height:100%;
+        }
         
         .breed-result-card:hover {
             transform: translateY(-8px);
@@ -187,13 +300,24 @@
             animation: fadeIn 0.5s ease;
         }
         
-        .emoji-icon { font-size: 64px; transition: transform .25s ease; display:inline-block }
+        .emoji-icon { 
+            font-size: 64px; 
+            transition: transform .25s ease; 
+            display:inline-block;
+        }
         
         .pet-card:hover .emoji-icon {
             transform: scale(1.2) rotate(5deg);
         }
         
-        .section-badge { background: linear-gradient(90deg,#ffdfe6,#fff1f3); color:var(--pet-primary); padding:8px 16px; border-radius:999px; font-weight:700 }
+        .section-badge { 
+            background: linear-gradient(90deg,#ffdfe6,#fff1f3); 
+            color:var(--pet-primary); 
+            padding:8px 16px; 
+            border-radius:999px; 
+            font-weight:700;
+            display: inline-block;
+        }
         
         .notification-toast {
             position: fixed;
@@ -230,7 +354,12 @@
             }
         }
         
-        .hair-option-card { position: relative; overflow:hidden; border-radius:12px; cursor:pointer }
+        .hair-option-card { 
+            position: relative; 
+            overflow:hidden; 
+            border-radius:12px; 
+            cursor:pointer;
+        }
         
         .hair-option-card:hover {
             transform: translateY(-8px);
@@ -245,16 +374,96 @@
             transform: scale(1.1) rotate(5deg);
         }
         
-        .back-button { background: white; color: var(--pet-primary); border: 2px solid rgba(255,99,127,0.08); padding:10px 18px; border-radius:10px; font-weight:700 }
-        .back-button:hover { transform: translateX(-4px); border-color: rgba(255,99,127,0.18) }
+        .back-button { 
+            background: white; 
+            color: var(--pet-primary); 
+            border: 2px solid rgba(255,99,127,0.08); 
+            padding:10px 18px; 
+            border-radius:10px; 
+            font-weight:700;
+        }
+        
+        .back-button:hover { 
+            transform: translateX(-4px); 
+            border-color: rgba(255,99,127,0.18);
+        }
 
         /* Responsive tweaks */
         @media (max-width: 768px) {
-            .quiz-container { padding: 1rem }
-            .pet-card { padding: 18px }
-            .question-card { padding: 12px }
-            .emoji-icon { font-size: 48px }
-            .btn-gradient, .btn-secondary { padding-left: 14px; padding-right: 14px }
+            .quiz-container { 
+                padding: 1.25rem;
+                margin: 0 0.5rem;
+            }
+            
+            .pet-card { 
+                padding: 20px;
+            }
+            
+            .question-card { 
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+            
+            .question-text {
+                font-size: 15px;
+                margin-bottom: 16px;
+            }
+            
+            .emoji-icon { 
+                font-size: 48px;
+            }
+            
+            .btn-gradient, .btn-secondary { 
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+            
+            .radio-label {
+                padding: 8px 4px;
+                min-height: 50px;
+            }
+            
+            .radio-label input[type="radio"] {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .scale-labels {
+                font-size: 10px;
+            }
+            
+            .radio-options {
+                gap: 4px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .quiz-container {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+            
+            .question-card {
+                padding: 14px;
+            }
+            
+            .question-text {
+                font-size: 14px;
+            }
+            
+            .radio-label {
+                padding: 6px 2px;
+                min-height: 45px;
+            }
+            
+            .radio-label input[type="radio"] {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .scale-labels {
+                font-size: 9px;
+            }
         }
     </style>
     
@@ -434,23 +643,25 @@
                     <div class="space-y-6">
                         <template x-for="(q, i) in sectionQuestions()" :key="currentSection + '-' + i">
                             <div class="question-card">
-                                <h3 class="text-lg font-semibold mb-4 text-gray-800" x-text="q.question"></h3>
-                                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs text-gray-500 mb-3">
-                                    <div class="text-left">Strongly Disagree</div>
-                                    <div class="hidden md:block col-span-3"></div>
-                                    <div class="text-right md:text-center">Strongly Agree</div>
+                                <h3 class="question-text" x-text="q.question"></h3>
+                                
+                                <div class="scale-labels">
+                                    <span>Strongly Disagree</span>
+                                    <span>Strongly Agree</span>
                                 </div>
-                                <div class="flex justify-between gap-2">
-                                    <template x-for="n in 5" :key="n">
-                                        <label class="radio-label flex-1 text-center">
-                                            <input type="radio" 
-                                                   :name="'q'+(sectionBaseIndex()+i)" 
-                                                   :value="n"
-                                                   x-model="personalityAnswers[sectionBaseIndex()+i]"
-                                                   class="mb-2 h-5 w-5">
-                                            <span class="text-sm font-semibold" x-text="n"></span>
-                                        </label>
-                                    </template>
+                                
+                                <div class="radio-options-container">
+                                    <div class="radio-options">
+                                        <template x-for="n in 5" :key="n">
+                                            <label class="radio-label flex-1">
+                                                <input type="radio" 
+                                                       :name="'q'+(sectionBaseIndex()+i)" 
+                                                       :value="n"
+                                                       x-model="personalityAnswers[sectionBaseIndex()+i]">
+                                                <span class="text-sm font-semibold mt-2" x-text="n"></span>
+                                            </label>
+                                        </template>
+                                    </div>
                                 </div>
                             </div>
                         </template>
@@ -467,7 +678,7 @@
 
                     <!-- Navigation -->
                     <div class="mt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div class="flex gap-3">
+                        <div class="flex gap-3 flex-wrap">
                             <button class="back-button" @click="prevSet" x-show="currentSection > 0">
                                 ← Back
                             </button>
@@ -476,7 +687,7 @@
                             </button>
                         </div>
                         
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-4 flex-wrap justify-center">
                             <span class="text-sm text-gray-600">
                                 Progress: <span x-text="sectionAnsweredCount()"></span>/<span x-text="questionsPerSection"></span>
                             </span>
@@ -499,7 +710,7 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                         <template x-for="(breed, index) in recommendedBreeds" :key="index">
-                            <div class="mt-2\ breed-result-card">
+                            <div class="mt-2 breed-result-card">
                                 <div class="overflow-hidden">
                                     <img :src="getBreedImage(breed)" :alt="breed.name" class="breed-image" loading="lazy">
                                 </div>
@@ -564,7 +775,7 @@
         </div>
     </div>
 
-    <!-- Alpine.js Logic (keeping your original JavaScript) -->
+    <!-- Alpine.js Logic -->
     <script>
         function quizApp() {
     // Safe initialization with try/catch
