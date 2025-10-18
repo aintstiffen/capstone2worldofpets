@@ -101,9 +101,15 @@
             100% { transform: translateX(100%); }
         }
         
-        .radio-label { position: relative; cursor:pointer; padding:8px; border-radius:12px; transition:all .18s ease; background:transparent }
-        .radio-label:hover { transform: translateY(-4px) }
-        .radio-label input[type="radio"] { accent-color: var(--pet-primary) }
+        .radio-label { position: relative; cursor:pointer; padding:8px; border-radius:12px; transition:all .18s ease; background:transparent; overscroll-behavior: contain; }
+        .radio-label:hover { transform: translateY(-4px); overscroll-behavior: contain; }
+        .radio-label input[type="radio"] { accent-color: var(--pet-primary); overscroll-behavior: contain; }
+        /* Prevent radio focus/hover from scrolling into view on any device */
+        .radio-label input[type="radio"]:focus, .radio-label input[type="radio"]:hover {
+            outline: none;
+            box-shadow: none;
+            scroll-margin: 0 !important;
+        }
         
         .question-card { background: linear-gradient(180deg, #fff 0%, #fffbfc 100%); border-radius:14px; padding:18px; margin-bottom:18px; box-shadow:0 6px 22px rgba(15,23,42,0.04) }
         
