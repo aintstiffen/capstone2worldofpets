@@ -712,14 +712,88 @@
                     <div class="space-y-4 pt-4">
                         <p>{{ $pet->description }}</p>
                         @if ($pet->colors)
-                            <div>
+                            @php
+                                // Normalize color_images to an associative mapping: name => url/path
+                                $colorImagesRaw = $pet->color_images;
+                                $colorImageMap = [];
+
+                                if (!empty($colorImagesRaw)) {
+                                    // If it's already an associative mapping (name => url)
+                                    $isAssoc = array_values($colorImagesRaw) !== $colorImagesRaw;
+                                    if ($isAssoc) {
+                                        $colorImageMap = $colorImagesRaw;
+                                    } else {
+                                        // it's an indexed array of items [{name, image}, ...]
+                                        foreach ($colorImagesRaw as $item) {
+                                            if (is_array($item) && isset($item['name'])) {
+                                                $name = $item['name'];
+                                                $img = $item['image'] ?? null;
+                                                if ($img) $colorImageMap[$name] = $img;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Build a merged set of colors to display: tags + color_images keys
+                                $tagColors = is_array($pet->colors) ? $pet->colors : [];
+                                $imageColors = array_keys($colorImageMap ?: []);
+                                $displayColors = array_values(array_unique(array_merge($tagColors, $imageColors)));
+                            @endphp
+
+                            <div x-data="{ colorModalOpen: false, colorImage: '' }">
                                 <h3 class="font-medium mb-2">Common Colors</h3>
                                 <div class="flex flex-wrap gap-2">
-                                    @foreach ($pet->colors as $color)
-                                        <div class="px-3 py-1 rounded-full text-sm"
-                                            style="background-color: color-mix(in oklab, var(--color-secondary) 12%, white); color: color-mix(in oklab, var(--color-secondary) 50%, black);">
-                                            {{ $color }}</div>
+                                    @foreach ($displayColors as $color)
+                                        @php
+                                            $colorKey = $color;
+                                            $colorImageUrl = null;
+
+                                            if (!empty($colorImageMap)) {
+                                                // match case-insensitively
+                                                foreach ($colorImageMap as $k => $v) {
+                                                    if (strtolower($k) === strtolower($colorKey)) {
+                                                        $colorImageUrl = $v;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+
+                                            // If we found a stored path (not a full URL), convert to public URL
+                                            if ($colorImageUrl && !preg_match('/^https?:\/\//', $colorImageUrl)) {
+                                                try {
+                                                    $colorImageUrl = \Illuminate\Support\Facades\Storage::url($colorImageUrl);
+                                                } catch (\Throwable $e) {
+                                                    // leave as-is
+                                                }
+                                            }
+
+                                            // final fallback to main image
+                                            $finalImage = $colorImageUrl ?: $pet->image_url;
+                                        @endphp
+
+                                        <button @click="colorImage = '{{ $finalImage ? e($finalImage) : '' }}'; colorModalOpen = true"
+                                                class="px-3 py-1 rounded-full text-sm focus:outline-none border shadow-sm"
+                                                style="background-color: color-mix(in oklab, var(--color-secondary) 12%, white); color: color-mix(in oklab, var(--color-secondary) 50%, black);"
+                                                aria-label="View {{ $color }} color image">
+                                            {{ $color }}
+                                        </button>
                                     @endforeach
+                                </div>
+
+                                <!-- Color image modal -->
+                                <div x-show="colorModalOpen" x-cloak x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+                                     @click.away="colorModalOpen = false" aria-hidden="true">
+                                    <div class="bg-white rounded-lg shadow-lg max-w-[90vw] max-h-[85vh] overflow-auto p-4">
+                                        <div class="flex justify-end">
+                                            <button @click="colorModalOpen = false" class="text-sm px-2 py-1">Close</button>
+                                        </div>
+                                        <template x-if="colorImage">
+                                            <img :src="colorImage" alt="Color image" class="max-w-full max-h-[70vh] object-contain mx-auto">
+                                        </template>
+                                        <template x-if="!colorImage">
+                                            <div class="p-6 text-center text-sm text-gray-600">No image available for this color.</div>
+                                        </template>
+                                    </div>
                                 </div>
                             </div>
                         @endif

@@ -81,9 +81,19 @@ Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 
 Route::get('/test-email', function () {
     Mail::raw('This is a test email from Laravel!', function ($message) {
-        $message->to('stiffendecastro48@gmail.com')
+        $message->to('stiffendecastrosite48@gmail.com')
                 ->subject('Test Email');
     });
 
     return 'Test email sent!';
+});
+Route::get('/debug-env', function () {
+    return [
+        'AWS_BUCKET' => env('AWS_BUCKET'),
+        'FILESYSTEM_DISK' => env('FILESYSTEM_DISK'),
+        'config_bucket' => config('filesystems.disks.s3.bucket'),
+        'config_default_disk' => config('filesystems.default'),
+        'php_version' => phpversion(),
+        'server_env' => $_SERVER,
+    ];
 });

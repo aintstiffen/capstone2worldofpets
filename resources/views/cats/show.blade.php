@@ -576,12 +576,104 @@
                 <div class="space-y-4 pt-4">
                     <p>{{ $pet->description }}</p>
                     @if($pet->colors)
-                        <div>
+                        @php
+                            $colorImagesRaw = $pet->color_images;
+                            $colorImageMap = [];
+
+                            if (!empty($colorImagesRaw)) {
+                                $isAssoc = array_values($colorImagesRaw) !== $colorImagesRaw;
+                                if ($isAssoc) {
+                                    $colorImageMap = $colorImagesRaw;
+                                } else {
+                                    foreach ($colorImagesRaw as $item) {
+                                        if (is_array($item) && isset($item['name'])) {
+                                            $name = $item['name'];
+                                            $img = $item['image'] ?? null;
+                                            if ($img) $colorImageMap[$name] = $img;
+                                        }
+                                    }
+                                }
+                            }
+
+                            $tagColors = is_array($pet->colors) ? $pet->colors : [];
+                            $imageColors = array_keys($colorImageMap ?: []);
+                            $displayColors = array_values(array_unique(array_merge($tagColors, $imageColors)));
+                        @endphp
+
+                        <div x-data="{
+                                colorPreviewOpen: false,
+                                colorPreviewImage: '',
+                                previewStyle: {},
+                                showPreview(url, ev) {
+                                    if (!url) return;
+                                    this.colorPreviewImage = url;
+                                    this.colorPreviewOpen = true;
+                                    // position above the target element (keep preview size fixed)
+                                    const rect = ev.target.getBoundingClientRect();
+                                    const previewHeight = 160; /* matches .h-40 */
+                                    const width = 280; /* keep the beautiful size */
+                                    let left = rect.left + window.scrollX;
+                                    // ensure preview doesn't run off-screen to the right
+                                    const maxLeft = window.innerWidth - width - 12;
+                                    if (left > maxLeft) left = Math.max(12, maxLeft);
+                                    const top = rect.top + window.scrollY - previewHeight - 8;
+                                    this.previewStyle = {
+                                        left: left + 'px',
+                                        top: top + 'px',
+                                        width: width + 'px'
+                                    };
+                                },
+                                hidePreview() {
+                                    this.colorPreviewOpen = false;
+                                    this.colorPreviewImage = '';
+                                    this.previewStyle = {};
+                                }
+                            }">
                             <h3 class="font-medium mb-2">Common Colors</h3>
                             <div class="flex flex-wrap gap-2">
-                                @foreach($pet->colors as $color)
-                                    <div class="px-3 py-1 rounded-full text-sm" style="background-color: color-mix(in oklab, var(--color-secondary) 12%, white); color: color-mix(in oklab, var(--color-secondary) 50%, black);">{{ $color }}</div>
+                                @foreach($displayColors as $color)
+                                    @php
+                                        $colorKey = $color;
+                                        $colorImageUrl = null;
+                                        if (!empty($colorImageMap)) {
+                                            foreach ($colorImageMap as $k => $v) {
+                                                if (strtolower($k) === strtolower($colorKey)) {
+                                                    $colorImageUrl = $v;
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        if ($colorImageUrl && !preg_match('/^https?:\/\//', $colorImageUrl)) {
+                                            try {
+                                                $colorImageUrl = \Illuminate\Support\Facades\Storage::url($colorImageUrl);
+                                            } catch (\Throwable $e) {
+                                                // leave as-is
+                                            }
+                                        }
+
+                                        $finalImage = $colorImageUrl ?: $pet->image_url;
+                                    @endphp
+
+                    <div @mouseenter="showPreview('{{ $finalImage ? e($finalImage) : '' }}', $event)"
+                         @mouseleave="hidePreview()"
+                         class="px-3 py-1 rounded-full text-sm border shadow-sm"
+                         style="background-color: color-mix(in oklab, var(--color-secondary) 12%, white); color: color-mix(in oklab, var(--color-secondary) 50%, black);">
+                        {{ $color }}
+                    </div>
                                 @endforeach
+                            </div>
+
+
+                            <!-- Hover preview card -->
+                            <div x-show="colorPreviewOpen" x-cloak x-transition.opacity.scale.origin.top.left
+                                 :style="previewStyle"
+                                 class="fixed z-50 pointer-events-none">
+                                <div class="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 animate-fade-in" style="width: 280px;">
+                                    <div class="p-2">
+                                        <img :src="colorPreviewImage" alt="Color preview" class="w-full h-40 object-cover rounded-md">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     @endif

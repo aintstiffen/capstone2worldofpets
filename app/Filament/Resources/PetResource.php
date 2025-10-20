@@ -93,6 +93,30 @@ class PetResource extends Resource
 
                 Forms\Components\TagsInput::make('colors'),
 
+                // Per-color image uploads (name + file). Stored as JSON array of items
+                // e.g. [{"name":"Black","image":"color_images/black.jpg"}, ...]
+                Forms\Components\Repeater::make('color_images')
+                    ->label('Color Images')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Color Name')
+                            ->required()
+                            ->maxLength(100),
+
+                        Forms\Components\FileUpload::make('image')
+                            ->label('Image')
+                            ->image()
+                            ->directory('color_images')
+                            ->disk('s3')
+                            ->required()
+                            ->helperText('Upload an image that represents this color. Files will be stored on your configured S3 bucket.'),
+                    ])
+                    ->columns(2)
+                    ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
+                    ->collapsible()
+                    ->reorderable()
+                    ->helperText('Upload an image for each common color. The frontend will show these when clicking a color badge.'),
+
                 // Gallery image URLs for carousel (up to 10 images)
                 Forms\Components\Repeater::make('gallery')
                     ->label('Gallery Images (up to 10)')
