@@ -30,16 +30,18 @@ class Pet extends Model
         'gif_url',
         'gallery',
         'color_images',
+        'diet_images',
     ];
-
+    
     protected $casts = [
         'colors' => 'array',
         'color_images' => 'array',
+        'diet_images' => 'array',
         'hotspots' => 'array',
         'fun_facts' => 'array',
         'gallery' => 'array',
     ];
-
+    
     /**
      * Return an associative mapping of color name => public URL for the uploaded images.
      * Normalizes stored paths to full URLs (Storage::url) when necessary.
@@ -98,6 +100,42 @@ class Pet extends Model
             $result[$name] = $url;
         }
 
+        return $result;
+    }
+
+    // Normalize diet_images into name => public URL mapping
+    public function getDietImagesAttribute($value)
+    {
+        $items = $this->attributes['diet_images'] ?? $value;
+        if (!$items) {
+            return [];
+        }
+        if (is_string($items)) {
+            $items = json_decode($items, true) ?: [];
+        }
+        if (!is_array($items)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($items as $item) {
+            if (!is_array($item)) continue;
+            $name = $item['name'] ?? null;
+            $path = $item['image'] ?? null;
+            if (!$name || !$path) continue;
+
+            if (preg_match('/^https?:\/\//', $path)) {
+                $url = $path;
+            } else {
+                try {
+                    $disk = config('filesystems.default', env('FILESYSTEM_DISK', 'public'));
+                    $url = \Illuminate\Support\Facades\Storage::disk($disk)->url($path);
+                } catch (\Throwable $e) {
+                    $url = $path;
+                }
+            }
+            $result[$name] = $url;
+        }
         return $result;
     }
 

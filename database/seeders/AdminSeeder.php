@@ -18,5 +18,10 @@ class AdminSeeder extends Seeder
             'email' => 'admin@petsofworld.test',
             'password' => Hash::make('password'),
         ]);
+                Admin::create([
+            'name' => 'Second Admin',
+            'email' => 'admin2@petsofworld.test',
+            'password' => Hash::make('another_password'),
+        ]);
     }
 }

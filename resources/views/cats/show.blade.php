@@ -287,6 +287,22 @@
         transform: scale(1.1);
         background: #f3f4f6;
     }
+
+    /* small preview card style; keep size consistent with color preview */
+.diet-preview {
+  position: fixed;
+  z-index: 60;
+  width: 280px; /* keep same beautiful size */
+  max-width: calc(100vw - 32px);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  background: white;
+  overflow: hidden;
+  pointer-events: none;
+  transform-origin: bottom center;
+}
+.diet-preview img { width: 100%; height: 160px; object-fit: cover; display:block; }
+.diet-preview .label { padding: 8px 12px; font-weight:600; }
 </style>
 @endpush
 
@@ -574,7 +590,17 @@
 
                 {{-- Overview --}}
                 <div class="space-y-4 pt-4">
-                    <p>{{ $pet->description }}</p>
+                    <div class="story-description">
+            <p id="petDescription" class="prose max-w-none">{{ $pet->description }}</p>
+            <div class="mt-3">
+                <button id="ttsPlayBtn" type="button" class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white rounded-md" aria-pressed="false" aria-label="Play description">
+                    🔊 Play
+                </button>
+                <button id="ttsStopBtn" type="button" class="inline-flex items-center px-3 py-2 ml-2 border rounded-md hidden" aria-label="Stop speech">
+                    ⏹ Stop
+                </button>
+            </div>
+        </div>
                     @if($pet->colors)
                         @php
                             $colorImagesRaw = $pet->color_images;
@@ -677,6 +703,92 @@
                             </div>
                         </div>
                     @endif
+
+                    {{-- Common Diet block --}}
+                    @php
+                        // Merge names: tags (if any) + diet_images keys
+                        $dietNames = [];
+                        if (!empty($pet->diets) && is_array($pet->diets)) {
+                            $dietNames = array_merge($dietNames, $pet->diets);
+                        }
+                        if (!empty($pet->diet_images) && is_array($pet->diet_images)) {
+                            $dietNames = array_merge($dietNames, array_keys($pet->diet_images));
+                        }
+                        $dietNames = array_values(array_unique(array_filter($dietNames)));
+                    @endphp
+
+                    @if(!empty($dietNames))
+                        <div x-data="{
+                                dietPreviewOpen: false,
+                                dietPreviewImage: '',
+                                dietPreviewName: '',
+                                dietPreviewStyle: {},
+                                showDietPreview(url, name, ev) {
+                                    if (!url) return;
+                                    this.dietPreviewImage = url;
+                                    this.dietPreviewName = name;
+                                    this.dietPreviewOpen = true;
+                                    // position above the target element (keep preview size fixed)
+                                    const rect = ev.target.getBoundingClientRect();
+                                    const previewHeight = 200; /* 160px image + 40px label */
+                                    const width = 280; /* keep the beautiful size */
+                                    let left = rect.left + window.scrollX;
+                                    // ensure preview doesn't run off-screen to the right
+                                    const maxLeft = window.innerWidth - width - 12;
+                                    if (left > maxLeft) left = Math.max(12, maxLeft);
+                                    const top = rect.top + window.scrollY - previewHeight - 8;
+                                    this.dietPreviewStyle = {
+                                        left: left + 'px',
+                                        top: top + 'px',
+                                        width: width + 'px'
+                                    };
+                                },
+                                hideDietPreview() {
+                                    this.dietPreviewOpen = false;
+                                    this.dietPreviewImage = '';
+                                    this.dietPreviewName = '';
+                                    this.dietPreviewStyle = {};
+                                }
+                            }" class="mt-4">
+                            <h3 class="font-medium mb-2">Common Diet</h3>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach ($dietNames as $name)
+                                    @php
+                                        $dietImageUrl = $pet->diet_images[$name] ?? null;
+                                        
+                                        if ($dietImageUrl && !preg_match('/^https?:\/\//', $dietImageUrl)) {
+                                            try {
+                                                $dietImageUrl = \Illuminate\Support\Facades\Storage::url($dietImageUrl);
+                                            } catch (\Throwable $e) {
+                                                // leave as-is
+                                            }
+                                        }
+                                        
+                                        $finalDietImage = $dietImageUrl ?: '/placeholder.svg?height=160&width=280';
+                                    @endphp
+
+                                    <div @mouseenter="showDietPreview('{{ e($finalDietImage) }}', '{{ e(ucfirst($name)) }}', $event)"
+                                         @mouseleave="hideDietPreview()"
+                                         class="px-3 py-1 rounded-full text-sm border shadow-sm cursor-default"
+                                         style="background-color: color-mix(in oklab, var(--color-secondary) 12%, white); color: color-mix(in oklab, var(--color-secondary) 50%, black);">
+                                        {{ ucfirst($name) }}
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <!-- Hover preview card for diet -->
+                            <div x-show="dietPreviewOpen" x-cloak x-transition.opacity.scale.origin.top.left
+                                 :style="dietPreviewStyle"
+                                 class="fixed z-50 pointer-events-none">
+                                <div class="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 animate-fade-in" style="width: 280px;">
+                                    <div class="p-2">
+                                        <img :src="dietPreviewImage" alt="Diet preview" class="w-full h-40 object-cover rounded-md">
+                                        <div class="px-2 py-2 font-semibold text-sm" x-text="dietPreviewName"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Characteristics (stars + short descriptions) --}}
@@ -758,8 +870,8 @@
                                     <img 
                                         src="{{ $galleryItem['url'] ?? $galleryItem }}"
                                         alt="{{ $pet->name }} - Image {{ $index + 1 }}"
-                                        class="gallery-image w-full rounded-lg"
-                                        loading="lazy">
+                                        class="block w-full h-auto object-cover rounded-lg"
+                                    />
                                 </div>
                             @endforeach
                         </div>
@@ -791,9 +903,6 @@
                 </div>
             </div>
         @endif
-
-        {{-- Lightbox Modal for Gallery --}}
-        {{-- Preview image removed as requested --}}
 
         {{-- GIF Modal --}}
         @if($pet->gif_url)
@@ -903,4 +1012,62 @@
     </div>
 </main>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const playBtn = document.getElementById('ttsPlayBtn');
+    const stopBtn = document.getElementById('ttsStopBtn');
+    const textEl = document.getElementById('petDescription');
+
+    if (!('speechSynthesis' in window)) {
+        if (playBtn) { playBtn.disabled = true; playBtn.title = 'Text-to-speech not supported'; }
+        return;
+    }
+
+    let utterance = null;
+
+    function speak() {
+        if (!textEl || !textEl.innerText.trim()) return;
+        window.speechSynthesis.cancel();
+        utterance = new SpeechSynthesisUtterance(textEl.innerText.trim());
+        utterance.lang = 'en-US';
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        utterance.onend = () => {
+            playBtn.textContent = '🔊 Play';
+            playBtn.setAttribute('aria-pressed', 'false');
+            stopBtn.classList.add('hidden');
+        };
+        window.speechSynthesis.speak(utterance);
+        playBtn.textContent = '⏸ Pause';
+        playBtn.setAttribute('aria-pressed', 'true');
+        stopBtn.classList.remove('hidden');
+    }
+
+    function stop() {
+        window.speechSynthesis.cancel();
+        playBtn.textContent = '🔊 Play';
+        playBtn.setAttribute('aria-pressed', 'false');
+        stopBtn.classList.add('hidden');
+    }
+
+    playBtn.addEventListener('click', function () {
+        if (window.speechSynthesis.speaking) {
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+                playBtn.textContent = '⏸ Pause';
+                playBtn.setAttribute('aria-pressed', 'true');
+            } else {
+                window.speechSynthesis.pause();
+                playBtn.textContent = '▶️ Resume';
+                playBtn.setAttribute('aria-pressed', 'false');
+            }
+        } else {
+            speak();
+        }
+    });
+
+    stopBtn.addEventListener('click', stop);
+    window.addEventListener('beforeunload', stop);
+});
+</script>
 @endsection

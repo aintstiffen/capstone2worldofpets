@@ -13,6 +13,11 @@ use Illuminate\Support\Str;
 use Filament\Tables\Columns\ImageColumn;
 use Illuminate\Support\Facades\Http;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Storage;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
+
 
 class PetResource extends Resource
 {
@@ -100,7 +105,7 @@ class PetResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Color Name')
-                            ->required()
+                           
                             ->maxLength(100),
 
                         Forms\Components\FileUpload::make('image')
@@ -108,7 +113,6 @@ class PetResource extends Resource
                             ->image()
                             ->directory('color_images')
                             ->disk('s3')
-                            ->required()
                             ->helperText('Upload an image that represents this color. Files will be stored on your configured S3 bucket.'),
                     ])
                     ->columns(2)
@@ -270,25 +274,8 @@ class PetResource extends Resource
                                 }
                                 
                                 // Description - handle both APIs
-                                $description = '';
-                                if (!empty($breedData['description'])) {
-                                    $description = $breedData['description'];
-                                } elseif (!empty($breedData['bred_for'])) {
-                                    // For dogs, use bred_for as part of description
-                                    $description = "Bred for: " . $breedData['bred_for'] . ". ";
-                                    if (!empty($breedData['breed_group'])) {
-                                        $description .= "Breed Group: " . $breedData['breed_group'] . ". ";
-                                    }
-                                }
-                                
-                                // Add temperament to description if not already set
-                                if ($description && !empty($breedData['temperament'])) {
-                                    $description .= "Temperament: " . $breedData['temperament'] . ".";
-                                }
-                                
-                                if ($description) {
-                                    $set('description', $description);
-                                }
+                                // Description will be entered manually by the admin.
+                                // Do not auto-fill 'description' from the external API.
                                 
                                 // Cat-specific ratings (1-5 scale)
                                 if ($type === 'cat') {
@@ -378,7 +365,29 @@ class PetResource extends Resource
                                 ->send();
                         }
                     })
+                    
                     ->dehydrated(false),
+                                Repeater::make('diet_images')
+                ->label('Common Diet')
+                ->schema([
+                    TextInput::make('name')
+                        ->label('Diet Name')
+
+                        ->columnSpan(6),
+
+                    FileUpload::make('image')
+                        ->label('Image')
+
+                        ->image()
+                        ->disk(env('FILESYSTEM_DISK', 's3'))
+                        ->directory('diet_images')
+                        ->columnSpan(6),
+                ])
+                ->createItemButtonLabel('Add diet item')
+                ->columns(2)
+                // hydrate repeater from model record on edit
+                                ->helperText('Upload an image for each common diet item; the frontend will show a hover preview.'),
+
                     Forms\Components\Select::make('gif_url')
                         ->label('Select a GIF (Tenor)')
                         ->searchable()
@@ -466,11 +475,9 @@ class PetResource extends Resource
 
                 Forms\Components\Textarea::make('description')
                     ->required()
-                    ->minLength(50)
-                    ->maxLength(1000)
-                    ->rows(4)
+                    ->rows(8)
                     ->placeholder('Provide a comprehensive description of this pet breed')
-                    ->helperText('Include origin, history, common uses, and distinguishing characteristics'),
+                    ->helperText('Enter the full description manually. No length limit is enforced by the form.'),
 
                 // Image Preview Section
                 Forms\Components\Section::make('Image Preview')
