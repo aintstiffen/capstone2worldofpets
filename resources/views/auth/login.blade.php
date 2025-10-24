@@ -68,6 +68,9 @@
                 @error('password')
                     <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                 @enderror
+                <div class="mt-2 text-right">
+                    <a href="{{ route('password.request') }}" class="text-sm text-pink-600 hover:underline">Forgot your password?</a>
+                </div>
             </div>
 
             <!-- Remember Me -->

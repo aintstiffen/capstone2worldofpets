@@ -1,3 +1,4 @@
+@extends('layouts.app')
 @section('content')
 <div class="mb-10 min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 pb-12 pet-page-bg">
     <div class="w-full sm:max-w-md lg:max-w-lg mt-6 mb-8 px-6 py-8 pet-card">
