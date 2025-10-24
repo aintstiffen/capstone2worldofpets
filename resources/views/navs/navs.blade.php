@@ -78,7 +78,7 @@
             <nav class="hidden md:flex items-center space-x-8 text-sm">
                 <a href="{{ route('dogs') }}" class="font-medium transition-colors hover:text-[var(--color-primary)] hover:underline underline-offset-4 {{ request()->routeIs('dogs*') ? 'text-[var(--color-primary)]' : '' }}">Dogs</a>
                 <a href="{{ route('cats') }}" class="font-medium transition-colors hover:text-[var(--color-primary)] hover:underline underline-offset-4 {{ request()->routeIs('cats*') ? 'text-[var(--color-primary)]' : '' }}">Cats</a>
-                <a href="{{ route('assessment') }}" class="font-medium transition-colors hover:text-[var(--color-primary)] hover:underline underline-offset-4 {{ request()->routeIs('assessment*') ? 'text-[var(--color-primary)]' : '' }}">Personality Assessment</a>
+                <a href="{{ route('assessment') }}" class="font-medium transition-colors hover:text-[var(--color-primary)] hover:underline underline-offset-4 {{ request()->routeIs('assessment*') ? 'text-[var(--color-primary)]' : '' }}">Breed Recommendations</a>
                 <a href="/compare" class="font-medium transition-colors hover:text-[var(--color-primary)] hover:underline underline-offset-4 {{ request()->path() == 'compare' ? 'text-[var(--color-primary)]' : '' }}">Compare Breeds</a>
             </nav>
             <div class="flex items-center gap-2">

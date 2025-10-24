@@ -105,7 +105,7 @@ class PetResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Color Name')
-                           
+                            ->required()
                             ->maxLength(100),
 
                         Forms\Components\FileUpload::make('image')
@@ -113,13 +113,21 @@ class PetResource extends Resource
                             ->image()
                             ->directory('color_images')
                             ->disk('s3')
+                            ->visibility('public')
+                            ->preserveFilenames()
                             ->helperText('Upload an image that represents this color. Files will be stored on your configured S3 bucket.'),
                     ])
                     ->columns(2)
                     ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
                     ->collapsible()
                     ->reorderable()
-                    ->helperText('Upload an image for each common color. The frontend will show these when clicking a color badge.'),
+                    ->helperText('Upload an image for each common color. The frontend will show these when clicking a color badge.')
+                    ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                        return $data;
+                    })
+                    ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                        return $data;
+                    }),
 
                 // Gallery image URLs for carousel (up to 10 images)
                 Forms\Components\Repeater::make('gallery')
@@ -273,10 +281,6 @@ class PetResource extends Resource
                                     $set('lifespan', $breedData['life_span']);
                                 }
                                 
-                                // Description - handle both APIs
-                                // Description will be entered manually by the admin.
-                                // Do not auto-fill 'description' from the external API.
-                                
                                 // Cat-specific ratings (1-5 scale)
                                 if ($type === 'cat') {
                                     // Energy level
@@ -367,103 +371,115 @@ class PetResource extends Resource
                     })
                     
                     ->dehydrated(false),
-                                Repeater::make('diet_images')
-                ->label('Common Diet')
-                ->schema([
-                    TextInput::make('name')
-                        ->label('Diet Name')
 
-                        ->columnSpan(6),
+                Repeater::make('diet_images')
+                    ->label('Common Diet')
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Diet Name')
+                            ->required()
+                            ->columnSpan(6),
 
-                    FileUpload::make('image')
-                        ->label('Image')
+                        FileUpload::make('image')
+                            ->label('Image')
+                            ->required()
+                            ->image()
+                            ->disk(env('FILESYSTEM_DISK', 's3'))
+                            ->directory('diet_images')
+                            ->visibility('public')
+                            ->preserveFilenames()
+                            ->columnSpan(6)
+                           
+                    ])
+                    ->createItemButtonLabel('Add diet item')
+                    ->columns(2)
+                    ->collapsible()
+                    ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
+                    ->reorderable()
+                    ->helperText('Upload an image for each common diet item; the frontend will show a hover preview.')
+                    ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                        return $data;
+                    })
+                    ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                        return $data;
+                    }),
 
-                        ->image()
-                        ->disk(env('FILESYSTEM_DISK', 's3'))
-                        ->directory('diet_images')
-                        ->columnSpan(6),
-                ])
-                ->createItemButtonLabel('Add diet item')
-                ->columns(2)
-                // hydrate repeater from model record on edit
-                                ->helperText('Upload an image for each common diet item; the frontend will show a hover preview.'),
+                Forms\Components\Select::make('gif_url')
+                    ->label('Select a GIF (Tenor)')
+                    ->searchable()
+                    ->reactive()
+                    ->options(function (callable $get) {
+                        try {
+                            $query = $get('name') ?? 'cute pet';
+                            $response = Http::get('https://tenor.googleapis.com/v2/search', [
+                                'key' => config('services.tenor.key'),
+                                'q' => $query,
+                                'limit' => 10,
+                                'contentfilter' => 'high',
+                            ]);
 
-                    Forms\Components\Select::make('gif_url')
-                        ->label('Select a GIF (Tenor)')
-                        ->searchable()
-                        ->reactive()
-                        ->options(function (callable $get) {
-                            try {
-                                $query = $get('name') ?? 'cute pet';
-                                $response = Http::get('https://tenor.googleapis.com/v2/search', [
-                                    'key' => config('services.tenor.key'),
-                                    'q' => $query,
-                                    'limit' => 10,
-                                    'contentfilter' => 'high',
-                                ]);
+                            if ($response->ok()) {
+                                $results = $response->json()['results'] ?? [];
 
-                                if ($response->ok()) {
-                                    $results = $response->json()['results'] ?? [];
+                                return collect($results)->mapWithKeys(function ($item) {
+                                    $media = $item['media_formats'] ?? [];
+                                    $url = $media['gif']['url'] 
+                                        ?? $media['mediumgif']['url'] 
+                                        ?? $media['mp4']['url'] 
+                                        ?? $media['tinygif']['url'] 
+                                        ?? $media['nanogif']['url'] 
+                                        ?? null;
 
-                                    return collect($results)->mapWithKeys(function ($item) {
-                                        $media = $item['media_formats'] ?? [];
-                                        $url = $media['gif']['url'] 
-                                            ?? $media['mediumgif']['url'] 
-                                            ?? $media['mp4']['url'] 
-                                            ?? $media['tinygif']['url'] 
-                                            ?? $media['nanogif']['url'] 
-                                            ?? null;
+                                    if (! $url) {
+                                        return [];
+                                    }
 
-                                        if (! $url) {
-                                            return [];
-                                        }
-
-                                        $label = $item['content_description'] ?? ($item['title'] ?? 'GIF');
-                                        return [$url => $label];
-                                    })->filter()->toArray();
-                                }
-                            } catch (\Exception $e) {
-                                \Log::error('Tenor API failed: ' . $e->getMessage());
+                                    $label = $item['content_description'] ?? ($item['title'] ?? 'GIF');
+                                    return [$url => $label];
+                                })->filter()->toArray();
                             }
+                        } catch (\Exception $e) {
+                            \Log::error('Tenor API failed: ' . $e->getMessage());
+                        }
 
-                            return [];
-                        })
-                        ->helperText('Search Tenor and select a GIF URL to store on the pet record')
-                        ->getSearchResultsUsing(function (string $search) {
-                            try {
-                                $response = Http::get('https://tenor.googleapis.com/v2/search', [
-                                    'key' => config('services.tenor.key'),
-                                    'q' => $search,
-                                    'limit' => 10,
-                                    'contentfilter' => 'high',
-                                ]);
+                        return [];
+                    })
+                    ->helperText('Search Tenor and select a GIF URL to store on the pet record')
+                    ->getSearchResultsUsing(function (string $search) {
+                        try {
+                            $response = Http::get('https://tenor.googleapis.com/v2/search', [
+                                'key' => config('services.tenor.key'),
+                                'q' => $search,
+                                'limit' => 10,
+                                'contentfilter' => 'high',
+                            ]);
 
-                                if ($response->ok()) {
-                                    $results = $response->json()['results'] ?? [];
+                            if ($response->ok()) {
+                                $results = $response->json()['results'] ?? [];
 
-                                    return collect($results)->mapWithKeys(function ($item) {
-                                        $media = $item['media_formats'] ?? [];
-                                        $url = $media['gif']['url'] 
-                                            ?? $media['mediumgif']['url'] 
-                                            ?? $media['mp4']['url'] 
-                                            ?? $media['tinygif']['url'] 
-                                            ?? $media['nanogif']['url'] 
-                                            ?? null;
+                                return collect($results)->mapWithKeys(function ($item) {
+                                    $media = $item['media_formats'] ?? [];
+                                    $url = $media['gif']['url'] 
+                                        ?? $media['mediumgif']['url'] 
+                                        ?? $media['mp4']['url'] 
+                                        ?? $media['tinygif']['url'] 
+                                        ?? $media['nanogif']['url'] 
+                                        ?? null;
 
-                                        if (! $url) {
-                                            return [];
-                                        }
+                                    if (! $url) {
+                                        return [];
+                                    }
 
-                                        $label = $item['content_description'] ?? ($item['title'] ?? 'GIF');
-                                        return [$url => $label];
-                                    })->filter()->toArray();
-                                }
-                            } catch (\Exception $e) {
-                                \Log::error('Tenor search failed: ' . $e->getMessage());
+                                    $label = $item['content_description'] ?? ($item['title'] ?? 'GIF');
+                                    return [$url => $label];
+                                })->filter()->toArray();
                             }
+                        } catch (\Exception $e) {
+                            \Log::error('Tenor search failed: ' . $e->getMessage());
+                        }
 
-                            return [];
-                        }),
+                        return [];
+                    }),
 
                 Forms\Components\TextInput::make('image')
                     ->label('Image URL')
@@ -590,8 +606,7 @@ class PetResource extends Resource
                     ->circular()
                     ->defaultImageUrl('/placeholder.svg?height=200&width=200')
                     ->getStateUsing(fn($record) => $record->image_url ?? $record->image)
-                    ->extraImgAttributes(['loading' => 'lazy'])
-                    ,
+                    ->extraImgAttributes(['loading' => 'lazy']),
 
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category')->sortable(),
