@@ -705,91 +705,85 @@
                     @endif
 
                     {{-- Common Diet block --}}
-                    @php
-                        // Merge names: tags (if any) + diet_images keys
-                        $dietNames = [];
-                        if (!empty($pet->diets) && is_array($pet->diets)) {
-                            $dietNames = array_merge($dietNames, $pet->diets);
-                        }
-                        if (!empty($pet->diet_images) && is_array($pet->diet_images)) {
-                            $dietNames = array_merge($dietNames, array_keys($pet->diet_images));
-                        }
-                        $dietNames = array_values(array_unique(array_filter($dietNames)));
-                    @endphp
+@php
+    // Get the URL-mapped diet images using the accessor
+    $dietImageUrls = $pet->diet_image_urls; // This returns ['name' => 'url'] mapping
+    
+    // Merge names: tags (if any) + diet_images keys
+    $dietNames = [];
+    if (!empty($pet->diets) && is_array($pet->diets)) {
+        $dietNames = array_merge($dietNames, $pet->diets);
+    }
+    if (!empty($dietImageUrls) && is_array($dietImageUrls)) {
+        $dietNames = array_merge($dietNames, array_keys($dietImageUrls));
+    }
+    $dietNames = array_values(array_unique(array_filter($dietNames)));
+@endphp
 
-                    @if(!empty($dietNames))
-                        <div x-data="{
-                                dietPreviewOpen: false,
-                                dietPreviewImage: '',
-                                dietPreviewName: '',
-                                dietPreviewStyle: {},
-                                showDietPreview(url, name, ev) {
-                                    if (!url) return;
-                                    this.dietPreviewImage = url;
-                                    this.dietPreviewName = name;
-                                    this.dietPreviewOpen = true;
-                                    // position above the target element (keep preview size fixed)
-                                    const rect = ev.target.getBoundingClientRect();
-                                    const previewHeight = 200; /* 160px image + 40px label */
-                                    const width = 280; /* keep the beautiful size */
-                                    let left = rect.left + window.scrollX;
-                                    // ensure preview doesn't run off-screen to the right
-                                    const maxLeft = window.innerWidth - width - 12;
-                                    if (left > maxLeft) left = Math.max(12, maxLeft);
-                                    const top = rect.top + window.scrollY - previewHeight - 8;
-                                    this.dietPreviewStyle = {
-                                        left: left + 'px',
-                                        top: top + 'px',
-                                        width: width + 'px'
-                                    };
-                                },
-                                hideDietPreview() {
-                                    this.dietPreviewOpen = false;
-                                    this.dietPreviewImage = '';
-                                    this.dietPreviewName = '';
-                                    this.dietPreviewStyle = {};
-                                }
-                            }" class="mt-4">
-                            <h3 class="font-medium mb-2">Common Diet</h3>
-                            <div class="flex flex-wrap gap-2">
-                                @foreach ($dietNames as $name)
-                                    @php
-                                        $dietImageUrl = $pet->diet_images[$name] ?? null;
-                                        
-                                        if ($dietImageUrl && !preg_match('/^https?:\/\//', $dietImageUrl)) {
-                                            try {
-                                                $dietImageUrl = \Illuminate\Support\Facades\Storage::url($dietImageUrl);
-                                            } catch (\Throwable $e) {
-                                                // leave as-is
-                                            }
-                                        }
-                                        
-                                        $finalDietImage = $dietImageUrl ?: '/placeholder.svg?height=160&width=280';
-                                    @endphp
+@if(!empty($dietNames))
+    <div x-data="{
+            dietPreviewOpen: false,
+            dietPreviewImage: '',
+            dietPreviewName: '',
+            dietPreviewStyle: {},
+            showDietPreview(url, name, ev) {
+                if (!url) return;
+                this.dietPreviewImage = url;
+                this.dietPreviewName = name;
+                this.dietPreviewOpen = true;
+                // position above the target element (keep preview size fixed)
+                const rect = ev.target.getBoundingClientRect();
+                const previewHeight = 200; /* 160px image + 40px label */
+                const width = 280; /* keep the beautiful size */
+                let left = rect.left + window.scrollX;
+                // ensure preview doesn't run off-screen to the right
+                const maxLeft = window.innerWidth - width - 12;
+                if (left > maxLeft) left = Math.max(12, maxLeft);
+                const top = rect.top + window.scrollY - previewHeight - 8;
+                this.dietPreviewStyle = {
+                    left: left + 'px',
+                    top: top + 'px',
+                    width: width + 'px'
+                };
+            },
+            hideDietPreview() {
+                this.dietPreviewOpen = false;
+                this.dietPreviewImage = '';
+                this.dietPreviewName = '';
+                this.dietPreviewStyle = {};
+            }
+        }" class="mt-4">
+        <h3 class="font-medium mb-2">Common Diet</h3>
+        <div class="flex flex-wrap gap-2">
+            @foreach ($dietNames as $name)
+                @php
+                    // Use the URL accessor which already handles conversion
+                    $dietImageUrl = $dietImageUrls[$name] ?? null;
+                    $finalDietImage = $dietImageUrl ?: '/placeholder.svg?height=160&width=280';
+                @endphp
 
-                                    <div @mouseenter="showDietPreview('{{ e($finalDietImage) }}', '{{ e(ucfirst($name)) }}', $event)"
-                                         @mouseleave="hideDietPreview()"
-                                         class="px-3 py-1 rounded-full text-sm border shadow-sm cursor-default"
-                                         style="background-color: color-mix(in oklab, var(--color-secondary) 12%, white); color: color-mix(in oklab, var(--color-secondary) 50%, black);">
-                                        {{ ucfirst($name) }}
-                                    </div>
-                                @endforeach
-                            </div>
-
-                            <!-- Hover preview card for diet -->
-                            <div x-show="dietPreviewOpen" x-cloak x-transition.opacity.scale.origin.top.left
-                                 :style="dietPreviewStyle"
-                                 class="fixed z-50 pointer-events-none">
-                                <div class="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 animate-fade-in" style="width: 280px;">
-                                    <div class="p-2">
-                                        <img :src="dietPreviewImage" alt="Diet preview" class="w-full h-40 object-cover rounded-md">
-                                        <div class="px-2 py-2 font-semibold text-sm" x-text="dietPreviewName"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
+                <div @mouseenter="showDietPreview('{{ e($finalDietImage) }}', '{{ e(ucfirst($name)) }}', $event)"
+                     @mouseleave="hideDietPreview()"
+                     class="px-3 py-1 rounded-full text-sm border shadow-sm cursor-default"
+                     style="background-color: color-mix(in oklab, var(--color-secondary) 12%, white); color: color-mix(in oklab, var(--color-secondary) 50%, black);">
+                    {{ ucfirst($name) }}
                 </div>
+            @endforeach
+        </div>
+
+        <!-- Hover preview card for diet -->
+        <div x-show="dietPreviewOpen" x-cloak x-transition.opacity.scale.origin.top.left
+             :style="dietPreviewStyle"
+             class="fixed z-50 pointer-events-none">
+            <div class="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100 animate-fade-in" style="width: 280px;">
+                <div class="p-2">
+                    <img :src="dietPreviewImage" alt="Diet preview" class="w-full h-40 object-cover rounded-md">
+   
+                </div>
+            </div>
+        </div>
+    </div>
+@endif
 
                 {{-- Characteristics (stars + short descriptions) --}}
                 <div class="space-y-6 pt-4">

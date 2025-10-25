@@ -96,32 +96,34 @@ class PetResource extends Resource
                     ->options([1, 2, 3, 4, 5])
                     ->default(3),
 
-                Forms\Components\TagsInput::make('colors'),
-
-                // Per-color image uploads (name + file). Stored as JSON array of items
-                // e.g. [{"name":"Black","image":"color_images/black.jpg"}, ...]
-                Forms\Components\Repeater::make('color_images')
+                // Color Images with Upload (same as diet_images)
+                Repeater::make('color_images')
                     ->label('Color Images')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Color Name')
                             ->required()
-                            ->maxLength(100),
+                            ->placeholder('e.g., Black, White, Grey')
+                            ->maxLength(100)
+                            ->columnSpan(6),
 
-                        Forms\Components\FileUpload::make('image')
+                        FileUpload::make('image')
                             ->label('Image')
+                            ->required()
                             ->image()
+                            ->disk(env('FILESYSTEM_DISK', 's3'))
                             ->directory('color_images')
-                            ->disk('s3')
                             ->visibility('public')
                             ->preserveFilenames()
-                            ->helperText('Upload an image that represents this color. Files will be stored on your configured S3 bucket.'),
+                            ->helperText('Upload an image that represents this color. Files will be stored on your configured S3 bucket.')
+                            ->columnSpan(6)
                     ])
+                    ->createItemButtonLabel('Add color variation')
                     ->columns(2)
-                    ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
                     ->collapsible()
+                    ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
                     ->reorderable()
-                    ->helperText('Upload an image for each common color. The frontend will show these when clicking a color badge.')
+                    ->helperText('Upload an image for each color variation. The frontend will show a hover preview when users mouse over the color badge.')
                     ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
                         return $data;
                     })
@@ -174,18 +176,15 @@ class PetResource extends Resource
 
                         $results = [];
                         foreach ($resp->json() as $item) {
-                            // Use unique id as value, show name
                             $results[$item['id']] = $item['name'] ?? $item['id'];
                         }
                         return $results;
                     })
                     ->afterStateUpdated(function ($state, $set, $get) {
-                        // When a breed is chosen, fetch full details and autofill form fields
                         $type = $get('category');
                         if (!$type || !$state) return;
 
                         try {
-                            // Show loading notification
                             \Filament\Notifications\Notification::make()
                                 ->title('Fetching breed details...')
                                 ->info()
@@ -194,7 +193,6 @@ class PetResource extends Resource
                             $breedData = null;
                             
                             if ($type === 'dog') {
-                                // Fetch breed details from TheDogAPI using breeds endpoint
                                 $breedResp = Http::withHeaders([
                                     'x-api-key' => config('services.dog_api.key'),
                                 ])->get(config('services.dog_api.base_url') . '/breeds', [
@@ -203,7 +201,6 @@ class PetResource extends Resource
                                 
                                 if ($breedResp->ok()) {
                                     $breeds = $breedResp->json();
-                                    // Find the breed by ID
                                     foreach ($breeds as $breed) {
                                         if ($breed['id'] == $state) {
                                             $breedData = $breed;
@@ -212,7 +209,6 @@ class PetResource extends Resource
                                     }
                                 }
                                 
-                                // Fetch an image for the breed
                                 $imageResp = Http::withHeaders([
                                     'x-api-key' => config('services.dog_api.key'),
                                 ])->get(config('services.dog_api.base_url') . '/images/search', [
@@ -228,7 +224,6 @@ class PetResource extends Resource
                                     }
                                 }
                             } else {
-                                // Fetch breed details from TheCatAPI using breeds endpoint
                                 $breedResp = Http::withHeaders([
                                     'x-api-key' => config('services.cat_api.key'),
                                 ])->get(config('services.cat_api.base_url') . '/breeds', [
@@ -237,7 +232,6 @@ class PetResource extends Resource
                                 
                                 if ($breedResp->ok()) {
                                     $breeds = $breedResp->json();
-                                    // Find the breed by ID
                                     foreach ($breeds as $breed) {
                                         if ($breed['id'] == $state) {
                                             $breedData = $breed;
@@ -246,7 +240,6 @@ class PetResource extends Resource
                                     }
                                 }
                                 
-                                // Fetch an image for the breed
                                 $imageResp = Http::withHeaders([
                                     'x-api-key' => config('services.cat_api.key'),
                                 ])->get(config('services.cat_api.base_url') . '/images/search', [
@@ -263,27 +256,21 @@ class PetResource extends Resource
                                 }
                             }
                             
-                            // Autofill form fields from breed data
                             if ($breedData) {
-                                // Name and slug
                                 if (!empty($breedData['name'])) {
                                     $set('name', $breedData['name']);
                                     $set('slug', \Illuminate\Support\Str::slug($breedData['name']));
                                 }
                                 
-                                // Temperament
                                 if (!empty($breedData['temperament'])) {
                                     $set('temperament', $breedData['temperament']);
                                 }
                                 
-                                // Lifespan
                                 if (!empty($breedData['life_span'])) {
                                     $set('lifespan', $breedData['life_span']);
                                 }
                                 
-                                // Cat-specific ratings (1-5 scale)
                                 if ($type === 'cat') {
-                                    // Energy level
                                     if (isset($breedData['energy_level'])) {
                                         $energyMap = [1 => 'Low', 2 => 'Low', 3 => 'Medium', 4 => 'High', 5 => 'High'];
                                         $set('energy', $energyMap[$breedData['energy_level']] ?? 'Medium');
@@ -305,7 +292,6 @@ class PetResource extends Resource
                                         $set('grooming', $breedData['grooming']);
                                     }
                                     
-                                    // Size from weight
                                     if (!empty($breedData['weight']['imperial'])) {
                                         $weight = $breedData['weight']['imperial'];
                                         preg_match('/(\d+)/', $weight, $matches);
@@ -321,16 +307,13 @@ class PetResource extends Resource
                                     }
                                 }
                                 
-                                // Dog-specific fields
                                 if ($type === 'dog') {
-                                    // Set default ratings for dogs (APIs don't provide these)
                                     $set('friendliness', 4);
                                     $set('trainability', 3);
                                     $set('exerciseNeeds', 3);
                                     $set('grooming', 3);
                                     $set('energy', 'Medium');
                                     
-                                    // Size from weight
                                     if (!empty($breedData['weight']['imperial'])) {
                                         $weight = $breedData['weight']['imperial'];
                                         preg_match('/(\d+)/', $weight, $matches);
@@ -347,7 +330,6 @@ class PetResource extends Resource
                                 }
                             }
                             
-                            // Show success notification
                             Notification::make()
                                 ->title('Breed details loaded!')
                                 ->body('Form fields have been automatically filled with breed information.')
@@ -355,13 +337,11 @@ class PetResource extends Resource
                                 ->send();
                                 
                         } catch (\Throwable $e) {
-                            // Log error for debugging
                             \Log::error('Breed fetch error: ' . $e->getMessage(), [
                                 'breed_id' => $state,
                                 'type' => $type
                             ]);
                             
-                            // Show error notification
                             Notification::make()
                                 ->title('Failed to fetch breed details')
                                 ->body('Error: ' . $e->getMessage() . '. Please fill in the fields manually.')
@@ -369,7 +349,6 @@ class PetResource extends Resource
                                 ->send();
                         }
                     })
-                    
                     ->dehydrated(false),
 
                 Repeater::make('diet_images')
@@ -378,6 +357,7 @@ class PetResource extends Resource
                         TextInput::make('name')
                             ->label('Diet Name')
                             ->required()
+                            ->placeholder('e.g., Dry Food, Wet Food, Raw')
                             ->columnSpan(6),
 
                         FileUpload::make('image')
@@ -389,7 +369,6 @@ class PetResource extends Resource
                             ->visibility('public')
                             ->preserveFilenames()
                             ->columnSpan(6)
-                           
                     ])
                     ->createItemButtonLabel('Add diet item')
                     ->columns(2)
