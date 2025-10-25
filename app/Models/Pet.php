@@ -13,12 +13,13 @@ class Pet extends Model
     protected $fillable = [
         'name',
         'slug',
-        'size',
-        'temperament',
+        // renamed fields to match Filament form
+        'average_weight',
+        'price_range',
         'lifespan',
-        'energy',
+        'energy_level',
         'friendliness',
-        'trainability',
+        'origin',
         'exerciseNeeds',
         'grooming',
         'description',
@@ -85,16 +86,17 @@ class Pet extends Model
     $items = $this->gallery;
     if (!$items || !is_array($items)) return [];
 
-    $result = [];
-    foreach ($items as $item) {
-        if (!is_array($item)) continue;
-        $path = $item['image'] ?? null;
-        if (!$path) continue;
+        $result = [];
+        foreach ($items as $item) {
+            if (!is_array($item)) continue;
+            // support both 'url' (new) and 'image' (legacy) keys
+            $path = $item['url'] ?? $item['image'] ?? null;
+            if (!$path) continue;
 
-        $result[] = $this->resolveUrl($path);
-    }
+            $result[] = $this->resolveUrl($path);
+        }
 
-    return $result;
+        return $result;
 }
 
     /**
@@ -108,7 +110,14 @@ class Pet extends Model
 
         try {
             $disk = config('filesystems.default', env('FILESYSTEM_DISK', 's3'));
-            return \Illuminate\Support\Facades\Storage::disk($disk)->url($path);
+            $storageDisk = \Illuminate\Support\Facades\Storage::disk($disk);
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $storageDisk */
+            if (method_exists($storageDisk, 'url')) {
+                return $storageDisk->url($path);
+            }
+
+            // Fallback: return the path if the disk adapter doesn't expose a url() method
+            return $path;
         } catch (\Throwable $e) {
             \Log::error('Failed to resolve URL for path: ' . $path, ['error' => $e->getMessage()]);
             return $path;
