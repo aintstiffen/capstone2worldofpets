@@ -528,38 +528,52 @@
 
                 </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-    <div class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transition-all duration-300 hover:scale-105 hover:shadow-pink-200 hover:bg-pink-50 relative overflow-hidden">
-        <span class="absolute top-2 left-2 text-pink-200 text-2xl paw-icon pulse-animation">🐾</span>
-        <div class="text-sm font-semibold text-pink-600 mb-1">Size</div>
-        <div class="text-lg font-extrabold text-gray-900 mb-1">{{ $pet->size }}</div>
-        <div class="text-xs text-gray-500 text-center leading-tight">
-            Indicates the general adult body size of the breed.<br>
-        </div>
-    </div>
-    <div class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transition-all duration-300 hover:scale-105 hover:shadow-blue-200 hover:bg-blue-50 relative overflow-hidden">
-        <span class="absolute top-2 left-2 text-blue-200 text-2xl paw-icon pulse-animation">🐾</span>
-        <div class="text-sm font-semibold text-blue-600 mb-1">Lifespan</div>
-        <div class="text-lg font-extrabold text-gray-900 mb-1">{{ $pet->lifespan }}</div>
-        <div class="text-xs text-gray-500 text-center leading-tight">
-            Average expected years the breed typically lives.
-        </div>
-    </div>
-    <div class="bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transition-all duration-300 hover:scale-105 hover:shadow-green-200 hover:bg-green-50 relative overflow-hidden">
-        <span class="absolute bottom-2 left-2 text-green-200 text-2xl paw-icon pulse-animation">🐾</span>
-        <div class="text-sm font-semibold text-green-600 mb-1">Energy</div>
-        <div class="text-lg font-extrabold text-gray-900 mb-1">
-            @if(is_numeric($pet->energy))
-                {{ $pet->energy }}/5
-            @else
-                {{ $pet->energy }}
-            @endif
-        </div>
-        <div class="text-xs text-gray-500 text-center leading-tight">
-            Describes how active and playful the breed usually is.<br>
-        </div>
-    </div>
+<div class="space-y-6 pt-4">
+    @php
+        $characteristics = [
+            'Friendliness' => $pet->friendliness,
+            'Trainability' => $pet->trainability,
+            'Exercise Needs' => $pet->exerciseNeeds,
+            'Grooming' => $pet->grooming
+        ];
 
+        $characteristicDescriptions = [
+            'Friendliness' => 'How sociable the breed is with people and other animals (higher = very friendly).',
+            'Trainability' => 'How easy the breed is to train and respond to commands (higher = very trainable).',
+            'Exercise Needs' => 'Approximate daily activity needs (higher = needs more exercise).',
+            'Grooming' => 'Amount of grooming & coat maintenance required (higher = more grooming).',
+        ];
+    @endphp
+
+    @foreach($characteristics as $label => $value)
+        @php
+            $value = (int) $value; // ensure int 0-5
+            $description = $characteristicDescriptions[$label] ?? '';
+        @endphp
+
+        <div>
+            <div class="flex items-start justify-between mb-2">
+                <div>
+                    <span class="text-sm font-medium block">{{ $label }}</span>
+                    <p class="text-xs text-[--color-muted-foreground] mt-1">{{ $description }}</p>
+                </div>
+
+                <div class="ml-4 flex items-center" aria-hidden="true">
+                    {{-- Stars (visual) --}}
+                    @for($i = 1; $i <= 5; $i++)
+                        @if($i <= $value)
+                            <svg class="h-5 w-5 text-yellow-400 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.13 3.478a1 1 0 00.95.69h3.654c.969 0 1.371 1.24.588 1.81l-2.958 2.15a1 1 0 00-.364 1.118l1.13 3.478c.3.921-.755 1.688-1.54 1.118l-2.958-2.15a1 1 0 00-1.176 0l-2.958 2.15c-.784.57-1.838-.197-1.539-1.118l1.13-3.478a1 1 0 00-.364-1.118L2.38 8.905c-.783-.57-.38-1.81.588-1.81h3.654a1 1 0 00.95-.69l1.13-3.478z"/></svg>
+                        @else
+                            <svg class="h-5 w-5 text-gray-300 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.13 3.478a1 1 0 00.95.69h3.654c.969 0 1.371 1.24.588 1.81l-2.958 2.15a1 1 0 00-.364 1.118l1.13 3.478c.3.921-.755 1.688-1.54 1.118l-2.958-2.15a1 1 0 00-1.176 0l-2.958 2.15c-.784.57-1.838-.197-1.539-1.118l1.13-3.478a1 1 0 00-.364-1.118L2.38 8.905c-.783-.57-.38-1.81.588-1.81h3.654a1 1 0 00.95-.69l1.13-3.478z"/></svg>
+                        @endif
+                    @endfor
+                </div>
+            </div>
+
+            {{-- Accessible textual fallback for screen readers --}}
+            <div class="sr-only">{{ $label }}: {{ $value }} out of 5.</div>
+        </div>
+    @endforeach
 </div>
             </div>
 
@@ -596,7 +610,7 @@
                 <button id="ttsPlayBtn" type="button" class="inline-flex items-center px-4 py-2 bg-[var(--color-primary)] text-white rounded-md" aria-pressed="false" aria-label="Play description">
                     🔊 Play
                 </button>
-                <button id="ttsStopBtn" type="button" class="inline-flex items-center px-3 py-2 ml-2 border rounded-md hidden" aria-label="Stop speech">
+                <button id="ttsStopBtn" type="button" class="items-center px-3 py-2 ml-2 border rounded-md hidden" aria-label="Stop speech">
                     ⏹ Stop
                 </button>
             </div>
@@ -785,54 +799,7 @@
     </div>
 @endif
 
-                {{-- Characteristics (stars + short descriptions) --}}
-                <div class="space-y-6 pt-4">
-                    @php
-                        $characteristics = [
-                            'Friendliness' => $pet->friendliness,
-                            'Trainability' => $pet->trainability,
-                            'Exercise Needs' => $pet->exerciseNeeds,
-                            'Grooming' => $pet->grooming
-                        ];
-
-                        $characteristicDescriptions = [
-                            'Friendliness' => 'How sociable the breed is with people and other animals (higher = very friendly).',
-                            'Trainability' => 'How easy the breed is to train and respond to commands (higher = very trainable).',
-                            'Exercise Needs' => 'Approximate daily activity needs (higher = needs more exercise).',
-                            'Grooming' => 'Amount of grooming & coat maintenance required (higher = more grooming).',
-                        ];
-                    @endphp
-
-                    @foreach($characteristics as $label => $value)
-                        @php
-                            $value = (int) $value; // ensure int 0-5
-                            $description = $characteristicDescriptions[$label] ?? '';
-                        @endphp
-
-                        <div>
-                            <div class="flex items-start justify-between mb-2">
-                                <div>
-                                    <span class="text-sm font-medium block">{{ $label }}</span>
-                                    <p class="text-xs text-[--color-muted-foreground] mt-1">{{ $description }}</p>
-                                </div>
-
-                                <div class="ml-4 flex items-center" aria-hidden="true">
-                                    {{-- Stars (visual) --}}
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= $value)
-                                            <svg class="h-5 w-5 text-yellow-400 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.13 3.478a1 1 0 00.95.69h3.654c.969 0 1.371 1.24.588 1.81l-2.958 2.15a1 1 0 00-.364 1.118l1.13 3.478c.3.921-.755 1.688-1.54 1.118l-2.958-2.15a1 1 0 00-1.176 0l-2.958 2.15c-.784.57-1.838-.197-1.539-1.118l1.13-3.478a1 1 0 00-.364-1.118L2.38 8.905c-.783-.57-.38-1.81.588-1.81h3.654a1 1 0 00.95-.69l1.13-3.478z"/></svg>
-                                        @else
-                                            <svg class="h-5 w-5 text-gray-300 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.13 3.478a1 1 0 00.95.69h3.654c.969 0 1.371 1.24.588 1.81l-2.958 2.15a1 1 0 00-.364 1.118l1.13 3.478c.3.921-.755 1.688-1.54 1.118l-2.958-2.15a1 1 0 00-1.176 0l-2.958 2.15c-.784.57-1.838-.197-1.539-1.118l1.13-3.478a1 1 0 00-.364-1.118L2.38 8.905c-.783-.57-.38-1.81.588-1.81h3.654a1 1 0 00.95-.69l1.13-3.478z"/></svg>
-                                        @endif
-                                    @endfor
-                                </div>
-                            </div>
-
-                            {{-- Accessible textual fallback for screen readers --}}
-                            <div class="sr-only">{{ $label }}: {{ $value }} out of 5.</div>
-                        </div>
-                    @endforeach
-                </div>
+                
             </div>
         </div>
 
@@ -860,9 +827,30 @@
                             class="gallery-track"
                             :style="{ transform: `translateX(-${currentSlide * (100 / visibleSlides)}%)` }">
                             @foreach($pet->gallery as $index => $galleryItem)
+                                @php
+                                    // Gallery items may be stored as arrays (['url' => 'path'])
+                                    // or as plain strings ("gallery/xxx.jpg" or full URLs).
+                                    $raw = is_array($galleryItem) ? ($galleryItem['url'] ?? null) : $galleryItem;
+                                    if (empty($raw)) {
+                                        $imgSrc = '/placeholder.svg?height=400&width=400';
+                                    } else {
+                                        // If it's already a full URL, use it. Otherwise, resolve via Storage.
+                                        if (preg_match('/^https?:\/\//i', $raw)) {
+                                            $imgSrc = $raw;
+                                        } else {
+                                            try {
+                                                $imgSrc = \Illuminate\Support\Facades\Storage::url($raw);
+                                            } catch (\Throwable $e) {
+                                                // Fallback to the raw value if Storage resolution fails
+                                                $imgSrc = $raw;
+                                            }
+                                        }
+                                    }
+                                @endphp
+
                                 <div class="gallery-slide px-2">
-                                    <img 
-                                        src="{{ $galleryItem['url'] ?? $galleryItem }}"
+                                    <img
+                                        src="{{ e($imgSrc) }}"
                                         alt="{{ $pet->name }} - Image {{ $index + 1 }}"
                                         class="block w-full h-auto object-cover rounded-lg"
                                     />

@@ -96,7 +96,7 @@ class PetResource extends Resource
                     ->options([1, 2, 3, 4, 5])
                     ->default(3),
 
-                // Color Images with Upload (same as diet_images)
+                // Color Images with Upload
                 Repeater::make('color_images')
                     ->label('Color Images')
                     ->schema([
@@ -115,7 +115,7 @@ class PetResource extends Resource
                             ->directory('color_images')
                             ->visibility('public')
                             ->preserveFilenames()
-                            ->helperText('Upload an image that represents this color. Files will be stored on your configured S3 bucket.')
+                            ->helperText('Upload an image that represents this color.')
                             ->columnSpan(6)
                     ])
                     ->createItemButtonLabel('Add color variation')
@@ -123,7 +123,7 @@ class PetResource extends Resource
                     ->collapsible()
                     ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
                     ->reorderable()
-                    ->helperText('Upload an image for each color variation. The frontend will show a hover preview when users mouse over the color badge.')
+                    ->helperText('Upload an image for each color variation. The frontend will show a hover preview.')
                     ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
                         return $data;
                     })
@@ -131,19 +131,31 @@ class PetResource extends Resource
                         return $data;
                     }),
 
-                // Gallery image URLs for carousel (up to 10 images)
-                Forms\Components\Repeater::make('gallery')
+                // Gallery images with S3 upload (up to 10 images)
+                Repeater::make('gallery')
                     ->label('Gallery Images (up to 10)')
                     ->schema([
-                        Forms\Components\TextInput::make('url')
-                            ->label('Image URL')
-                            ->url()
+                        FileUpload::make('image')
+                            ->label('Gallery Image')
                             ->required()
-                            ->helperText('Paste a direct image URL from TheCatAPI or elsewhere.')
+                            ->image()
+                            ->disk(env('FILESYSTEM_DISK', 's3'))
+                            ->directory('gallery_images')
+                            ->visibility('public')
+                            ->preserveFilenames()
+                            ->helperText('Upload a gallery image. It will be stored on S3.')
                     ])
                     ->maxItems(10)
                     ->columns(1)
-                    ->helperText('These images will appear in the breed carousel. You can add up to 10.'),
+                    ->collapsible()
+                    ->reorderable()
+                    ->helperText('Upload up to 10 images for the breed gallery carousel.')
+                    ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                        return $data;
+                    })
+                    ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                        return $data;
+                    }),
 
                 Forms\Components\Select::make('breed_lookup')
                     ->label('Breed (search from API)')
