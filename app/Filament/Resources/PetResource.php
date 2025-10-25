@@ -5,19 +5,17 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PetResource\Pages;
 use App\Models\Pet;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Support\Str;
-use Filament\Tables\Columns\ImageColumn;
-use Illuminate\Support\Facades\Http;
-use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Storage;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\FileUpload;
-
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class PetResource extends Resource
 {
@@ -116,7 +114,7 @@ class PetResource extends Resource
                             ->visibility('public')
                             ->preserveFilenames()
                             ->helperText('Upload an image that represents this color.')
-                            ->columnSpan(6)
+                            ->columnSpan(6),
                     ])
                     ->createItemButtonLabel('Add color variation')
                     ->columns(2)
@@ -131,11 +129,10 @@ class PetResource extends Resource
                         return $data;
                     }),
 
-                // Gallery images with S3 upload (up to 10 images)
                 Repeater::make('gallery')
                     ->label('Gallery Images (up to 10)')
                     ->schema([
-                        FileUpload::make('image')
+                        FileUpload::make('url')  // ← Changed from 'image' to 'url'
                             ->label('Gallery Image')
                             ->required()
                             ->image()
@@ -143,19 +140,15 @@ class PetResource extends Resource
                             ->directory('gallery_images')
                             ->visibility('public')
                             ->preserveFilenames()
-                            ->helperText('Upload a gallery image. It will be stored on S3.')
+                            ->helperText('Upload a gallery image. It will be stored on S3.'),
                     ])
+                    ->createItemButtonLabel('Add gallery image')
                     ->maxItems(10)
                     ->columns(1)
                     ->collapsible()
                     ->reorderable()
-                    ->helperText('Upload up to 10 images for the breed gallery carousel.')
-                    ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
-                        return $data;
-                    })
-                    ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
-                        return $data;
-                    }),
+                    ->defaultItems(0)
+                    ->helperText('Upload up to 10 images for the breed gallery carousel.'),
 
                 Forms\Components\Select::make('breed_lookup')
                     ->label('Breed (search from API)')
@@ -164,19 +157,21 @@ class PetResource extends Resource
                     ->helperText('Start typing to search breeds from your selected Pet Type')
                     ->getSearchResultsUsing(function (string $search, $get) {
                         $type = $get('category');
-                        if (!$type) return [];
+                        if (! $type) {
+                            return [];
+                        }
 
                         try {
                             if ($type === 'dog') {
                                 $resp = Http::withHeaders([
                                     'x-api-key' => config('services.dog_api.key'),
-                                ])->get(config('services.dog_api.base_url') . '/breeds/search', [
+                                ])->get(config('services.dog_api.base_url').'/breeds/search', [
                                     'q' => $search,
                                 ]);
                             } else {
                                 $resp = Http::withHeaders([
                                     'x-api-key' => config('services.cat_api.key'),
-                                ])->get(config('services.cat_api.base_url') . '/breeds/search', [
+                                ])->get(config('services.cat_api.base_url').'/breeds/search', [
                                     'q' => $search,
                                 ]);
                             }
@@ -184,33 +179,38 @@ class PetResource extends Resource
                             return [];
                         }
 
-                        if (!$resp->ok()) return [];
+                        if (! $resp->ok()) {
+                            return [];
+                        }
 
                         $results = [];
                         foreach ($resp->json() as $item) {
                             $results[$item['id']] = $item['name'] ?? $item['id'];
                         }
+
                         return $results;
                     })
                     ->afterStateUpdated(function ($state, $set, $get) {
                         $type = $get('category');
-                        if (!$type || !$state) return;
+                        if (! $type || ! $state) {
+                            return;
+                        }
 
                         try {
                             \Filament\Notifications\Notification::make()
                                 ->title('Fetching breed details...')
                                 ->info()
                                 ->send();
-                            
+
                             $breedData = null;
-                            
+
                             if ($type === 'dog') {
                                 $breedResp = Http::withHeaders([
                                     'x-api-key' => config('services.dog_api.key'),
-                                ])->get(config('services.dog_api.base_url') . '/breeds', [
-                                    'attach_breed' => 0
+                                ])->get(config('services.dog_api.base_url').'/breeds', [
+                                    'attach_breed' => 0,
                                 ]);
-                                
+
                                 if ($breedResp->ok()) {
                                     $breeds = $breedResp->json();
                                     foreach ($breeds as $breed) {
@@ -220,15 +220,15 @@ class PetResource extends Resource
                                         }
                                     }
                                 }
-                                
+
                                 $imageResp = Http::withHeaders([
                                     'x-api-key' => config('services.dog_api.key'),
-                                ])->get(config('services.dog_api.base_url') . '/images/search', [
+                                ])->get(config('services.dog_api.base_url').'/images/search', [
                                     'breed_ids' => $state,
                                     'limit' => 1,
                                 ]);
-                                
-                                if ($imageResp->ok() && !empty($imageResp->json())) {
+
+                                if ($imageResp->ok() && ! empty($imageResp->json())) {
                                     $imageData = $imageResp->json()[0] ?? [];
                                     $url = $imageData['url'] ?? null;
                                     if ($url) {
@@ -238,10 +238,10 @@ class PetResource extends Resource
                             } else {
                                 $breedResp = Http::withHeaders([
                                     'x-api-key' => config('services.cat_api.key'),
-                                ])->get(config('services.cat_api.base_url') . '/breeds', [
-                                    'attach_breed' => 0
+                                ])->get(config('services.cat_api.base_url').'/breeds', [
+                                    'attach_breed' => 0,
                                 ]);
-                                
+
                                 if ($breedResp->ok()) {
                                     $breeds = $breedResp->json();
                                     foreach ($breeds as $breed) {
@@ -251,15 +251,15 @@ class PetResource extends Resource
                                         }
                                     }
                                 }
-                                
+
                                 $imageResp = Http::withHeaders([
                                     'x-api-key' => config('services.cat_api.key'),
-                                ])->get(config('services.cat_api.base_url') . '/images/search', [
+                                ])->get(config('services.cat_api.base_url').'/images/search', [
                                     'breed_ids' => $state,
                                     'limit' => 1,
                                 ]);
-                                
-                                if ($imageResp->ok() && !empty($imageResp->json())) {
+
+                                if ($imageResp->ok() && ! empty($imageResp->json())) {
                                     $imageData = $imageResp->json()[0] ?? [];
                                     $url = $imageData['url'] ?? null;
                                     if ($url) {
@@ -267,48 +267,48 @@ class PetResource extends Resource
                                     }
                                 }
                             }
-                            
+
                             if ($breedData) {
-                                if (!empty($breedData['name'])) {
+                                if (! empty($breedData['name'])) {
                                     $set('name', $breedData['name']);
                                     $set('slug', \Illuminate\Support\Str::slug($breedData['name']));
                                 }
-                                
-                                if (!empty($breedData['temperament'])) {
+
+                                if (! empty($breedData['temperament'])) {
                                     $set('temperament', $breedData['temperament']);
                                 }
-                                
-                                if (!empty($breedData['life_span'])) {
+
+                                if (! empty($breedData['life_span'])) {
                                     $set('lifespan', $breedData['life_span']);
                                 }
-                                
+
                                 if ($type === 'cat') {
                                     if (isset($breedData['energy_level'])) {
                                         $energyMap = [1 => 'Low', 2 => 'Low', 3 => 'Medium', 4 => 'High', 5 => 'High'];
                                         $set('energy', $energyMap[$breedData['energy_level']] ?? 'Medium');
                                     }
-                                    
+
                                     if (isset($breedData['affection_level'])) {
                                         $set('friendliness', $breedData['affection_level']);
                                     }
-                                    
+
                                     if (isset($breedData['intelligence'])) {
                                         $set('trainability', $breedData['intelligence']);
                                     }
-                                    
+
                                     if (isset($breedData['energy_level'])) {
                                         $set('exerciseNeeds', $breedData['energy_level']);
                                     }
-                                    
+
                                     if (isset($breedData['grooming'])) {
                                         $set('grooming', $breedData['grooming']);
                                     }
-                                    
-                                    if (!empty($breedData['weight']['imperial'])) {
+
+                                    if (! empty($breedData['weight']['imperial'])) {
                                         $weight = $breedData['weight']['imperial'];
                                         preg_match('/(\d+)/', $weight, $matches);
-                                        $avgWeight = isset($matches[1]) ? (int)$matches[1] : 0;
-                                        
+                                        $avgWeight = isset($matches[1]) ? (int) $matches[1] : 0;
+
                                         if ($avgWeight < 8) {
                                             $set('size', 'Small');
                                         } elseif ($avgWeight < 15) {
@@ -318,19 +318,19 @@ class PetResource extends Resource
                                         }
                                     }
                                 }
-                                
+
                                 if ($type === 'dog') {
                                     $set('friendliness', 4);
                                     $set('trainability', 3);
                                     $set('exerciseNeeds', 3);
                                     $set('grooming', 3);
                                     $set('energy', 'Medium');
-                                    
-                                    if (!empty($breedData['weight']['imperial'])) {
+
+                                    if (! empty($breedData['weight']['imperial'])) {
                                         $weight = $breedData['weight']['imperial'];
                                         preg_match('/(\d+)/', $weight, $matches);
-                                        $avgWeight = isset($matches[1]) ? (int)$matches[1] : 0;
-                                        
+                                        $avgWeight = isset($matches[1]) ? (int) $matches[1] : 0;
+
                                         if ($avgWeight < 25) {
                                             $set('size', 'Small');
                                         } elseif ($avgWeight < 60) {
@@ -341,22 +341,22 @@ class PetResource extends Resource
                                     }
                                 }
                             }
-                            
+
                             Notification::make()
                                 ->title('Breed details loaded!')
                                 ->body('Form fields have been automatically filled with breed information.')
                                 ->success()
                                 ->send();
-                                
+
                         } catch (\Throwable $e) {
-                            \Log::error('Breed fetch error: ' . $e->getMessage(), [
+                            \Log::error('Breed fetch error: '.$e->getMessage(), [
                                 'breed_id' => $state,
-                                'type' => $type
+                                'type' => $type,
                             ]);
-                            
+
                             Notification::make()
                                 ->title('Failed to fetch breed details')
-                                ->body('Error: ' . $e->getMessage() . '. Please fill in the fields manually.')
+                                ->body('Error: '.$e->getMessage().'. Please fill in the fields manually.')
                                 ->danger()
                                 ->send();
                         }
@@ -380,7 +380,7 @@ class PetResource extends Resource
                             ->directory('diet_images')
                             ->visibility('public')
                             ->preserveFilenames()
-                            ->columnSpan(6)
+                            ->columnSpan(6),
                     ])
                     ->createItemButtonLabel('Add diet item')
                     ->columns(2)
@@ -414,11 +414,11 @@ class PetResource extends Resource
 
                                 return collect($results)->mapWithKeys(function ($item) {
                                     $media = $item['media_formats'] ?? [];
-                                    $url = $media['gif']['url'] 
-                                        ?? $media['mediumgif']['url'] 
-                                        ?? $media['mp4']['url'] 
-                                        ?? $media['tinygif']['url'] 
-                                        ?? $media['nanogif']['url'] 
+                                    $url = $media['gif']['url']
+                                        ?? $media['mediumgif']['url']
+                                        ?? $media['mp4']['url']
+                                        ?? $media['tinygif']['url']
+                                        ?? $media['nanogif']['url']
                                         ?? null;
 
                                     if (! $url) {
@@ -426,11 +426,12 @@ class PetResource extends Resource
                                     }
 
                                     $label = $item['content_description'] ?? ($item['title'] ?? 'GIF');
+
                                     return [$url => $label];
                                 })->filter()->toArray();
                             }
                         } catch (\Exception $e) {
-                            \Log::error('Tenor API failed: ' . $e->getMessage());
+                            \Log::error('Tenor API failed: '.$e->getMessage());
                         }
 
                         return [];
@@ -450,11 +451,11 @@ class PetResource extends Resource
 
                                 return collect($results)->mapWithKeys(function ($item) {
                                     $media = $item['media_formats'] ?? [];
-                                    $url = $media['gif']['url'] 
-                                        ?? $media['mediumgif']['url'] 
-                                        ?? $media['mp4']['url'] 
-                                        ?? $media['tinygif']['url'] 
-                                        ?? $media['nanogif']['url'] 
+                                    $url = $media['gif']['url']
+                                        ?? $media['mediumgif']['url']
+                                        ?? $media['mp4']['url']
+                                        ?? $media['tinygif']['url']
+                                        ?? $media['nanogif']['url']
                                         ?? null;
 
                                     if (! $url) {
@@ -462,11 +463,12 @@ class PetResource extends Resource
                                     }
 
                                     $label = $item['content_description'] ?? ($item['title'] ?? 'GIF');
+
                                     return [$url => $label];
                                 })->filter()->toArray();
                             }
                         } catch (\Exception $e) {
-                            \Log::error('Tenor search failed: ' . $e->getMessage());
+                            \Log::error('Tenor search failed: '.$e->getMessage());
                         }
 
                         return [];
@@ -495,7 +497,7 @@ class PetResource extends Resource
                             ->helperText('Click on different parts of the image (ears, eyes, nose, etc.) to add fun facts'),
                     ])
                     ->collapsed()
-                    ->visible(fn ($get) => !empty($get('image'))),
+                    ->visible(fn ($get) => ! empty($get('image'))),
 
                 // Hotspots & Fun Facts Management
                 Forms\Components\Section::make('Interactive Hotspots & Fun Facts')
@@ -596,7 +598,7 @@ class PetResource extends Resource
                     ->label('Image')
                     ->circular()
                     ->defaultImageUrl('/placeholder.svg?height=200&width=200')
-                    ->getStateUsing(fn($record) => $record->image_url ?? $record->image)
+                    ->getStateUsing(fn ($record) => $record->image_url ?? $record->image)
                     ->extraImgAttributes(['loading' => 'lazy']),
 
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),

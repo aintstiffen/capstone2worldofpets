@@ -1,7 +1,25 @@
 @php
-    // Get image URL from the record
+    // Get image URL from the record - FIXED ORDER
     $record = $getRecord();
-    $imageUrl = $record?->image ?? $record?->image_url ?? null;
+    // Try image_url accessor FIRST (it resolves S3 URLs properly)
+    // Then fallback to raw image field
+    $imageUrl = $record?->image_url ?? $record?->image ?? null;
+    
+    // Additional safety check: if image exists but image_url doesn't, 
+    // manually resolve it using the same logic from the model
+    if (!$imageUrl && $record?->image) {
+        if (preg_match('/^https?:\/\//', $record->image)) {
+            $imageUrl = $record->image;
+        } else {
+            try {
+                $disk = config('filesystems.default', env('FILESYSTEM_DISK', 's3'));
+                $imageUrl = \Illuminate\Support\Facades\Storage::disk($disk)->url($record->image);
+            } catch (\Throwable $e) {
+                \Log::error('Failed to resolve image URL: ' . $e->getMessage());
+                $imageUrl = null;
+            }
+        }
+    }
 @endphp
 
 <div class="space-y-4" x-data="{ showGrid: false, mouseX: 0, mouseY: 0 }">

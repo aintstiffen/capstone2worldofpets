@@ -80,6 +80,22 @@ class Pet extends Model
         }
         return $result;
     }
+    public function getGalleryImageUrlsAttribute()
+{
+    $items = $this->gallery;
+    if (!$items || !is_array($items)) return [];
+
+    $result = [];
+    foreach ($items as $item) {
+        if (!is_array($item)) continue;
+        $path = $item['image'] ?? null;
+        if (!$path) continue;
+
+        $result[] = $this->resolveUrl($path);
+    }
+
+    return $result;
+}
 
     /**
      * Helper method to resolve file path to full URL
