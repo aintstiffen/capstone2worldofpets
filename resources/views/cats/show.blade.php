@@ -12,7 +12,8 @@
         }
 
         /* Reset default page margins which can cause small gaps on some hosts/browsers */
-        html, body {
+        html,
+        body {
             margin: 0;
             padding: 0;
             -webkit-font-smoothing: antialiased;
@@ -30,7 +31,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background-image: 
+            background-image:
                 radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 1px, transparent 1px),
                 radial-gradient(circle at 80% 50%, rgba(118, 75, 162, 0.08) 1px, transparent 1px);
             background-size: 40px 40px;
@@ -38,8 +39,15 @@
         }
 
         @keyframes float-pattern {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(20px, 20px); }
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(20px, 20px);
+            }
         }
 
         /* Glass Card Effect */
@@ -101,9 +109,10 @@
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .hotspot-marker span {
-    background: transparent !important;
-}
+            background: transparent !important;
+        }
 
         .hotspot-marker::before {
             content: '';
@@ -115,10 +124,13 @@
         }
 
         @keyframes pulse-ring {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
                 opacity: 0.5;
             }
+
             50% {
                 transform: scale(1.3);
                 opacity: 0;
@@ -182,8 +194,13 @@
         }
 
         @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
         }
 
         /* Info Pills Enhanced */
@@ -493,6 +510,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -503,10 +521,25 @@
             animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
-        .stagger-1 { animation-delay: 0.1s; opacity: 0; }
-        .stagger-2 { animation-delay: 0.2s; opacity: 0; }
-        .stagger-3 { animation-delay: 0.3s; opacity: 0; }
-        .stagger-4 { animation-delay: 0.4s; opacity: 0; }
+        .stagger-1 {
+            animation-delay: 0.1s;
+            opacity: 0;
+        }
+
+        .stagger-2 {
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+
+        .stagger-3 {
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
+
+        .stagger-4 {
+            animation-delay: 0.4s;
+            opacity: 0;
+        }
     </style>
 @endpush
 
@@ -517,9 +550,11 @@
             <div class="container mx-auto px-4 md:px-6">
                 <!-- Breadcrumb -->
                 <nav class="flex items-center gap-2 text-sm mb-8 animate-fade-in-up">
-                    <a href="{{ route('cats') }}" class="text-gray-600 hover:text-[var(--color-primary)] transition flex items-center gap-1">
+                    <a href="{{ route('cats') }}"
+                        class="text-gray-600 hover:text-[var(--color-primary)] transition flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
                         Cat Breeds
                     </a>
@@ -540,26 +575,26 @@
                             setActive(feature, hotspotEl) {
                                 this.activeTooltip = feature;
                                 this.activeFact = hotspotEl.dataset.fact || '';
-                                
+                        
                                 const container = this.$refs.imageContainer;
                                 if (!container) return;
                                 const containerRect = container.getBoundingClientRect();
                                 const elRect = hotspotEl.getBoundingClientRect();
-                                
+                        
                                 const cx = (elRect.left - containerRect.left) + (elRect.width / 2);
                                 const cy = (elRect.top - containerRect.top) + (elRect.height / 2);
                                 const w = containerRect.width;
                                 const h = containerRect.height;
-                                
+                        
                                 const padding = 12;
                                 let tooltipW = window.innerWidth >= 1024 ? 350 : 320;
                                 let left = w > (tooltipW + padding * 2) ? w - tooltipW - padding - 32 : Math.max(padding, (w - tooltipW) / 2);
                                 let tooltipH = 200;
                                 let top = Math.max(padding, Math.min(cy, h - tooltipH - padding));
-                                
+                        
                                 if (left + tooltipW + 32 > w) left = w - tooltipW - 32;
                                 if (left < 0) left = 0;
-                                
+                        
                                 this.tooltipStyle = { left: left + 'px', top: top + 'px' };
                             },
                             clearActive() {
@@ -574,27 +609,53 @@
                         }">
                             <div class="main-image-wrapper relative" x-ref="imageContainer">
                                 <img src="{{ $pet->image ? $pet->image_url : '/placeholder.svg?height=600&width=600' }}"
-                                    alt="{{ $pet->name }}"
-                                    class="w-full h-auto"
+                                    alt="{{ $pet->name }}" class="w-full h-auto"
                                     style="max-height: 450px; object-fit: contain;">
 
                                 <!-- Hotspots -->
                                 <div class="absolute inset-0" style="z-index: 15">
                                     @php
                                         $defaultHotspots = [
-                                            ['feature' => 'ears', 'position_x' => 50, 'position_y' => 15, 'width' => 48, 'height' => 48],
-                                            ['feature' => 'eyes', 'position_x' => 50, 'position_y' => 30, 'width' => 48, 'height' => 48],
-                                            ['feature' => 'tail', 'position_x' => 85, 'position_y' => 70, 'width' => 48, 'height' => 48],
-                                            ['feature' => 'paws', 'position_x' => 30, 'position_y' => 85, 'width' => 48, 'height' => 48],
+                                            [
+                                                'feature' => 'ears',
+                                                'position_x' => 50,
+                                                'position_y' => 15,
+                                                'width' => 48,
+                                                'height' => 48,
+                                            ],
+                                            [
+                                                'feature' => 'eyes',
+                                                'position_x' => 50,
+                                                'position_y' => 30,
+                                                'width' => 48,
+                                                'height' => 48,
+                                            ],
+                                            [
+                                                'feature' => 'tail',
+                                                'position_x' => 85,
+                                                'position_y' => 70,
+                                                'width' => 48,
+                                                'height' => 48,
+                                            ],
+                                            [
+                                                'feature' => 'paws',
+                                                'position_x' => 30,
+                                                'position_y' => 85,
+                                                'width' => 48,
+                                                'height' => 48,
+                                            ],
                                         ];
                                         $hotspots = $pet->hotspots ?? $defaultHotspots;
                                         $funFacts = $pet->fun_facts ?? [];
-                                        
+
                                         $defaultFacts = [
-                                            'ears' => 'Cats use their ears to detect faint sounds and orient themselves.',
-                                            'eyes' => 'Cats have excellent night vision thanks to a reflective layer behind the retina.',
+                                            'ears' =>
+                                                'Cats use their ears to detect faint sounds and orient themselves.',
+                                            'eyes' =>
+                                                'Cats have excellent night vision thanks to a reflective layer behind the retina.',
                                             'tail' => 'A cat\'s tail helps with balance and communication.',
-                                            'paws' => 'Cats have sensitive paw pads used for hunting and sensing terrain.',
+                                            'paws' =>
+                                                'Cats have sensitive paw pads used for hunting and sensing terrain.',
                                             'nose' => 'A cat\'s nose is highly sensitive to scent.',
                                             'coat' => 'Coat patterns and density vary by breed and climate.',
                                         ];
@@ -610,40 +671,44 @@
                                                     break;
                                                 }
                                             }
-                                            if (!$fact) $fact = $defaultFacts[$feature] ?? 'Interesting facts about this ' . $feature . '.';
+                                            if (!$fact) {
+                                                $fact =
+                                                    $defaultFacts[$feature] ??
+                                                    'Interesting facts about this ' . $feature . '.';
+                                            }
                                         @endphp
 
                                         <div class="absolute"
                                             style="top: {{ $hotspot['position_y'] }}%; left: {{ $hotspot['position_x'] }}%; transform: translate(-50%, -50%);"
-                                            @mouseenter="setActive('{{ $feature }}', $el)"
-                                            @mouseleave="clearActive()"
-                                            @click="setActive('{{ $feature }}', $el)"
-                                            data-fact="{{ e($fact) }}">
+                                            @mouseenter="setActive('{{ $feature }}', $el)" @mouseleave="clearActive()"
+                                            @click="setActive('{{ $feature }}', $el)" data-fact="{{ e($fact) }}">
                                             <div class="hotspot-marker cursor-pointer rounded-full flex items-center justify-center backdrop-blur-sm bg-transparent border-2 border-[var(--color-primary)] shadow-lg"
                                                 style="width: {{ $hotspot['width'] ?? 48 }}px; height: {{ $hotspot['height'] ?? 48 }}px;">
-                                                <span class="text-xs font-bold text-[var(--color-primary)] bg-white/80 px-2 py-1 rounded-full">{{ ucfirst($feature) }}</span>
+                                                <span
+                                                    class="text-xs font-bold text-[var(--color-primary)] bg-white/80 px-2 py-1 rounded-full">{{ ucfirst($feature) }}</span>
                                             </div>
                                         </div>
                                     @endforeach
 
                                     <!-- Tooltip -->
-                                    <div x-show="activeTooltip" x-cloak
-                                        @mouseenter="tooltipHovered = true"
+                                    <div x-show="activeTooltip" x-cloak @mouseenter="tooltipHovered = true"
                                         @mouseleave="tooltipHovered = false; clearActive()"
                                         x-transition:enter="transition ease-out duration-200"
                                         x-transition:enter-start="opacity-0 scale-95"
-                                        x-transition:enter-end="opacity-100 scale-100"
-                                        :style="tooltipStyle"
+                                        x-transition:enter-end="opacity-100 scale-100" :style="tooltipStyle"
                                         class="tooltip-enhanced absolute z-50 pointer-events-auto">
-                                        <div class="font-bold text-lg text-[var(--color-primary)] mb-2" x-text="activeTooltip ? '{{ $pet->name }}\'s ' + activeTooltip : ''"></div>
+                                        <div class="font-bold text-lg text-[var(--color-primary)] mb-2"
+                                            x-text="activeTooltip ? '{{ $pet->name }}\'s ' + activeTooltip : ''"></div>
                                         <p class="text-sm text-gray-700" x-text="activeFact"></p>
                                     </div>
 
                                     <!-- Hint -->
                                     <div class="absolute bottom-4 left-4 right-4 text-center">
-                                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-black/70 text-white text-xs rounded-full backdrop-blur-sm">
+                                        <div
+                                            class="inline-flex items-center gap-2 px-4 py-2 bg-black/70 text-white text-xs rounded-full backdrop-blur-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                             <span>Hover or tap circles to learn more</span>
                                         </div>
@@ -666,22 +731,28 @@
                                 <div class="fact-label">Energy Level</div>
                                 <div class="fact-value">{{ $pet->energy_level ?? 'Moderate' }}</div>
                             </div>
-                            @if($pet->life_span)
-                            <div class="fact-card">
-                                <div class="fact-label">Life Span</div>
-                                <div class="fact-value">{{ $pet->life_span }} years</div>
-                            </div>
+                            @if ($pet->life_span)
+                                <div class="fact-card">
+                                    <div class="fact-label">Life Span</div>
+                                    <div class="fact-value">{{ $pet->life_span }} years</div>
+                                </div>
                             @endif
                         </div>
 
                         <!-- Characteristics (moved below image) -->
                         <div class="glass-card p-6 animate-fade-in-up stagger-3">
                             <h3 class="section-title text-xl">Breed Characteristics</h3>
-                            
+
                             @php
                                 $characteristics = [
-                                    'Friendliness' => ['value' => $pet->friendliness, 'desc' => 'How sociable with people and other animals'],
-                                    'Grooming' => ['value' => $pet->grooming, 'desc' => 'Amount of grooming & coat maintenance required'],
+                                    'Friendliness' => [
+                                        'value' => $pet->friendliness,
+                                        'desc' => 'How sociable with people and other animals',
+                                    ],
+                                    'Grooming' => [
+                                        'value' => $pet->grooming,
+                                        'desc' => 'Amount of grooming & coat maintenance required',
+                                    ],
                                 ];
                             @endphp
 
@@ -696,14 +767,17 @@
                                             </div>
                                             <div class="flex items-center gap-1">
                                                 @for ($i = 1; $i <= 5; $i++)
-                                                    <svg class="w-5 h-5 {{ $i <= $value ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.13 3.478a1 1 0 00.95.69h3.654c.969 0 1.371 1.24.588 1.81l-2.958 2.15a1 1 0 00-.364 1.118l1.13 3.478c.3.921-.755 1.688-1.54 1.118l-2.958-2.15a1 1 0 00-1.176 0l-2.958 2.15c-.784.57-1.838-.197-1.539-1.118l1.13-3.478a1 1 0 00-.364-1.118L2.38 8.905c-.783-.57-.38-1.81.588-1.81h3.654a1 1 0 00.95-.69l1.13-3.478z" />
+                                                    <svg class="w-5 h-5 {{ $i <= $value ? 'text-yellow-400' : 'text-gray-300' }}"
+                                                        fill="currentColor" viewBox="0 0 20 20">
+                                                        <path
+                                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.13 3.478a1 1 0 00.95.69h3.654c.969 0 1.371 1.24.588 1.81l-2.958 2.15a1 1 0 00-.364 1.118l1.13 3.478c.3.921-.755 1.688-1.54 1.118l-2.958-2.15a1 1 0 00-1.176 0l-2.958 2.15c-.784.57-1.838-.197-1.539-1.118l1.13-3.478a1 1 0 00-.364-1.118L2.38 8.905c-.783-.57-.38-1.81.588-1.81h3.654a1 1 0 00.95-.69l1.13-3.478z" />
                                                     </svg>
                                                 @endfor
                                             </div>
                                         </div>
                                         <div class="progress-container">
-                                            <div class="progress-fill" style="width: 0" data-width="{{ ($value / 5) * 100 }}"></div>
+                                            <div class="progress-fill" style="width: 0"
+                                                data-width="{{ ($value / 5) * 100 }}"></div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -714,12 +788,14 @@
                         <div class="glass-card p-6 animate-fade-in-up stagger-3">
                             <h3 class="section-title text-xl">About {{ $pet->name }}</h3>
                             <p id="petDescription" class="text-gray-700 leading-relaxed mb-4">{{ $pet->description }}</p>
-                            
+
                             <div class="tts-controls">
-                                <button id="ttsPlayBtn" type="button" class="btn-secondary-enhanced text-sm py-2" aria-pressed="false">
+                                <button id="ttsPlayBtn" type="button" class="btn-secondary-enhanced text-sm py-2"
+                                    aria-pressed="false">
                                     🔊 Play
                                 </button>
-                                <button id="ttsStopBtn" type="button" class="btn-secondary-enhanced text-sm py-2 hidden" aria-label="Stop speech">
+                                <button id="ttsStopBtn" type="button" class="btn-secondary-enhanced text-sm py-2 hidden"
+                                    aria-label="Stop speech">
                                     ⏹ Stop
                                 </button>
                             </div>
@@ -730,7 +806,8 @@
                     <div class="lg:col-span-2 space-y-6">
                         <!-- Title & Action Buttons -->
                         <div class="animate-fade-in-up stagger-2">
-                            <h1 class="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent">
+                            <h1
+                                class="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent">
                                 {{ $pet->name }}
                             </h1>
                         </div>
@@ -749,7 +826,9 @@
                                             if (is_array($item) && isset($item['name'])) {
                                                 $name = $item['name'];
                                                 $img = $item['image'] ?? null;
-                                                if ($img) $colorImageMap[$name] = $img;
+                                                if ($img) {
+                                                    $colorImageMap[$name] = $img;
+                                                }
                                             }
                                         }
                                     }
@@ -776,13 +855,18 @@
                                             }
                                             if ($colorImageUrl && !preg_match('/^https?:\/\//', $colorImageUrl)) {
                                                 try {
-                                                    $colorImageUrl = \Illuminate\Support\Facades\Storage::url($colorImageUrl);
-                                                } catch (\Throwable $e) {}
+                                                    $colorImageUrl = \Illuminate\Support\Facades\Storage::url(
+                                                        $colorImageUrl,
+                                                    );
+                                                } catch (\Throwable $e) {
+                                                }
                                             }
                                             $finalImage = $colorImageUrl ?: $pet->image_url;
                                         @endphp
 
-                                        <div class="tag-enhanced preview-trigger" data-preview="{{ $finalImage ? e($finalImage) : '' }}" role="button" tabindex="0">
+                                        <div class="tag-enhanced preview-trigger"
+                                            data-preview="{{ $finalImage ? e($finalImage) : '' }}" role="button"
+                                            tabindex="0">
                                             {{ $color }}
                                         </div>
                                     @endforeach
@@ -813,7 +897,8 @@
                                             $finalDietImage = $dietImageUrl ?: '/placeholder.svg?height=160&width=280';
                                         @endphp
 
-                                        <div class="tag-enhanced preview-trigger" data-preview="{{ e($finalDietImage) }}" role="button" tabindex="0">
+                                        <div class="tag-enhanced preview-trigger" data-preview="{{ e($finalDietImage) }}"
+                                            role="button" tabindex="0">
                                             {{ ucfirst($name) }}
                                         </div>
                                     @endforeach
@@ -829,7 +914,7 @@
         @if (!empty($pet->gallery) && count($pet->gallery) > 0)
             <div class="container mx-auto px-4 md:px-6 py-12">
                 <h2 class="section-title text-3xl mb-8">Photo Gallery</h2>
-                
+
                 <div class="gallery-grid-enhanced">
                     @foreach ($pet->gallery as $index => $galleryItem)
                         @php
@@ -938,7 +1023,8 @@
                     anchoredEl.className = 'preview-card-enhanced';
                     anchoredEl.style.display = 'none';
                     anchoredEl.setAttribute('id', 'anchored-preview');
-                    anchoredEl.innerHTML = '<img src="" alt="preview"><div class="content"><div class="title"></div></div>';
+                    anchoredEl.innerHTML =
+                        '<img src="" alt="preview"><div class="content"><div class="title"></div></div>';
                     anchoredEl._contentEl = anchoredEl.querySelector('.content');
                     anchoredEl._titleEl = anchoredEl.querySelector('.title');
                     document.body.appendChild(anchoredEl);
@@ -955,7 +1041,8 @@
                         if (src) {
                             try {
                                 const main = document.querySelector('main');
-                                if (main && main.__x && main.__x.$data && typeof main.__x.$data.openLightbox === 'function') {
+                                if (main && main.__x && main.__x.$data && typeof main.__x.$data
+                                    .openLightbox === 'function') {
                                     main.__x.$data.openLightbox(src);
                                 } else {
                                     window.open(src, '_blank');
