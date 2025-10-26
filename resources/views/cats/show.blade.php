@@ -11,6 +11,14 @@
                 --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
             }
 
+            /* Reset default page margins which can cause small gaps on some hosts/browsers */
+            html, body {
+                margin: 0;
+                padding: 0;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
             /* Hero Section */
             .hero-gradient {
                 background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
@@ -432,6 +440,32 @@
 
                 .facts-grid {
                     grid-template-columns: 1fr;
+                }
+            }
+
+            /* Additional small-screen tweaks to remove excessive top/bottom spacing and improve layout when deployed */
+            @media (max-width: 640px) {
+                .hero-gradient {
+                    /* Tailwind classes add padding; clamp it here for small devices to remove large top gap */
+                    padding-top: 0.75rem;
+                    padding-bottom: 0.75rem;
+                }
+
+                .glass-card {
+                    padding-top: 0.75rem;
+                    padding-bottom: 0.75rem;
+                }
+
+                /* Make main image wrapper more fluid on small screens */
+                .main-image-wrapper {
+                    max-width: 100%;
+                    max-height: none;
+                }
+
+                /* Ensure preview card doesn't exceed viewport on small screens */
+                .preview-card-enhanced {
+                    max-width: calc(100vw - 24px);
+                    width: auto;
                 }
             }
 
