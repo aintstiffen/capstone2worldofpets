@@ -927,7 +927,7 @@
                                 }
                             @endphp
 
-                            <div class="gallery-item-enhanced" @click="openLightbox('{{ e($imgSrc) }}')">
+                            <div class="gallery-item-enhanced">
                                 <img src="{{ e($imgSrc) }}" alt="{{ $pet->name }} - Image {{ $index + 1 }}">
                             </div>
                         @endforeach
