@@ -637,7 +637,7 @@
                             <h1 class="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent">
                                 {{ $pet->name }}
                             </h1>
-      
+    
                         </div>
                         <!-- Quick Facts Grid -->
                         <div class="facts-grid animate-fade-in-up stagger-2">
