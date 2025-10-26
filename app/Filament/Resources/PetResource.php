@@ -100,11 +100,6 @@ class PetResource extends Resource
                     ->helperText('Where the breed originated (country or region).')
                     ->maxLength(100),
 
-                Forms\Components\TextInput::make('exerciseNeeds')
-                    ->label('Exercise Needs')
-                    ->placeholder('e.g., Low, Moderate, High or 1-5')
-                    ->helperText('Describe exercise requirements or use a 1-5 scale.')
-                    ->maxLength(50),
 
                 Forms\Components\TextInput::make('grooming')
                     ->placeholder('e.g., Low, Moderate, High or 1-5')
