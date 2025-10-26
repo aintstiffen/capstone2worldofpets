@@ -75,7 +75,7 @@
         {{-- Main Content --}}
         @include('navs.navs')
         <!-- Reduced top padding on small screens to avoid large mobile gap (pt-4 instead of pt-16) -->
-        <main class="animated-fade-in pt-4 md:pt-0">
+        <main class="animated-fade-in md:pt-0">
             @yield('content')
         </main>
         @include('footer.footer')
