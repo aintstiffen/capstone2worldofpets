@@ -22,6 +22,39 @@
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- Small fallback CSS to ensure the .container centers and has a max-width on desktop
+             This protects production when utility CSS isn't loaded or if a build step missed Tailwind classes. -->
+        <style>
+            /* Center main container and provide sensible defaults if Tailwind output is missing */
+            .container {
+                max-width: 1100px;
+                margin-left: auto;
+                margin-right: auto;
+                padding-left: 1rem;
+                padding-right: 1rem;
+                box-sizing: border-box;
+            }
+
+            /* Ensure top-level main keeps content centered */
+            main.animated-fade-in {
+                margin-left: auto;
+                margin-right: auto;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            /* Header/nav fallback: keep full width but ensure inner alignment */
+            header, .site-header {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            /* On very wide screens allow the container to grow a bit */
+            @media (min-width: 1280px) {
+                .container { max-width: 1280px; }
+            }
+        </style>
         
         <!-- Pet Facts API Integration -->
         <link rel="stylesheet" href="{{ asset('css/pet-facts.css') }}">
@@ -37,11 +70,12 @@
     @stack('styles')
     </head>
 
-    <body class="font-sans antialiased bg-[var(--color-background)] text-[var(--color-foreground)] paw-pattern">
+        <body class="font-sans antialiased bg-[var(--color-background)] text-[var(--color-foreground)] paw-pattern">
 
         {{-- Main Content --}}
         @include('navs.navs')
-        <main class="animated-fade-in pt-16 md:pt-0">
+        <!-- Reduced top padding on small screens to avoid large mobile gap (pt-4 instead of pt-16) -->
+        <main class="animated-fade-in pt-4 md:pt-0">
             @yield('content')
         </main>
         @include('footer.footer')
