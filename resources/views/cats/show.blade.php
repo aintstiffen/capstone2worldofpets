@@ -399,8 +399,10 @@
 
             .preview-card-enhanced img {
                 width: 100%;
-                height: 180px;
+                height: auto;
+                max-height: 240px;
                 object-fit: cover;
+                display: block;
             }
 
             .preview-card-enhanced .content {
@@ -1073,6 +1075,9 @@
                         anchoredEl.style.display = 'none';
                         anchoredEl.setAttribute('id', 'anchored-preview');
                         anchoredEl.innerHTML = '<img src="" alt="preview"><div class="content"><div class="title"></div></div>';
+                        // store refs for later show/hide of content area when title is empty
+                        anchoredEl._contentEl = anchoredEl.querySelector('.content');
+                        anchoredEl._titleEl = anchoredEl.querySelector('.title');
                         document.body.appendChild(anchoredEl);
                         // keep open while hovering
                         anchoredEl.addEventListener('mouseenter', () => {
@@ -1109,7 +1114,11 @@
                         const img = el.querySelector('img');
                         const title = el.querySelector('.title');
                         img.setAttribute('src', url);
+                        // if title is empty, hide the content area to avoid large blank space
                         title.textContent = '';
+                        if (el._contentEl) {
+                            el._contentEl.style.display = title.textContent.trim() ? 'block' : 'none';
+                        }
                         el.style.display = 'block';
 
                         const rect = triggerEl.getBoundingClientRect();
