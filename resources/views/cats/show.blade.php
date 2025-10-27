@@ -889,7 +889,7 @@
                                 </div>
                             @endif
                             @if (!empty($pet->gallery) && count($pet->gallery) > 0)
-                                <div class="container mx-auto px-4 md:px-6 py-12">
+                                <div class="glass-card p-6 animate-fade-in-up stagger-4">
                                     <h2 class="section-title text-3xl mb-8">Photo Gallery</h2>
 
                                     @php
@@ -911,7 +911,7 @@
 
                                             $processedGallery[] = [
                                                 'image' => $imgSrc,
-                                                'text' => 'Photo ' . ($index + 1),
+                                                'text' => 'Gallery Image ' . ($index + 1),
                                             ];
                                         }
                                     @endphp
