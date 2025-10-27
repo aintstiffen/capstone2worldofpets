@@ -814,6 +814,14 @@
                                 </div>
                             </div>
                         @endif
+
+                        {{-- What to Avoid Card --}}
+                        @if (!empty($pet->avoid_title) || !empty($pet->avoid_description))
+                            <div class="glass-card p-6 animate-fade-in-up stagger-4">
+                                <h3 class="section-title text-xl">{{ $pet->avoid_title ?? 'What to Avoid' }}</h3>
+                                <p class="text-gray-700 leading-relaxed mb-2">{{ $pet->avoid_description ?? 'No information provided.' }}</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

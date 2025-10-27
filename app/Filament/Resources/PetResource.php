@@ -203,6 +203,16 @@ class PetResource extends Resource
                     ->placeholder('Provide a comprehensive description of this pet breed')
                     ->helperText('Enter the full description manually. No length limit is enforced by the form.'),
 
+                Forms\Components\TextInput::make('avoid_title')
+                    ->label('What to Avoid Title')
+                    ->maxLength(255)
+                    ->placeholder('e.g., Foods to Avoid'),
+
+                Forms\Components\Textarea::make('avoid_description')
+                    ->label('What to Avoid Description')
+                    ->rows(4)
+                    ->placeholder('Describe what should be avoided for this breed'),
+
                 // Image Preview Section
                 Forms\Components\Section::make('Image Preview')
                     ->schema([

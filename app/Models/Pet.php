@@ -31,6 +31,8 @@ class Pet extends Model
         'gallery',
         'color_images',
         'diet_images',
+        'avoid_title',
+        'avoid_description',
     ];
     
     protected $casts = [
