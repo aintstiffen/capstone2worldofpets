@@ -20,7 +20,7 @@
 
         <!-- Alpine.js CDN (for immediate testing) -->
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-        
+        @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         <!-- Small fallback CSS to ensure the .container centers and has a max-width on desktop
