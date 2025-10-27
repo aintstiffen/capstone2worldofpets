@@ -11,7 +11,6 @@
             --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
         }
 
-        /* Reset default page margins which can cause small gaps on some hosts/browsers */
         html,
         body {
             margin: 0;
@@ -20,7 +19,6 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Hero Section */
         .hero-gradient {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
             position: relative;
@@ -39,18 +37,10 @@
         }
 
         @keyframes float-pattern {
-
-            0%,
-            100% {
-                transform: translate(0, 0);
-            }
-
-            50% {
-                transform: translate(20px, 20px);
-            }
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 20px); }
         }
 
-        /* Glass Card Effect */
         .glass-card {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px);
@@ -65,16 +55,19 @@
             transform: translateY(-4px);
         }
 
-        /* Main Image Container with Enhanced Styling */
+        /* FIXED: Full container image without white space */
         .main-image-wrapper {
             position: relative;
             border-radius: 32px;
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-            max-height: 450px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 100%;
+            aspect-ratio: 4/3;
+               max-height: 450px;
             max-width: 700px;
-            margin: 0 auto;
+            margin: 0;
+            padding: 0;
         }
 
         .main-image-wrapper::before {
@@ -93,17 +86,17 @@
         }
 
         .main-image-wrapper img {
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .main-image-wrapper:hover img {
             transform: scale(1.03);
         }
 
-        /* Interactive Hotspots - Enhanced */
         .hotspot-marker {
             position: relative;
             cursor: pointer;
@@ -124,13 +117,10 @@
         }
 
         @keyframes pulse-ring {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: scale(1);
                 opacity: 0.5;
             }
-
             50% {
                 transform: scale(1.3);
                 opacity: 0;
@@ -141,7 +131,6 @@
             transform: scale(1.15);
         }
 
-        /* Tooltip Enhancement */
         .tooltip-enhanced {
             background: white;
             border-radius: 20px;
@@ -151,7 +140,6 @@
             max-width: 350px;
         }
 
-        /* Stats Card */
         .stat-card {
             background: white;
             border-radius: 20px;
@@ -167,7 +155,6 @@
             transform: translateY(-2px);
         }
 
-        /* Progress Bar Enhanced */
         .progress-container {
             height: 12px;
             background: linear-gradient(90deg, #f5f7fa 0%, #e8ecf1 100%);
@@ -194,16 +181,10 @@
         }
 
         @keyframes shimmer {
-            0% {
-                transform: translateX(-100%);
-            }
-
-            100% {
-                transform: translateX(100%);
-            }
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
-        /* Info Pills Enhanced */
         .info-pill {
             display: inline-flex;
             align-items: center;
@@ -230,7 +211,6 @@
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
         }
 
-        /* Section Headers */
         .section-title {
             position: relative;
             padding-left: 20px;
@@ -250,7 +230,6 @@
             border-radius: 3px;
         }
 
-        /* Gallery Grid Enhanced */
         .gallery-grid-enhanced {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -312,7 +291,6 @@
             opacity: 0.6;
         }
 
-        /* Color/Diet Tags Enhanced */
         .tag-enhanced {
             display: inline-flex;
             align-items: center;
@@ -334,7 +312,6 @@
             border-color: var(--color-primary);
         }
 
-        /* Action Buttons Enhanced */
         .btn-primary-enhanced {
             display: inline-flex;
             align-items: center;
@@ -381,14 +358,12 @@
             box-shadow: var(--shadow-lg);
         }
 
-        /* TTS Controls Enhanced */
         .tts-controls {
             display: flex;
             gap: 12px;
             margin-top: 20px;
         }
 
-        /* Facts Grid */
         .facts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -426,7 +401,6 @@
             color: #1a202c;
         }
 
-        /* Preview Cards - FIXED */
         .preview-card-enhanced {
             position: fixed;
             z-index: 99999 !important;
@@ -459,7 +433,6 @@
             margin-bottom: 4px;
         }
 
-        /* Responsive Adjustments */
         @media (max-width: 768px) {
             .section-title {
                 font-size: 24px;
@@ -471,6 +444,7 @@
 
             .main-image-wrapper {
                 border-radius: 20px;
+                min-height: 350px;
             }
 
             .facts-grid {
@@ -478,10 +452,8 @@
             }
         }
 
-        /* Additional small-screen tweaks to remove excessive top/bottom spacing and improve layout when deployed */
         @media (max-width: 640px) {
             .hero-gradient {
-                /* Tailwind classes add padding; clamp it here for small devices to remove large top gap */
                 padding-top: 0.75rem;
                 padding-bottom: 0.75rem;
             }
@@ -491,26 +463,22 @@
                 padding-bottom: 0.75rem;
             }
 
-            /* Make main image wrapper more fluid on small screens */
             .main-image-wrapper {
                 max-width: 100%;
-                max-height: none;
+                min-height: 280px;
             }
 
-            /* Ensure preview card doesn't exceed viewport on small screens */
             .preview-card-enhanced {
                 max-width: calc(100vw - 24px);
                 width: auto;
             }
         }
 
-        /* Animation for page load */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
                 transform: translateY(30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -545,10 +513,8 @@
 
 @section('content')
     <main class="flex-1">
-        <!-- Hero Section -->
         <div class="hero-gradient py-8 md:py-12">
             <div class="container mx-auto px-4 md:px-6">
-                <!-- Breadcrumb -->
                 <nav class="flex items-center gap-2 text-sm mb-8 animate-fade-in-up">
                     <a href="{{ route('cats') }}"
                         class="text-gray-600 hover:text-[var(--color-primary)] transition flex items-center gap-1">
@@ -562,11 +528,8 @@
                     <span class="text-gray-900 font-semibold">{{ $pet->name }}</span>
                 </nav>
 
-                <!-- Hero Content -->
                 <div class="grid lg:grid-cols-5 gap-8 lg:gap-12">
-                    <!-- Left Column: Image & Interactive Features (3/5) -->
                     <div class="lg:col-span-3 space-y-6">
-                        <!-- Main Image with Hotspots -->
                         <div class="animate-fade-in-up stagger-1" x-data="{
                             activeTooltip: null,
                             activeFact: '',
@@ -609,53 +572,24 @@
                         }">
                             <div class="main-image-wrapper relative" x-ref="imageContainer">
                                 <img src="{{ $pet->image ? $pet->image_url : '/placeholder.svg?height=600&width=600' }}"
-                                    alt="{{ $pet->name }}" class="w-full h-auto"
-                                    style="max-height: 450px; object-fit: contain;">
+                                    alt="{{ $pet->name }}">
 
-                                <!-- Hotspots -->
                                 <div class="absolute inset-0" style="z-index: 15">
                                     @php
                                         $defaultHotspots = [
-                                            [
-                                                'feature' => 'ears',
-                                                'position_x' => 50,
-                                                'position_y' => 15,
-                                                'width' => 48,
-                                                'height' => 48,
-                                            ],
-                                            [
-                                                'feature' => 'eyes',
-                                                'position_x' => 50,
-                                                'position_y' => 30,
-                                                'width' => 48,
-                                                'height' => 48,
-                                            ],
-                                            [
-                                                'feature' => 'tail',
-                                                'position_x' => 85,
-                                                'position_y' => 70,
-                                                'width' => 48,
-                                                'height' => 48,
-                                            ],
-                                            [
-                                                'feature' => 'paws',
-                                                'position_x' => 30,
-                                                'position_y' => 85,
-                                                'width' => 48,
-                                                'height' => 48,
-                                            ],
+                                            ['feature' => 'ears', 'position_x' => 50, 'position_y' => 15, 'width' => 48, 'height' => 48],
+                                            ['feature' => 'eyes', 'position_x' => 50, 'position_y' => 30, 'width' => 48, 'height' => 48],
+                                            ['feature' => 'tail', 'position_x' => 85, 'position_y' => 70, 'width' => 48, 'height' => 48],
+                                            ['feature' => 'paws', 'position_x' => 30, 'position_y' => 85, 'width' => 48, 'height' => 48],
                                         ];
                                         $hotspots = $pet->hotspots ?? $defaultHotspots;
                                         $funFacts = $pet->fun_facts ?? [];
 
                                         $defaultFacts = [
-                                            'ears' =>
-                                                'Cats use their ears to detect faint sounds and orient themselves.',
-                                            'eyes' =>
-                                                'Cats have excellent night vision thanks to a reflective layer behind the retina.',
+                                            'ears' => 'Cats use their ears to detect faint sounds and orient themselves.',
+                                            'eyes' => 'Cats have excellent night vision thanks to a reflective layer behind the retina.',
                                             'tail' => 'A cat\'s tail helps with balance and communication.',
-                                            'paws' =>
-                                                'Cats have sensitive paw pads used for hunting and sensing terrain.',
+                                            'paws' => 'Cats have sensitive paw pads used for hunting and sensing terrain.',
                                             'nose' => 'A cat\'s nose is highly sensitive to scent.',
                                             'coat' => 'Coat patterns and density vary by breed and climate.',
                                         ];
@@ -672,9 +606,7 @@
                                                 }
                                             }
                                             if (!$fact) {
-                                                $fact =
-                                                    $defaultFacts[$feature] ??
-                                                    'Interesting facts about this ' . $feature . '.';
+                                                $fact = $defaultFacts[$feature] ?? 'Interesting facts about this ' . $feature . '.';
                                             }
                                         @endphp
 
@@ -684,13 +616,11 @@
                                             @click="setActive('{{ $feature }}', $el)" data-fact="{{ e($fact) }}">
                                             <div class="hotspot-marker cursor-pointer rounded-full flex items-center justify-center backdrop-blur-sm bg-transparent border-2 border-[var(--color-primary)] shadow-lg"
                                                 style="width: {{ $hotspot['width'] ?? 48 }}px; height: {{ $hotspot['height'] ?? 48 }}px;">
-                                                <span
-                                                    class="text-xs font-bold text-[var(--color-primary)] bg-white/80 px-2 py-1 rounded-full">{{ ucfirst($feature) }}</span>
+                                                <span class="text-xs font-bold text-[var(--color-primary)] bg-white/80 px-2 py-1 rounded-full">{{ ucfirst($feature) }}</span>
                                             </div>
                                         </div>
                                     @endforeach
 
-                                    <!-- Tooltip -->
                                     <div x-show="activeTooltip" x-cloak @mouseenter="tooltipHovered = true"
                                         @mouseleave="tooltipHovered = false; clearActive()"
                                         x-transition:enter="transition ease-out duration-200"
@@ -702,10 +632,8 @@
                                         <p class="text-sm text-gray-700" x-text="activeFact"></p>
                                     </div>
 
-                                    <!-- Hint -->
                                     <div class="absolute bottom-4 left-4 right-4 text-center">
-                                        <div
-                                            class="inline-flex items-center gap-2 px-4 py-2 bg-black/70 text-white text-xs rounded-full backdrop-blur-sm">
+                                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-black/70 text-white text-xs rounded-full backdrop-blur-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -717,7 +645,6 @@
                             </div>
                         </div>
 
-                        <!-- Quick Facts Grid (moved below image) -->
                         <div class="facts-grid animate-fade-in-up stagger-2">
                             <div class="fact-card">
                                 <div class="fact-label">Average Weight</div>
@@ -739,20 +666,13 @@
                             @endif
                         </div>
 
-                        <!-- Characteristics (moved below image) -->
                         <div class="glass-card p-6 animate-fade-in-up stagger-3">
                             <h3 class="section-title text-xl">Breed Characteristics</h3>
 
                             @php
                                 $characteristics = [
-                                    'Friendliness' => [
-                                        'value' => $pet->friendliness,
-                                        'desc' => 'How sociable with people and other animals',
-                                    ],
-                                    'Grooming' => [
-                                        'value' => $pet->grooming,
-                                        'desc' => 'Amount of grooming & coat maintenance required',
-                                    ],
+                                    'Friendliness' => ['value' => $pet->friendliness, 'desc' => 'How sociable with people and other animals'],
+                                    'Grooming' => ['value' => $pet->grooming, 'desc' => 'Amount of grooming & coat maintenance required'],
                                 ];
                             @endphp
 
@@ -769,75 +689,67 @@
                                                 @for ($i = 1; $i <= 5; $i++)
                                                     <svg class="w-5 h-5 {{ $i <= $value ? 'text-yellow-400' : 'text-gray-300' }}"
                                                         fill="currentColor" viewBox="0 0 20 20">
-                                                        <path
-                                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.13 3.478a1 1 0 00.95.69h3.654c.969 0 1.371 1.24.588 1.81l-2.958 2.15a1 1 0 00-.364 1.118l1.13 3.478c.3.921-.755 1.688-1.54 1.118l-2.958-2.15a1 1 0 00-1.176 0l-2.958 2.15c-.784.57-1.838-.197-1.539-1.118l1.13-3.478a1 1 0 00-.364-1.118L2.38 8.905c-.783-.57-.38-1.81.588-1.81h3.654a1 1 0 00.95-.69l1.13-3.478z" />
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.13 3.478a1 1 0 00.95.69h3.654c.969 0 1.371 1.24.588 1.81l-2.958 2.15a1 1 0 00-.364 1.118l1.13 3.478c.3.921-.755 1.688-1.54 1.118l-2.958-2.15a1 1 0 00-1.176 0l-2.958 2.15c-.784.57-1.838-.197-1.539-1.118l1.13-3.478a1 1 0 00-.364-1.118L2.38 8.905c-.783-.57-.38-1.81.588-1.81h3.654a1 1 0 00.95-.69l1.13-3.478z" />
                                                     </svg>
                                                 @endfor
                                             </div>
                                         </div>
                                         <div class="progress-container">
-                                            <div class="progress-fill" style="width: 0"
-                                                data-width="{{ ($value / 5) * 100 }}"></div>
+                                            <div class="progress-fill" style="width: 0" data-width="{{ ($value / 5) * 100 }}"></div>
                                         </div>
                                     </div>
                                 @endforeach
                             </div>
                         </div>
 
-                        <!-- Description with TTS (moved below characteristics) -->
                         <div class="glass-card p-6 animate-fade-in-up stagger-3">
                             <h3 class="section-title text-xl">About {{ $pet->name }}</h3>
                             <p id="petDescription" class="text-gray-700 leading-relaxed mb-4">{{ $pet->description }}</p>
 
                             <div class="tts-controls">
-                                <button id="ttsPlayBtn" type="button" class="btn-secondary-enhanced text-sm py-2"
-                                    aria-pressed="false">
+                                <button id="ttsPlayBtn" type="button" class="btn-secondary-enhanced text-sm py-2" aria-pressed="false">
                                     🔊 Play
                                 </button>
-                                <button id="ttsStopBtn" type="button" class="btn-secondary-enhanced text-sm py-2 hidden"
-                                    aria-label="Stop speech">
+                                <button id="ttsStopBtn" type="button" class="btn-secondary-enhanced text-sm py-2 hidden" aria-label="Stop speech">
                                     ⏹ Stop
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right Column: Details (2/5) -->
                     <div class="lg:col-span-2 space-y-6">
-                        <!-- Title & Action Buttons -->
                         <div class="animate-fade-in-up stagger-2">
-                            <h1
-                                class="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent">
+                            <h1 class="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent">
                                 {{ $pet->name }}
                             </h1>
                         </div>
 
-                        <!-- Colors Section with FIXED Modal -->
-                        @if ($pet->colors)
-                            @php
-                                $colorImagesRaw = $pet->color_images;
-                                $colorImageMap = [];
-                                if (!empty($colorImagesRaw)) {
-                                    $isAssoc = array_values($colorImagesRaw) !== $colorImagesRaw;
-                                    if ($isAssoc) {
-                                        $colorImageMap = $colorImagesRaw;
-                                    } else {
-                                        foreach ($colorImagesRaw as $item) {
-                                            if (is_array($item) && isset($item['name'])) {
-                                                $name = $item['name'];
-                                                $img = $item['image'] ?? null;
-                                                if ($img) {
-                                                    $colorImageMap[$name] = $img;
-                                                }
+                        @php
+                            $colorImagesRaw = $pet->color_images;
+                            $colorImageMap = [];
+                            if (!empty($colorImagesRaw)) {
+                                $isAssoc = array_values($colorImagesRaw) !== $colorImagesRaw;
+                                if ($isAssoc) {
+                                    $colorImageMap = $colorImagesRaw;
+                                } else {
+                                    foreach ($colorImagesRaw as $item) {
+                                        if (is_array($item) && isset($item['name'])) {
+                                            $name = $item['name'];
+                                            $img = $item['image'] ?? null;
+                                            if ($img) {
+                                                $colorImageMap[$name] = $img;
                                             }
                                         }
                                     }
                                 }
-                                $tagColors = is_array($pet->colors) ? $pet->colors : [];
-                                $imageColors = array_keys($colorImageMap ?: []);
-                                $displayColors = array_values(array_unique(array_merge($tagColors, $imageColors)));
-                            @endphp
+                            }
+                            
+                            $tagColors = !empty($pet->colors) && is_array($pet->colors) ? $pet->colors : [];
+                            $imageColors = array_keys($colorImageMap ?: []);
+                            $displayColors = array_values(array_unique(array_merge($tagColors, $imageColors)));
+                        @endphp
 
+                        @if (!empty($displayColors))
                             <div class="glass-card p-6 animate-fade-in-up stagger-4">
                                 <h3 class="section-title text-xl">Available Colors</h3>
                                 <div class="flex flex-wrap gap-3">
@@ -855,9 +767,7 @@
                                             }
                                             if ($colorImageUrl && !preg_match('/^https?:\/\//', $colorImageUrl)) {
                                                 try {
-                                                    $colorImageUrl = \Illuminate\Support\Facades\Storage::url(
-                                                        $colorImageUrl,
-                                                    );
+                                                    $colorImageUrl = \Illuminate\Support\Facades\Storage::url($colorImageUrl);
                                                 } catch (\Throwable $e) {
                                                 }
                                             }
@@ -874,7 +784,6 @@
                             </div>
                         @endif
 
-                        <!-- Diet Section with FIXED Modal -->
                         @php
                             $dietImageUrls = $pet->diet_image_urls;
                             $dietNames = [];
@@ -910,7 +819,6 @@
             </div>
         </div>
 
-        <!-- Gallery Section -->
         @if (!empty($pet->gallery) && count($pet->gallery) > 0)
             <div class="container mx-auto px-4 md:px-6 py-12">
                 <h2 class="section-title text-3xl mb-8">Photo Gallery</h2>
@@ -945,7 +853,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Animate progress bars
             setTimeout(() => {
                 document.querySelectorAll('.progress-fill').forEach(el => {
                     const width = el.dataset.width;
@@ -953,7 +860,6 @@
                 });
             }, 300);
 
-            // Text-to-Speech functionality
             const playBtn = document.getElementById('ttsPlayBtn');
             const stopBtn = document.getElementById('ttsStopBtn');
             const textEl = document.getElementById('petDescription');
@@ -1012,7 +918,6 @@
             stopBtn?.addEventListener('click', stop);
             window.addEventListener('beforeunload', stop);
 
-            // Anchored preview for color/diet tags
             (function() {
                 let anchoredEl = null;
                 let outsideHandler = null;
@@ -1023,8 +928,7 @@
                     anchoredEl.className = 'preview-card-enhanced';
                     anchoredEl.style.display = 'none';
                     anchoredEl.setAttribute('id', 'anchored-preview');
-                    anchoredEl.innerHTML =
-                        '<img src="" alt="preview"><div class="content"><div class="title"></div></div>';
+                    anchoredEl.innerHTML = '<img src="" alt="preview"><div class="content"><div class="title"></div></div>';
                     anchoredEl._contentEl = anchoredEl.querySelector('.content');
                     anchoredEl._titleEl = anchoredEl.querySelector('.title');
                     document.body.appendChild(anchoredEl);
@@ -1041,8 +945,7 @@
                         if (src) {
                             try {
                                 const main = document.querySelector('main');
-                                if (main && main.__x && main.__x.$data && typeof main.__x.$data
-                                    .openLightbox === 'function') {
+                                if (main && main.__x && main.__x.$data && typeof main.__x.$data.openLightbox === 'function') {
                                     main.__x.$data.openLightbox(src);
                                 } else {
                                     window.open(src, '_blank');
