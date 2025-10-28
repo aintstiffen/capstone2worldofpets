@@ -104,7 +104,7 @@ class Media {
     scene,
     screen,
     text,
-    viewnpport,
+    viewport,
     bend,
     textColor,
     borderRadius = 0,
