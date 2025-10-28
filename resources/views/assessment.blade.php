@@ -316,32 +316,27 @@
 
         /* Responsive tweaks */
         @media (max-width: 768px) {
-            .quiz-container { 
+            .quiz-container {
                 padding: 1.25rem;
                 margin: 0 0.5rem;
             }
-            
-            .pet-card { 
-                padding: 20px;
+            .gradient-text {
+                font-size: 2.2rem !important;
+                line-height: 1.1;
+                word-break: break-word;
+                white-space: normal;
             }
-            
-            .question-card { 
-                padding: 16px;
-                margin-bottom: 16px;
+            .quiz-container h1 {
+                font-size: 2.2rem !important;
+                line-height: 1.1;
+                word-break: break-word;
+                white-space: normal;
             }
-            
-            .question-text {
-                font-size: 16px;
-                margin-bottom: 16px;
-            }
-            
-            .emoji-icon { 
-                font-size: 48px;
-            }
-            
-            .btn-gradient, .btn-secondary { 
-                padding: 10px 16px;
-                font-size: 14px;
+            .btn-gradient {
+                font-size: 1rem;
+                padding: 12px 0;
+                width: 100%;
+                min-width: 0;
             }
         }
     </style>
@@ -487,8 +482,7 @@
                                         <h3 class="text-2xl font-bold text-gray-800" x-text="breed.name"></h3>
                                         <span class="compatibility-badge" x-text="breed.compatibility + '%'"></span>
                                     </div>
-                                    
-                                    <p class="text-gray-600 text-sm mb-4" x-text="breed.description"></p>
+                                    <p class="text-gray-600 text-sm mb-4" x-text="truncateDescription(breed.description)"></p>
                                     
                                     <div class="mb-4">
                                         <div class="text-sm font-semibold text-gray-700 mb-2">Why This Match:</div>
@@ -1037,7 +1031,11 @@
                     this.resultsSaved = false;
                     
                     window.scrollTo(0, 0);
-                }
+                },
+                truncateDescription(desc) {
+                    if (!desc) return '';
+                    return desc.length > 120 ? desc.slice(0, 120) + '...' : desc;
+                },
             };
         }
     </script>
