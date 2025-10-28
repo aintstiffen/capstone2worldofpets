@@ -104,7 +104,7 @@ class Media {
     scene,
     screen,
     text,
-    viewport,
+    viewnpport,
     bend,
     textColor,
     borderRadius = 0,
@@ -127,7 +127,6 @@ class Media {
     this.font = font;
     this.createShader();
     this.createMesh();
-    this.createTitle();
     this.onResize();
   }
   createShader() {
