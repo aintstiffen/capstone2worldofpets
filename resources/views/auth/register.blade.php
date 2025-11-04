@@ -80,7 +80,7 @@
             <p class="text-sm text-gray-600">Join the World of Pets community</p>
         </div>
 
-        <form method="POST" action="{{ route('register') }}" class="space-y-6">
+        <form method="POST" action="{{ route('register') }}" class="space-y-6" novalidate>
             @csrf
 
             <!-- Name -->
@@ -110,7 +110,8 @@
                        value="{{ old('email') }}" 
                        placeholder="Enter your email address"
                        required 
-                       autocomplete="username" />
+                       autocomplete="username"
+                       pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" />
                 @error('email')
                     <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                 @enderror
@@ -119,17 +120,17 @@
             <!-- Password -->
             <div>
                 <label for="password" class="block font-medium text-sm text-gray-700 mb-2">Password</label>
-          <input id="password" 
+                <input id="password" 
                        class="block w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-150" 
                        type="password" 
                        name="password" 
                        placeholder="Create a password"
                        required 
                        autocomplete="new-password"
-              minlength="8"
-              title="Password must be at least 8 characters long." />
-          <p id="password-help" class="text-xs text-gray-500 mt-2">Password must be at least 8 characters.</p>
-          <p id="password-error" class="text-red-500 text-sm mt-2 hidden">Password must be at least 8 characters.</p>
+                       minlength="8"
+                       title="Password must be at least 8 characters long." />
+                <p id="password-help" class="text-xs text-gray-500 mt-2">Password must be at least 8 characters.</p>
+                <p id="password-error" class="text-red-500 text-sm mt-2 hidden">Password must be at least 8 characters.</p>
                 @error('password')
                     <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                 @enderror
@@ -166,9 +167,11 @@
 
                 const pwd = form.querySelector('#password');
                 const pwdConfirm = form.querySelector('#password_confirmation');
+                const emailInput = form.querySelector('#email');
                 const pwdError = document.getElementById('password-error');
 
                 const minLength = 8;
+                const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
                 function showPwdError(msg){
                     pwdError.textContent = msg;
@@ -181,23 +184,34 @@
                 form.addEventListener('submit', function(e){
                     hidePwdError();
 
-                    const value = pwd.value || '';
-                    if (value.length < minLength) {
+                    // Password length validation
+                    const pwdValue = pwd.value || '';
+                    if (pwdValue.length < minLength) {
                         e.preventDefault();
                         showPwdError(`Password must be at least ${minLength} characters.`);
                         pwd.focus();
                         return false;
                     }
 
-                    if (pwdConfirm && pwdConfirm.value !== value){
+                    // Password confirmation match
+                    if (pwdConfirm && pwdConfirm.value !== pwdValue){
                         e.preventDefault();
                         showPwdError('Password and confirmation do not match.');
                         pwdConfirm.focus();
                         return false;
                     }
+
+                    // Email format validation
+                    const emailValue = emailInput.value || '';
+                    if(!emailPattern.test(emailValue)){
+                        e.preventDefault();
+                        showPwdError('Please enter a valid email address.');
+                        emailInput.focus();
+                        return false;
+                    }
                 });
 
-                // Live feedback
+                // Live feedback for password & confirmation fields
                 pwd.addEventListener('input', function(){
                     if ((pwd.value || '').length >= minLength){
                         hidePwdError();
@@ -210,6 +224,13 @@
                         }
                     });
                 }
+
+                // Live feedback for email field
+                emailInput.addEventListener('input', function(){
+                    if(emailPattern.test(emailInput.value)){
+                        hidePwdError();
+                    }
+                });
             })();
         </script>
         @endpush
