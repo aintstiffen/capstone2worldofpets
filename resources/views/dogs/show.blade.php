@@ -705,19 +705,23 @@
                                 <div class="fact-card">
                                     <div class="fact-label">Average Weight</div>
                                     <div class="fact-value">{{ $pet->average_weight ?? 'N/A' }}</div>
+                                    <p class="text-xs text-gray-500 mt-2">Typical adult weight range. Actual weight varies based on diet, exercise, and genetics.</p>
                                 </div>
                                 <div class="fact-card">
                                     <div class="fact-label">Origin</div>
                                     <div class="fact-value">{{ $pet->origin ?? 'Unknown' }}</div>
+                                    <p class="text-xs text-gray-500 mt-2">The country or region where this breed was originally developed.</p>
                                 </div>
                                 <div class="fact-card">
                                     <div class="fact-label">Energy Level</div>
                                     <div class="fact-value">{{ $pet->energy_level ?? 'Moderate' }}</div>
+                                    <p class="text-xs text-gray-500 mt-2">How active this breed is. Higher energy means more exercise and playtime needed daily.</p>
                                 </div>
                                 @if ($pet->life_span)
                                     <div class="fact-card">
                                         <div class="fact-label">Life Span</div>
                                         <div class="fact-value">{{ $pet->life_span }} years</div>
+                                        <p class="text-xs text-gray-500 mt-2">Average lifespan with proper care, nutrition, and regular veterinary checkups.</p>
                                     </div>
                                 @endif
                             </div>
@@ -817,43 +821,6 @@
                                 $displayColors = array_values(array_unique(array_merge($tagColors, $imageColors)));
                             @endphp
 
-                            @if (!empty($displayColors))
-                                <div class="glass-card p-6 animate-fade-in-up stagger-4">
-                                    <h3 class="section-title text-xl">Available Colors</h3>
-                                    <div class="flex flex-wrap gap-3">
-                                        @foreach ($displayColors as $color)
-                                            @php
-                                                $colorKey = $color;
-                                                $colorImageUrl = null;
-                                                if (!empty($colorImageMap)) {
-                                                    foreach ($colorImageMap as $k => $v) {
-                                                        if (strtolower($k) === strtolower($colorKey)) {
-                                                            $colorImageUrl = $v;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                                if ($colorImageUrl && !preg_match('/^https?:\/\//', $colorImageUrl)) {
-                                                    try {
-                                                        $colorImageUrl = \Illuminate\Support\Facades\Storage::url(
-                                                            $colorImageUrl,
-                                                        );
-                                                    } catch (\Throwable $e) {
-                                                    }
-                                                }
-                                                $finalImage = $colorImageUrl ?: $pet->image_url;
-                                            @endphp
-
-                                            <div class="tag-enhanced preview-trigger"
-                                                data-preview="{{ $finalImage ? e($finalImage) : '' }}" role="button"
-                                                tabindex="0">
-                                                {{ $color }}
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
-
                             @php
                                 $dietImageUrls = $pet->diet_image_urls;
                                 $dietNames = [];
@@ -868,7 +835,10 @@
 
                             @if (!empty($dietNames))
                                 <div class="glass-card p-6 animate-fade-in-up stagger-4">
-                                    <h3 class="section-title text-xl">Recommended Diet</h3>
+                                    <h3 class="section-title text-xl">Common Diet Options</h3>
+                                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">
+                                        These are popular diet types commonly fed to this breed. Always consult with your veterinarian to determine the best nutritional plan for your individual pet's needs, age, and health condition.
+                                    </p>
                                     <div class="flex flex-wrap gap-3">
                                         @foreach ($dietNames as $name)
                                             @php

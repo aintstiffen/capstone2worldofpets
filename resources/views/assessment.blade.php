@@ -1562,6 +1562,7 @@
                         const detailedReasons = this.generateMatchReasons(match.profile);
 
                         return {
+                            id: breedData?.id || null,
                             name: match.name,
                             slug: breedData?.slug || match.name.toLowerCase().replace(/\s+/g, '-'),
                             image: breedData?.image || '/placeholder.svg?height=300&width=400',
