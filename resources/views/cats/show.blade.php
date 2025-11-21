@@ -165,16 +165,11 @@
                 border: 2px solid transparent;
             }
 
-            .stat-card:hover {
-                border-color: var(--color-primary);
-                box-shadow: var(--shadow-md);
-                transform: translateY(-2px);
-            }
-
+            /* Material Design Progress Bars */
             .progress-container {
-                height: 12px;
-                background: linear-gradient(90deg, #f5f7fa 0%, #e8ecf1 100%);
-                border-radius: 6px;
+                height: 8px;
+                background: #E0E0E0;
+                border-radius: 4px;
                 overflow: hidden;
                 position: relative;
             }
@@ -182,10 +177,10 @@
             .progress-fill {
                 height: 100%;
                 background: var(--gradient-primary);
-                border-radius: 6px;
-                transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+                border-radius: 4px;
+                transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
                 position: relative;
-                overflow: hidden;
+                box-shadow: 0 0 8px rgba(102, 126, 234, 0.4);
             }
 
             .progress-fill::after {
@@ -206,131 +201,107 @@
                 }
             }
 
+            /* Material Design Chips/Pills */
             .info-pill {
                 display: inline-flex;
                 align-items: center;
-                gap: 10px;
-                padding: 12px 20px;
-                border-radius: 24px;
-                font-size: 14px;
-                font-weight: 600;
-                background: white;
-                border: 2px solid rgba(102, 126, 234, 0.2);
-                box-shadow: var(--shadow-sm);
-                transition: all 0.3s ease;
+                gap: 8px;
+                padding: 8px 16px;
+                border-radius: 16px;
+                font-size: 0.875rem;
+                font-weight: 500;
+                background: #F5F5F5;
+                color: var(--md-on-surface);
+                box-shadow: var(--md-elevation-1);
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                 cursor: default;
             }
 
             .info-pill:hover {
-                transform: translateY(-3px);
-                box-shadow: var(--shadow-md);
-                border-color: var(--color-primary);
+                background: #EEEEEE;
+                box-shadow: var(--md-elevation-2);
             }
 
             .info-pill .icon {
-                font-size: 20px;
-                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+                font-size: 18px;
             }
 
+            /* Material Design Section Titles */
             .section-title {
-                position: relative;
-                padding-left: 20px;
-                font-size: 28px;
-                font-weight: 700;
+                font-size: 1.75rem;
+                font-weight: 600;
                 margin-bottom: 24px;
+                color: var(--md-on-surface);
+                position: relative;
+                padding-bottom: 12px;
             }
 
-            .section-title::before {
+            .section-title::after {
                 content: '';
                 position: absolute;
-                left: 0;
-                top: 0;
                 bottom: 0;
-                width: 6px;
-                background: var(--gradient-primary);
-                border-radius: 3px;
+                left: 0;
+                width: 48px;
+                height: 3px;
+                background: var(--md-primary);
+                border-radius: 2px;
             }
 
+            /* Material Design Gallery */
             .gallery-grid-enhanced {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                gap: 20px;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 24px;
             }
 
             .gallery-item-enhanced {
                 position: relative;
                 aspect-ratio: 4/3;
-                border-radius: 20px;
+                border-radius: 12px;
                 overflow: hidden;
-                box-shadow: var(--shadow-sm);
-                transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-                max-height: 300px;
-            }
-
-            .gallery-item-enhanced::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
-                opacity: 0;
-                transition: opacity 0.5s ease;
-                z-index: 1;
+                box-shadow: var(--md-elevation-2);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                background: #F5F5F5;
             }
 
             .gallery-item-enhanced:hover {
-                transform: translateY(-12px) scale(1.02);
-                box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
-            }
-
-            .gallery-item-enhanced:hover::before {
-                opacity: 1;
+                box-shadow: var(--md-elevation-6);
+                transform: translateY(-8px);
             }
 
             .gallery-item-enhanced img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
 
             .gallery-item-enhanced:hover img {
-                transform: scale(1.1) rotate(2deg);
+                transform: scale(1.05);
             }
 
-            .gallery-item-enhanced::after {
-                content: '';
-                position: absolute;
-                inset: -2px;
-                background: var(--gradient-primary);
-                border-radius: 20px;
-                opacity: 0;
-                transition: opacity 0.5s ease;
-                z-index: -1;
-            }
-
-            .gallery-item-enhanced:hover::after {
-                opacity: 0.6;
-            }
-
+            /* Material Design Tags */
             .tag-enhanced {
                 display: inline-flex;
                 align-items: center;
-                gap: 8px;
-                padding: 10px 18px;
-                border-radius: 20px;
-                font-size: 14px;
+                gap: 6px;
+                padding: 8px 16px;
+                border-radius: 12px;
+                font-size: 0.875rem;
                 font-weight: 500;
-                background: white;
-                border: 2px solid rgba(102, 126, 234, 0.15);
-                box-shadow: var(--shadow-sm);
-                transition: all 0.3s ease;
+                background: var(--md-surface);
+                color: var(--md-primary);
+                border: 1px solid #E0E0E0;
+                box-shadow: var(--md-elevation-1);
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                 cursor: pointer;
             }
 
             .tag-enhanced:hover {
-                transform: translateY(-3px) scale(1.05);
-                box-shadow: var(--shadow-md);
-                border-color: var(--color-primary);
+                background: var(--md-primary);
+                color: var(--md-on-primary);
+                box-shadow: var(--md-elevation-3);
+                transform: translateY(-2px);
             }
 
             .btn-primary-enhanced {

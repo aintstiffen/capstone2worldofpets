@@ -33,7 +33,6 @@
             overflow-x: hidden;
             width: 100%;
             max-width: 100%;
-            max-height: 85vh;
             display: flex;
             flex-direction: column;
         }
@@ -204,8 +203,6 @@
             margin-bottom: 1rem;
             box-shadow: 0 6px 22px rgba(15, 23, 42, 0.04);
             width: 100%;
-            overflow-y: auto;
-            max-height: 45vh;
         }
 
         .options-grid {
@@ -398,7 +395,6 @@
             .quiz-container {
                 padding: 1rem;
                 margin: 0 0.5rem;
-                max-height: 90vh;
             }
 
             .gradient-text {
@@ -424,7 +420,6 @@
             
             .question-card {
                 padding: 1rem;
-                max-height: 50vh;
             }
             
             .options-grid {
