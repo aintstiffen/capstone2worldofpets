@@ -8,10 +8,10 @@ class CatController extends Controller
 {
       public function index()
     {
-        // Get all cat breeds with pagination (12 per page)
+        // Get all cat breeds with pagination (4 per page)
         $petss = Pet::where('category', 'cat')
             ->orderBy('name', 'asc')
-            ->paginate(12);
+            ->paginate(4);
 
         return view('cats', compact('petss'));
     }

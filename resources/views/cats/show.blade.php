@@ -3,12 +3,32 @@
     @push('styles')
         <style>
             :root {
+                /* Material Design Color Palette */
+                --md-primary: #6200EE;
+                --md-primary-variant: #3700B3;
+                --md-secondary: #03DAC6;
+                --md-secondary-variant: #018786;
+                --md-surface: #FFFFFF;
+                --md-background: #F5F5F5;
+                --md-error: #B00020;
+                --md-on-primary: #FFFFFF;
+                --md-on-secondary: #000000;
+                --md-on-surface: #000000;
+                --md-on-background: #000000;
+                --md-on-error: #FFFFFF;
+
+                /* Material Design Elevation Shadows */
+                --md-elevation-0: none;
+                --md-elevation-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+                --md-elevation-2: 0 3px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.12);
+                --md-elevation-3: 0 10px 20px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.10);
+                --md-elevation-4: 0 15px 25px rgba(0,0,0,0.15), 0 5px 10px rgba(0,0,0,0.05);
+                --md-elevation-6: 0 20px 40px rgba(0,0,0,0.2);
+                
+                /* Gradients */
                 --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
                 --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-                --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
-                --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
             }
 
             html,
@@ -48,48 +68,53 @@
                 }
             }
 
+            /* Material Design Cards */
             .glass-card {
-                background: rgba(255, 255, 255, 0.8);
-                backdrop-filter: blur(20px);
-                border: 1px solid rgba(255, 255, 255, 0.5);
-                box-shadow: var(--shadow-md);
-                border-radius: 24px;
-                transition: all 0.3s ease;
+                background: var(--md-surface);
+                border-radius: 16px;
+                box-shadow: var(--md-elevation-2);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                overflow: hidden;
+                position: relative;
             }
 
             .glass-card:hover {
-                box-shadow: var(--shadow-lg);
-                transform: translateY(-4px);
+                box-shadow: var(--md-elevation-4);
+                transform: translateY(-2px);
             }
 
-            /* FIXED: Full container image without white space */
-            .main-image-wrapper {
-                position: relative;
-                border-radius: 32px;
-                overflow: hidden;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                width: 100%;
-                aspect-ratio: 4/3;
-                max-height: 450px;
-                max-width: 700px;
-                margin: 0;
-                padding: 0;
-            }
-
-            .main-image-wrapper::before {
+            .glass-card::before {
                 content: '';
                 position: absolute;
-                inset: -2px;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
                 background: var(--gradient-primary);
-                border-radius: 32px;
-                z-index: -1;
                 opacity: 0;
                 transition: opacity 0.3s ease;
             }
 
-            .main-image-wrapper:hover::before {
-                opacity: 0.3;
+            .glass-card:hover::before {
+                opacity: 1;
+            }
+
+            /* Material Design Image Container */
+            .main-image-wrapper {
+                position: relative;
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: var(--md-elevation-3);
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                width: 100%;
+                aspect-ratio: 4/3;
+                max-height: 500px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .main-image-wrapper:hover {
+                box-shadow: var(--md-elevation-6);
+                transform: translateY(-4px);
             }
 
             .main-image-wrapper img {
@@ -143,8 +168,36 @@
                 }
             }
 
-            .hotspot-marker:hover {
-                transform: none;
+            /* Material Design Fact Cards */
+            .fact-card {
+                background: var(--md-surface);
+                border-radius: 12px;
+                padding: 20px;
+                box-shadow: var(--md-elevation-1);
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                border-left: 4px solid transparent;
+            }
+
+            .fact-card:hover {
+                box-shadow: var(--md-elevation-3);
+                transform: translateX(4px);
+                border-left-color: var(--md-primary);
+            }
+
+            .fact-label {
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: #666;
+                margin-bottom: 8px;
+            }
+
+            .fact-value {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--md-on-surface);
+                margin-bottom: 4px;
             }
 
             .tooltip-enhanced {
