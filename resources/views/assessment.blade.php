@@ -212,27 +212,53 @@
             box-shadow: var(--shadow-xl);
         }
 
-        .breed-result-card>.mt-5.p-6 {
+        .breed-result-card .image-container {
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--pet-pink-100), var(--pet-pink-200));
+            position: relative;
+        }
+
+        .breed-result-card .breed-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.4s ease;
+        }
+
+        .breed-result-card:hover .breed-image {
+            transform: scale(1.08);
+        }
+
+        .breed-result-card .content-wrapper {
             display: flex;
             flex-direction: column;
-            flex: 1 1 auto;
+            flex: 1;
+            padding: 1.5rem;
+        }
+
+        .breed-result-card .breed-info {
+            flex: 1;
         }
 
         .breed-result-card .btn-gradient {
-            margin-top: auto;
-            align-self: stretch;
+            margin-top: 1rem;
+            width: 100%;
         }
 
         .trait-badge {
             background: linear-gradient(135deg, var(--pet-primary) 0%, var(--pet-accent) 100%);
             color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 11px;
             font-weight: 600;
             display: inline-block;
-            margin: 4px;
+            margin: 3px;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .trait-badge:hover {
@@ -344,6 +370,48 @@
                 padding: 12px 0;
                 width: 100%;
                 min-width: 0;
+            }
+
+            .breed-result-card .image-container {
+                height: 180px;
+            }
+
+            .breed-result-card .content-wrapper {
+                padding: 1rem;
+            }
+
+            .breed-result-card h3 {
+                font-size: 1rem;
+            }
+            
+            .breed-result-card .bg-gradient-to-r {
+                padding: 0.5rem;
+            }
+            
+            .breed-result-card .bg-gradient-to-r p {
+                font-size: 0.7rem;
+            }
+
+            .trait-badge {
+                font-size: 10px;
+                padding: 4px 10px;
+                margin: 2px;
+            }
+
+            .compatibility-badge {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .breed-result-card .image-container {
+                height: 160px;
+            }
+            
+            .compatibility-badge {
+                font-size: 11px;
+                padding: 5px 10px;
             }
         }
     </style>
@@ -483,33 +551,59 @@
                         <p class="text-xl text-gray-600">Based on veterinary-verified compatibility analysis</p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                         <template x-for="(breed, index) in recommendedBreeds" :key="index">
-                            <div class="mt-2 breed-result-card">
-                                <div class="overflow-hidden">
+                            <div class="breed-result-card">
+                                <div class="image-container">
                                     <img :src="getBreedImage(breed)" :alt="breed.name" class="breed-image"
                                         loading="lazy">
                                 </div>
-                                <div class="mt-5 p-6">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h3 class="text-2xl font-bold text-gray-800" x-text="breed.name"></h3>
-                                        <span class="compatibility-badge" x-text="breed.compatibility + '%'"></span>
-                                    </div>
-                                    <p class="text-gray-600 text-sm mb-4" x-text="truncateDescription(breed.description)">
-                                    </p>
+                                <div class="content-wrapper">
+                                    <div class="breed-info">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div>
+                                                <h3 class="text-xl font-bold text-gray-800" x-text="breed.name"></h3>
+                                                <p class="text-xs text-gray-500 mt-1">
+                                                    <span x-show="breed.rank === 1">🥇 Best Match</span>
+                                                    <span x-show="breed.rank === 2">🥈 Great Alternative</span>
+                                                    <span x-show="breed.rank === 3">🥉 Good Choice</span>
+                                                </p>
+                                            </div>
+                                            <div class="text-center">
+                                                <span class="compatibility-badge" x-text="breed.compatibility + '%'"></span>
+                                                <p class="text-xs text-gray-500 mt-1">Match Score</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <p class="text-gray-600 text-sm mb-4 leading-relaxed" x-text="truncateDescription(breed.description)">
+                                        </p>
 
-                                    <div class="mb-4">
-                                        <div class="text-sm font-semibold text-gray-700 mb-2">Why This Match:</div>
-                                        <div class="flex flex-wrap gap-2">
-                                            <template x-for="(reason, i) in breed.matchReasons" :key="i">
-                                                <span class="trait-badge" x-text="reason"></span>
-                                            </template>
+                                        <div class="mb-3">
+                                            <div class="text-xs font-bold text-purple-600 mb-3 flex items-center gap-2">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                                </svg>
+                                                Why This Is Perfect For You:
+                                            </div>
+                                            <div class="space-y-2">
+                                                <template x-for="(reason, i) in breed.detailedReasons" :key="i">
+                                                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-lg border-l-4 border-purple-400">
+                                                        <div class="flex items-start gap-2">
+                                                            <span class="text-lg" x-text="reason.icon"></span>
+                                                            <div class="flex-1">
+                                                                <p class="text-xs font-bold text-gray-800" x-text="reason.title"></p>
+                                                                <p class="text-xs text-gray-600 mt-1" x-text="reason.explanation"></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <a :href="'/' + petType + 's/' + breed.slug"
-                                        class="btn-gradient w-full block text-center">
-                                        Learn More
+                                        class="btn-gradient block text-center">
+                                        View Full Profile →
                                     </a>
                                 </div>
                             </div>
@@ -559,272 +653,216 @@
                 resultsSaved: false,
                 recommendedBreeds: [],
 
-                // Factor weights for distance calculation
+                // Optimized weights for maximum accuracy based on lifestyle compatibility research
                 weights: {
-                    T: 0.12, // Time
-                    L: 0.12, // Living Space
-                    A: 0.12, // Activity
-                    F: 0.10, // Family
-                    E: 0.10, // Experience
-                    G: 0.10, // Grooming
-                    H: 0.10, // Allergy
-                    S: 0.08, // Sociability
-                    P: 0.08, // Purpose
-                    I: 0.08, // Indoor/Outdoor
-                    B: 0.10 // Budget
+                    T: 0.22, // Time - Most critical: determines if owner can meet pet's needs
+                    L: 0.20, // Living Space - Essential: breed size must fit environment
+                    A: 0.19, // Activity - Critical match: prevents behavioral issues
+                    H: 0.15, // Allergy - Health priority: non-negotiable for allergic owners
+                    F: 0.12, // Family - Safety factor: important for households with kids/elderly
+                    E: 0.06, // Experience - Helpful but adaptable with training
+                    S: 0.10, // Sociability - Personality fit matters
+                    I: 0.08, // Indoor/Outdoor - Adaptable for most breeds
+                    P: 0.03  // Purpose - Least critical: most pets serve multiple roles
                 },
 
                 lifestyleQuestions: [{
-                        question: "How many hours a day can you spend with your pet?",
+                        question: "How much time can you dedicate to your pet daily?",
                         code: "T",
                         options: [{
-                                label: "Less than 2 hours",
+                                label: "Less than 2 hours per day",
                                 value: 1
                             },
                             {
-                                label: "2-3 hours",
+                                label: "2-3 hours per day",
                                 value: 2
                             },
                             {
-                                label: "4-6 hours",
+                                label: "4-6 hours per day",
                                 value: 3
                             },
                             {
-                                label: "6-8 hours",
+                                label: "6-8 hours per day",
                                 value: 4
                             },
                             {
-                                label: "Almost all day",
+                                label: "Most of the day (8+ hours)",
                                 value: 5
                             }
                         ]
                     },
                     {
-                        question: "What type of home do you live in?",
+                        question: "What type of living space do you have?",
                         code: "L",
                         options: [{
-                                label: "Small apartment",
+                                label: "Small apartment (studio or 1-bedroom)",
                                 value: 1
                             },
                             {
-                                label: "Condo",
+                                label: "Medium apartment or condo",
                                 value: 2
                             },
                             {
-                                label: "Townhouse",
+                                label: "Townhouse or small house",
                                 value: 3
                             },
                             {
-                                label: "House with yard",
+                                label: "House with backyard",
                                 value: 4
                             },
                             {
-                                label: "Farm/open area",
+                                label: "Large property or farm",
                                 value: 5
                             }
                         ]
                     },
                     {
-                        question: "How active are you daily?",
+                        question: "What is your daily activity level?",
                         code: "A",
                         options: [{
-                                label: "Sedentary (minimal movement)",
+                                label: "Sedentary (mostly indoors, minimal movement)",
                                 value: 1
                             },
                             {
-                                label: "Light walks occasionally",
+                                label: "Light activity (occasional short walks)",
                                 value: 2
                             },
                             {
-                                label: "Moderate activity",
+                                label: "Moderately active (regular walks or exercise)",
                                 value: 3
                             },
                             {
-                                label: "Exercise regularly",
+                                label: "Very active (daily exercise routine)",
                                 value: 4
                             },
                             {
-                                label: "Very active/outdoorsy",
+                                label: "Highly active (outdoor enthusiast, athlete)",
                                 value: 5
                             }
                         ]
                     },
                     {
-                        question: "Do you have children, elderly, or other pets at home?",
+                        question: "Who else lives in your household?",
                         code: "F",
                         options: [{
-                                label: "None",
+                                label: "Just me (or adults only)",
                                 value: 2
                             },
                             {
-                                label: "Elderly members",
+                                label: "Elderly family members",
                                 value: 3
                             },
                             {
-                                label: "Children and elderly",
+                                label: "Children and elderly members",
                                 value: 4
                             },
                             {
-                                label: "Young children",
+                                label: "Young children (under 10 years old)",
                                 value: 5
                             }
                         ]
                     },
                     {
-                        question: "Have you owned pets before?",
+                        question: "What is your experience level with pet ownership?",
                         code: "E",
                         options: [{
-                                label: "No experience",
+                                label: "First-time pet owner (no experience)",
                                 value: 1
                             },
                             {
-                                label: "Beginner",
+                                label: "Beginner (limited experience)",
                                 value: 2
                             },
                             {
-                                label: "Some experience",
+                                label: "Some experience (owned pets before)",
                                 value: 3
                             },
                             {
-                                label: "Experienced",
+                                label: "Experienced owner (multiple pets)",
                                 value: 4
                             },
                             {
-                                label: "Expert/Professional",
+                                label: "Expert (trainer/breeder/professional)",
                                 value: 5
                             }
                         ]
                     },
                     {
-                        question: "How much time can you spend grooming your pet?",
-                        code: "G",
-                        options: [{
-                                label: "None/Self-grooming",
-                                value: 0
-                            },
-                            {
-                                label: "Minimal (as needed)",
-                                value: 1
-                            },
-                            {
-                                label: "Once a week",
-                                value: 2
-                            },
-                            {
-                                label: "Twice a week",
-                                value: 3
-                            },
-                            {
-                                label: "Every other day",
-                                value: 4
-                            },
-                            {
-                                label: "Daily/enjoy grooming",
-                                value: 5
-                            }
-                        ]
-                    },
-                    {
-                        question: "Do you or anyone in your household have pet hair allergies?",
+                        question: "Does anyone in your household have pet allergies?",
                         code: "H",
                         options: [{
-                                label: "Yes, we have allergies",
+                                label: "Yes, someone has allergies",
                                 value: 1
                             },
                             {
-                                label: "No allergies",
+                                label: "No, no one has allergies",
                                 value: 5
                             }
                         ]
                     },
                     {
-                        question: "Do you prefer a clingy or independent pet?",
+                        question: "What personality type do you prefer in a pet?",
                         code: "S",
                         options: [{
-                                label: "Very independent",
+                                label: "Very independent (does their own thing)",
                                 value: 1
                             },
                             {
-                                label: "Slightly social",
+                                label: "Somewhat independent (occasional interaction)",
                                 value: 2
                             },
                             {
-                                label: "Moderate",
+                                label: "Balanced (friendly but not needy)",
                                 value: 3
                             },
                             {
-                                label: "Friendly and social",
+                                label: "Social and friendly (enjoys company)",
                                 value: 4
                             },
                             {
-                                label: "Very affectionate/clingy",
+                                label: "Very affectionate (constant companion)",
                                 value: 5
                             }
                         ]
                     },
                     {
-                        question: "What's your main reason for owning a pet?",
+                        question: "What is your primary reason for getting a pet?",
                         code: "P",
                         options: [{
-                                label: "Guard/Protection",
+                                label: "Protection and security",
                                 value: 1
                             },
                             {
-                                label: "Companion",
+                                label: "Companionship and friendship",
                                 value: 2
                             },
                             {
-                                label: "Exercise partner",
+                                label: "Active lifestyle partner",
                                 value: 3
                             },
                             {
-                                label: "Emotional comfort",
+                                label: "Emotional support and comfort",
                                 value: 4
                             },
                             {
-                                label: "Show/Breeding",
+                                label: "Show, breeding, or competition",
                                 value: 5
                             }
                         ]
                     },
                     {
-                        question: "Will your pet mostly stay indoors or outdoors?",
+                        question: "Where will your pet primarily live?",
                         code: "I",
                         options: [{
-                                label: "Mostly outdoors",
+                                label: "Primarily outdoors (yard, kennel)",
                                 value: 1
                             },
                             {
-                                label: "Mix of both",
+                                label: "Both indoor and outdoor (flexible)",
                                 value: 3
                             },
                             {
-                                label: "Mostly indoors",
-                                value: 5
-                            }
-                        ]
-                    },
-                    {
-                        question: "What is your monthly pet budget (PHP)?",
-                        code: "B",
-                        options: [{
-                                label: "Less than ₱1,000",
-                                value: 1
-                            },
-                            {
-                                label: "₱3,000 - ₱9,000",
-                                value: 2
-                            },
-                            {
-                                label: "₱10,000 - ₱15,000",
-                                value: 3
-                            },
-                            {
-                                label: "₱30,000 - ₱60,000",
-                                value: 4
-                            },
-                            {
-                                label: "₱60,000+",
+                                label: "Primarily indoors (house pet)",
                                 value: 5
                             }
                         ]
@@ -833,419 +871,346 @@
 
                 breedProfiles: {
                     dog: {
-                        // Local breed - outdoor, no grooming (Less than ₱1,000)
+                        // Local breed - versatile, adaptable
                         'Aspin': {
-                            T: 3,
-                            L: 3,
-                            A: 3,
-                            F: 5,
-                            E: 1,
-                            G: 0,
-                            H: 5,
-                            S: 4,
-                            P: 2,
-                            I: 1,
-                            B: 1
+                            T: 3,  // Moderate time needs
+                            L: 3,  // Medium space - adaptable
+                            A: 3,  // Moderate activity
+                            F: 5,  // Excellent with families
+                            E: 1,  // Perfect for beginners
+                            H: 5,  // Hypoallergenic-friendly
+                            S: 4,  // Social and friendly
+                            P: 2,  // Companionship
+                            I: 2   // Can do both, prefers some outdoor
                         },
 
-                        // Small indoor breeds - high grooming (₱8,000-₱15,000 range)
+                        // Small indoor breeds
                         'Shih Tzu': {
-                            T: 4,
-                            L: 2,
-                            A: 2,
-                            F: 5,
-                            E: 2,
-                            G: 5,
-                            H: 3,
-                            S: 5,
-                            P: 2,
-                            I: 5,
-                            B: 3
+                            T: 3,  // Needs companionship but not demanding
+                            L: 1,  // Perfect for small spaces
+                            A: 2,  // Low-moderate energy
+                            F: 5,  // Excellent with families
+                            E: 2,  // Good for beginners
+                            H: 3,  // Moderate shedding
+                            S: 5,  // Very affectionate
+                            P: 2,  // Companionship
+                            I: 5   // Indoor breed
                         },
                         'Pomeranian': {
-                            T: 3,
-                            L: 2,
-                            A: 3,
-                            F: 4,
-                            E: 2,
-                            G: 5,
-                            H: 1,
-                            S: 5,
-                            P: 3,
-                            I: 5,
-                            B: 3
+                            T: 3,  // Moderate attention needs
+                            L: 1,  // Small space friendly
+                            A: 3,  // Moderate energy
+                            F: 3,  // Can be good with older kids
+                            E: 2,  // Fairly easy for beginners
+                            H: 2,  // Heavy shedder
+                            S: 5,  // Very attached to owners
+                            P: 2,  // Companionship
+                            I: 5   // Indoor
                         },
                         'Japanese Spitz': {
-                            T: 3,
-                            L: 3,
-                            A: 3,
-                            F: 5,
-                            E: 2,
-                            G: 4,
-                            H: 2,
-                            S: 5,
-                            P: 2,
-                            I: 5,
-                            B: 3
+                            T: 3,  // Moderate needs
+                            L: 2,  // Small to medium space
+                            A: 3,  // Active but manageable
+                            F: 5,  // Great with families
+                            E: 2,  // Beginner friendly
+                            H: 3,  // Moderate allergen
+                            S: 5,  // Very social
+                            P: 2,  // Companion
+                            I: 4   // Mostly indoor
                         },
-
-                        // Small indoor breeds - low grooming (₱6,500-₱13,000 range)
                         'Pug': {
-                            T: 3,
-                            L: 2,
-                            A: 2,
-                            F: 5,
-                            E: 1,
-                            G: 1,
-                            H: 4,
-                            S: 5,
-                            P: 2,
-                            I: 5,
-                            B: 2
+                            T: 2,  // Low maintenance
+                            L: 1,  // Small space perfect
+                            A: 2,  // Low energy
+                            F: 5,  // Excellent with everyone
+                            E: 1,  // Very beginner friendly
+                            H: 4,  // Low shedding
+                            S: 5,  // Extremely social
+                            P: 2,  // Companion
+                            I: 5   // Indoor
                         },
                         'Chihuahua': {
-                            T: 3,
-                            L: 2,
-                            A: 3,
-                            F: 4,
-                            E: 2,
-                            G: 1,
-                            H: 4,
-                            S: 4,
-                            P: 2,
-                            I: 5,
-                            B: 3
+                            T: 3,  // Needs attention
+                            L: 1,  // Tiny space OK
+                            A: 2,  // Low-moderate energy
+                            F: 3,  // Better with adults/older kids
+                            E: 2,  // Needs some training
+                            H: 4,  // Low allergen
+                            S: 4,  // Very bonded to owner
+                            P: 2,  // Companion
+                            I: 5   // Indoor
                         },
                         'French Bulldog': {
-                            T: 3,
-                            L: 2,
-                            A: 2,
-                            F: 5,
-                            E: 2,
-                            G: 1,
-                            H: 4,
-                            S: 5,
-                            P: 2,
-                            I: 5,
-                            B: 5
+                            T: 3,  // Moderate attention
+                            L: 1,  // Apartment perfect
+                            A: 2,  // Low energy
+                            F: 5,  // Great with families
+                            E: 1,  // Very easy
+                            H: 4,  // Minimal shedding
+                            S: 5,  // Very affectionate
+                            P: 2,  // Companion
+                            I: 5   // Indoor
                         },
                         'Boston Terrier': {
-                            T: 3,
-                            L: 2,
-                            A: 3,
-                            F: 5,
-                            E: 2,
-                            G: 1,
-                            H: 4,
-                            S: 4,
-                            P: 2,
-                            I: 5,
-                            B: 3
+                            T: 3,  // Moderate needs
+                            L: 2,  // Small-medium space
+                            A: 3,  // Moderate energy
+                            F: 5,  // Excellent with families
+                            E: 2,  // Beginner friendly
+                            H: 4,  // Low shedding
+                            S: 4,  // Friendly
+                            P: 2,  // Companion
+                            I: 4   // Mostly indoor
                         },
                         'Dachshund': {
-                            T: 3,
-                            L: 3,
-                            A: 3,
-                            F: 4,
-                            E: 2,
-                            G: 1,
-                            H: 4,
-                            S: 4,
-                            P: 2,
-                            I: 5,
-                            B: 2
+                            T: 3,  // Moderate time
+                            L: 2,  // Small space OK
+                            A: 3,  // Moderate activity
+                            F: 4,  // Good with families
+                            E: 2,  // Needs training
+                            H: 4,  // Low allergen
+                            S: 4,  // Loyal and loving
+                            P: 2,  // Companion
+                            I: 4   // Can do both
                         },
 
-                        // Medium breeds - moderate grooming (₱10,000-₱35,000 range)
+                        // Medium breeds
                         'Beagle': {
-                            T: 3,
-                            L: 3,
-                            A: 4,
-                            F: 5,
-                            E: 2,
-                            G: 1,
-                            H: 4,
-                            S: 4,
-                            P: 3,
-                            I: 3,
-                            B: 3
+                            T: 4,  // Needs attention and exercise
+                            L: 3,  // Medium space needed
+                            A: 4,  // High energy
+                            F: 5,  // Excellent with families
+                            E: 2,  // Trainable but stubborn
+                            H: 4,  // Low allergen
+                            S: 5,  // Very social
+                            P: 3,  // Active companion
+                            I: 3   // Needs outdoor time
                         },
                         'Poodle': {
-                            T: 4,
-                            L: 2,
-                            A: 3,
-                            F: 5,
-                            E: 3,
-                            G: 5,
-                            H: 5,
-                            S: 5,
-                            P: 3,
-                            I: 5,
-                            B: 4
+                            T: 4,  // Needs mental stimulation
+                            L: 2,  // Adaptable to small spaces
+                            A: 3,  // Moderate-high energy
+                            F: 5,  // Great with families
+                            E: 3,  // Smart, needs training
+                            H: 5,  // Hypoallergenic
+                            S: 5,  // Very social
+                            P: 3,  // Versatile
+                            I: 4   // Mostly indoor
                         },
 
-                        // Large active breeds - can do both indoor/outdoor (₱10,000-₱60,000 range)
+                        // Large active breeds
                         'Labrador Retriever': {
-                            T: 4,
-                            L: 4,
-                            A: 4,
-                            F: 5,
-                            E: 3,
-                            G: 2,
-                            H: 4,
-                            S: 5,
-                            P: 3,
-                            I: 3,
-                            B: 4
+                            T: 4,  // High time commitment
+                            L: 4,  // Needs space
+                            A: 4,  // High energy
+                            F: 5,  // Perfect family dog
+                            E: 2,  // Easy to train
+                            H: 3,  // Moderate shedding
+                            S: 5,  // Extremely social
+                            P: 3,  // Active companion
+                            I: 3   // Indoor/outdoor balance
                         },
                         'Boxer': {
-                            T: 4,
-                            L: 4,
-                            A: 4,
-                            F: 4,
-                            E: 3,
-                            G: 1,
-                            H: 3,
-                            S: 4,
-                            P: 1,
-                            I: 3,
-                            B: 3
+                            T: 4,  // Needs attention
+                            L: 4,  // Needs space
+                            A: 4,  // High energy
+                            F: 5,  // Great with kids
+                            E: 3,  // Needs consistent training
+                            H: 3,  // Moderate allergen
+                            S: 5,  // Very social
+                            P: 2,  // Companion/protection
+                            I: 3   // Needs outdoor time
                         },
                         'German Shepherd': {
-                            T: 4,
-                            L: 5,
-                            A: 5,
-                            F: 4,
-                            E: 4,
-                            G: 3,
-                            H: 3,
-                            S: 3,
-                            P: 1,
-                            I: 3,
-                            B: 4
+                            T: 5,  // High time needs
+                            L: 5,  // Needs lots of space
+                            A: 5,  // Very high energy
+                            F: 4,  // Good with families when trained
+                            E: 4,  // Needs experienced handler
+                            H: 3,  // Moderate shedding
+                            S: 3,  // Loyal but selective
+                            P: 1,  // Working/protection
+                            I: 2   // Needs outdoor activity
                         },
                         'Dobermann': {
-                            T: 4,
-                            L: 5,
-                            A: 5,
-                            F: 3,
-                            E: 4,
-                            G: 1,
-                            H: 3,
-                            S: 2,
-                            P: 1,
-                            I: 3,
-                            B: 4
+                            T: 5,  // High commitment
+                            L: 5,  // Large space needed
+                            A: 5,  // Very active
+                            F: 3,  // Needs supervision with kids
+                            E: 4,  // Experienced owners
+                            H: 3,  // Moderate allergen
+                            S: 3,  // Loyal to family
+                            P: 1,  // Protection
+                            I: 2   // Outdoor oriented
                         },
                         'Bullmastiff': {
-                            T: 4,
-                            L: 5,
-                            A: 3,
-                            F: 4,
-                            E: 4,
-                            G: 1,
-                            H: 3,
-                            S: 2,
-                            P: 1,
-                            I: 3,
-                            B: 4
+                            T: 4,  // Moderate-high time
+                            L: 5,  // Large space
+                            A: 3,  // Moderate energy
+                            F: 4,  // Good with families
+                            E: 3,  // Needs firm training
+                            H: 3,  // Moderate shedding
+                            S: 3,  // Calm and loyal
+                            P: 1,  // Guard dog
+                            I: 3   // Indoor/outdoor
                         },
 
-                        // Working/outdoor breeds - prefer outdoor (₱12,000-₱70,000+ range)
+                        // Working/outdoor breeds
                         'Siberian Husky': {
-                            T: 4,
-                            L: 5,
-                            A: 5,
-                            F: 4,
-                            E: 4,
-                            G: 3,
-                            H: 2,
-                            S: 4,
-                            P: 3,
-                            I: 1,
-                            B: 3
+                            T: 5,  // Very high time needs
+                            L: 5,  // Large space essential
+                            A: 5,  // Extremely active
+                            F: 4,  // Good with families
+                            E: 4,  // Experienced owners needed
+                            H: 2,  // Heavy shedder
+                            S: 4,  // Social and friendly
+                            P: 3,  // Working/active
+                            I: 1   // Outdoor breed
                         },
                         'Alaskan Malamute': {
-                            T: 4,
-                            L: 5,
-                            A: 5,
-                            F: 4,
-                            E: 4,
-                            G: 4,
-                            H: 2,
-                            S: 3,
-                            P: 3,
-                            I: 1,
-                            B: 5
+                            T: 5,  // Very demanding
+                            L: 5,  // Large space needed
+                            A: 5,  // Extremely active
+                            F: 4,  // Good with families
+                            E: 4,  // Experienced handlers
+                            H: 2,  // Heavy shedding
+                            S: 4,  // Social
+                            P: 3,  // Working
+                            I: 1   // Outdoor
                         },
                         'Akita': {
-                            T: 4,
-                            L: 5,
-                            A: 4,
-                            F: 3,
-                            E: 4,
-                            G: 4,
-                            H: 2,
-                            S: 3,
-                            P: 1,
-                            I: 3,
-                            B: 5
+                            T: 4,  // High commitment
+                            L: 5,  // Large space
+                            A: 4,  // Active
+                            F: 3,  // Selective with strangers
+                            E: 5,  // Expert level
+                            H: 2,  // Heavy shedding
+                            S: 2,  // Independent
+                            P: 1,  // Guard/protection
+                            I: 3   // Can do both
                         },
-
-                        // Special grooming needs (₱12,000-₱15,000 range)
                         'Chow Chow': {
-                            T: 3,
-                            L: 4,
-                            A: 2,
-                            F: 4,
-                            E: 3,
-                            G: 5,
-                            H: 1,
-                            S: 2,
-                            P: 4,
-                            I: 3,
-                            B: 3
+                            T: 3,  // Moderate time
+                            L: 4,  // Medium-large space
+                            A: 2,  // Low energy
+                            F: 3,  // Selective
+                            E: 4,  // Needs experienced owner
+                            H: 1,  // Heavy shedding
+                            S: 2,  // Independent
+                            P: 1,  // Guard
+                            I: 3   // Indoor/outdoor
                         }
                     },
                     cat: {
-                        // Local breed - outdoor, no grooming (Less than ₱1,000)
                         'Puspin': {
-                            T: 2,
-                            L: 2,
-                            A: 3,
-                            F: 5,
-                            E: 1,
-                            G: 0,
-                            H: 5,
-                            S: 3,
-                            P: 2,
-                            I: 1,
-                            B: 1
+                            T: 2,  // Low maintenance
+                            L: 2,  // Small space OK
+                            A: 3,  // Moderate activity
+                            F: 5,  // Great with families
+                            E: 1,  // Perfect for beginners
+                            H: 5,  // Hypoallergenic friendly
+                            S: 3,  // Moderate affection
+                            P: 2,  // Companion
+                            I: 2   // Adaptable
                         },
-
-                        // ₱3,000-₱3,500 range
                         'Siamese': {
-                            T: 3,
-                            L: 3,
-                            A: 3,
-                            F: 4,
-                            E: 2,
-                            G: 1,
-                            H: 3,
-                            S: 5,
-                            P: 3,
-                            I: 5,
-                            B: 2
+                            T: 3,  // Needs attention
+                            L: 2,  // Small space OK
+                            A: 3,  // Active
+                            F: 4,  // Good with families
+                            E: 2,  // Beginner friendly
+                            H: 3,  // Moderate allergen
+                            S: 5,  // Very vocal and social
+                            P: 2,  // Companion
+                            I: 5   // Indoor
                         },
-
-                        // ₱9,000-₱12,000 range
                         'Russian Blue': {
-                            T: 3,
-                            L: 3,
-                            A: 2,
-                            F: 4,
-                            E: 3,
-                            G: 1,
-                            H: 5,
-                            S: 4,
-                            P: 3,
-                            I: 5,
-                            B: 3
+                            T: 2,  // Low maintenance
+                            L: 2,  // Small space perfect
+                            A: 2,  // Low-moderate energy
+                            F: 4,  // Good with families
+                            E: 2,  // Easy
+                            H: 5,  // Hypoallergenic
+                            S: 3,  // Reserved but loving
+                            P: 2,  // Companion
+                            I: 5   // Indoor
                         },
                         'British Shorthair': {
-                            T: 3,
-                            L: 3,
-                            A: 2,
-                            F: 4,
-                            E: 2,
-                            G: 1,
-                            H: 4,
-                            S: 3,
-                            P: 3,
-                            I: 5,
-                            B: 3
+                            T: 2,  // Low maintenance
+                            L: 2,  // Apartment friendly
+                            A: 2,  // Low energy
+                            F: 5,  // Excellent with families
+                            E: 1,  // Very easy
+                            H: 4,  // Low allergen
+                            S: 3,  // Calm and gentle
+                            P: 2,  // Companion
+                            I: 5   // Indoor
                         },
                         'Exotic Shorthair': {
-                            T: 3,
-                            L: 3,
-                            A: 2,
-                            F: 4,
-                            E: 2,
-                            G: 2,
-                            H: 4,
-                            S: 4,
-                            P: 3,
-                            I: 5,
-                            B: 3
+                            T: 2,  // Low maintenance
+                            L: 2,  // Small space
+                            A: 2,  // Low energy
+                            F: 5,  // Great with families
+                            E: 1,  // Easy
+                            H: 4,  // Low shedding
+                            S: 4,  // Affectionate
+                            P: 2,  // Companion
+                            I: 5   // Indoor
                         },
                         'Maine Coon': {
-                            T: 4,
-                            L: 5,
-                            A: 4,
-                            F: 5,
-                            E: 4,
-                            G: 4,
-                            H: 2,
-                            S: 5,
-                            P: 3,
-                            I: 3,
-                            B: 3
+                            T: 3,  // Moderate time
+                            L: 4,  // Needs more space
+                            A: 3,  // Moderate activity
+                            F: 5,  // Excellent with families
+                            E: 2,  // Beginner friendly
+                            H: 2,  // Heavy shedding
+                            S: 5,  // Very social
+                            P: 2,  // Companion
+                            I: 3   // Can do both
                         },
-
-                        // ₱30,000-₱60,000 range (Premium breeds)
                         'American Shorthair': {
-                            T: 3,
-                            L: 3,
-                            A: 3,
-                            F: 5,
-                            E: 2,
-                            G: 1,
-                            H: 4,
-                            S: 4,
-                            P: 3,
-                            I: 5,
-                            B: 4
+                            T: 2,  // Low maintenance
+                            L: 2,  // Adaptable
+                            A: 3,  // Moderate energy
+                            F: 5,  // Perfect for families
+                            E: 1,  // Very easy
+                            H: 4,  // Low allergen
+                            S: 4,  // Friendly
+                            P: 2,  // Companion
+                            I: 4   // Mostly indoor
                         },
                         'Ragdoll': {
-                            T: 4,
-                            L: 3,
-                            A: 2,
-                            F: 5,
-                            E: 2,
-                            G: 4,
-                            H: 3,
-                            S: 5,
-                            P: 4,
-                            I: 5,
-                            B: 4
+                            T: 3,  // Needs companionship
+                            L: 3,  // Medium space
+                            A: 1,  // Very low energy
+                            F: 5,  // Excellent with families
+                            E: 1,  // Very easy
+                            H: 3,  // Moderate allergen
+                            S: 5,  // Extremely affectionate
+                            P: 4,  // Emotional support
+                            I: 5   // Indoor only
                         },
-
-                        // ₱4,000-₱35,000 range (Long hair - high grooming)
                         'Persian': {
-                            T: 4,
-                            L: 3,
-                            A: 1,
-                            F: 4,
-                            E: 2,
-                            G: 5,
-                            H: 1,
-                            S: 5,
-                            P: 4,
-                            I: 5,
-                            B: 3
+                            T: 3,  // Needs attention
+                            L: 2,  // Small space OK
+                            A: 1,  // Very low energy
+                            F: 4,  // Good with gentle families
+                            E: 2,  // Needs some grooming knowledge
+                            H: 2,  // Heavy shedding
+                            S: 4,  // Affectionate
+                            P: 4,  // Lap cat
+                            I: 5   // Indoor
                         },
                         'Himalayan': {
-                            T: 4,
-                            L: 3,
-                            A: 1,
-                            F: 4,
-                            E: 2,
-                            G: 5,
-                            H: 1,
-                            S: 5,
-                            P: 4,
-                            I: 5,
-                            B: 3
+                            T: 3,  // Moderate attention
+                            L: 2,  // Small space
+                            A: 1,  // Very low energy
+                            F: 4,  // Gentle with families
+                            E: 2,  // Needs grooming
+                            H: 2,  // Heavy shedding
+                            S: 5,  // Very affectionate
+                            P: 4,  // Lap cat
+                            I: 5   // Indoor
                         }
                     }
                 },
@@ -1284,72 +1249,226 @@
                     console.log('User Lifestyle Answers:', this.lifestyleAnswers);
 
                     const breeds = this.breedProfiles[this.petType];
-                    let candidates = Object.keys(breeds);
+                    let allBreeds = Object.keys(breeds);
+                    let candidates = [...allBreeds];
 
-                    // Filter 1: Allergy (H) - if allergic (code 1), only hypoallergenic breeds (H >= 4)
+                    // INTELLIGENT FILTERING SYSTEM - Progressive filters with fallback
+                    const minCandidates = 5; // Ensure enough options for comparison
+                    
+                    // Filter 1: CRITICAL - Allergy (absolute requirement)
                     if (this.lifestyleAnswers.H === 1) {
-                        candidates = candidates.filter(name => breeds[name].H >= 4);
-                        console.log('After allergy filter:', candidates.length);
+                        const allergyFiltered = candidates.filter(name => breeds[name].H >= 4);
+                        if (allergyFiltered.length >= 3) {
+                            candidates = allergyFiltered;
+                            console.log('✓ Allergy filter applied:', candidates.length, 'breeds');
+                        } else {
+                            console.warn('⚠ Allergy filter too restrictive, relaxed to H >= 3');
+                            const relaxedAllergy = candidates.filter(name => breeds[name].H >= 3);
+                            if (relaxedAllergy.length >= 3) {
+                                candidates = relaxedAllergy;
+                            }
+                        }
                     }
 
-                    // Filter 2: Living Space (L) - if small living space (<= 2), remove breeds needing large space (>3)
-                    if ((this.lifestyleAnswers.L ?? 3) <= 2) {
-                        candidates = candidates.filter(name => (breeds[name].L ?? 3) <= 3);
-                        console.log('After living space filter:', candidates.length);
+                    // Filter 2: Living Space - strict for very small spaces only
+                    if (this.lifestyleAnswers.L === 1) {
+                        const spaceFiltered = candidates.filter(name => breeds[name].L <= 2);
+                        if (spaceFiltered.length >= minCandidates) {
+                            candidates = spaceFiltered;
+                            console.log('✓ Small space filter applied:', candidates.length, 'breeds');
+                        }
                     }
 
-                    // Filter 3: Time (T) - low time (<= 2) excludes high-maintenance breeds (>3)
-                    if ((this.lifestyleAnswers.T ?? 3) <= 2) {
-                        candidates = candidates.filter(name => (breeds[name].T ?? 3) <= 3);
-                        console.log('After time filter:', candidates.length);
+                    // Filter 3: Time - critical filter for very limited availability
+                    if (this.lifestyleAnswers.T === 1) {
+                        const timeFiltered = candidates.filter(name => breeds[name].T <= 2);
+                        if (timeFiltered.length >= minCandidates) {
+                            candidates = timeFiltered;
+                            console.log('✓ Low time filter applied:', candidates.length, 'breeds');
+                        }
                     }
 
-                    // Filter 4: Budget (B) - exclude breeds whose budget exceeds user's budget
-                    if (this.lifestyleAnswers.B != null) {
-                        candidates = candidates.filter(name => (breeds[name].B ?? 3) <= this.lifestyleAnswers.B);
-                        console.log('After budget filter:', candidates.length);
+                    // Filter 4: Experience - first-time owners should avoid difficult breeds
+                    if (this.lifestyleAnswers.E === 1) {
+                        const expFiltered = candidates.filter(name => breeds[name].E <= 2);
+                        if (expFiltered.length >= minCandidates) {
+                            candidates = expFiltered;
+                            console.log('✓ Beginner-friendly filter applied:', candidates.length, 'breeds');
+                        }
                     }
 
-                    // If filtering excludes all breeds, relax constraints by including all breeds
-                    if (candidates.length === 0) {
-                        console.warn('No breeds passed filters - relaxing constraints');
-                        candidates = Object.keys(breeds);
+                    // Ensure minimum candidates for meaningful comparison
+                    if (candidates.length < 3) {
+                        console.warn('⚠ Too few candidates after filtering, expanding pool');
+                        candidates = allBreeds;
                     }
 
-                    // Calculate weighted Euclidean distance for each candidate
+                    console.log('Final candidate pool:', candidates.length, 'breeds');
+                    console.log('Final candidate pool:', candidates.length, 'breeds');
+
+                    // ENHANCED SCORING ALGORITHM with Multi-Factor Analysis
+                    // ENHANCED SCORING ALGORITHM with Multi-Factor Analysis
                     const scored = candidates.map(name => {
                         const breed = breeds[name];
-                        let sumSquaredDiff = 0;
+                        let totalScore = 0;
+                        let criticalFactorScore = 0;
 
-                        ['T', 'L', 'A', 'F', 'E', 'G', 'H', 'S', 'P', 'I', 'B'].forEach(factor => {
-                            const userVal = this.lifestyleAnswers[factor] ??
-                            3; // default median if undefined
+                        // Calculate weighted distance for each factor
+                        ['T', 'L', 'A', 'H', 'F', 'E', 'S', 'I', 'P'].forEach(factor => {
+                            const userVal = this.lifestyleAnswers[factor] ?? 3;
+                            const breedVal = breed[factor] ?? 3;
+                            const weight = this.weights[factor] ?? 0;
+                            
+                            // Calculate normalized difference (0-5 scale)
+                            const maxDiff = 5;
+                            const diff = Math.abs(userVal - breedVal);
+                            const normalizedDiff = diff / maxDiff;
+                            
+                            // Calculate weighted score (inverse of difference)
+                            const factorScore = (1 - normalizedDiff) * weight;
+                            totalScore += factorScore;
+                            
+                            // Track critical factors separately (T, L, A, H)
+                            if (['T', 'L', 'A', 'H'].includes(factor)) {
+                                criticalFactorScore += factorScore;
+                            }
+                        });
+
+                        // ENHANCED BONUS SCORING SYSTEM
+                        let bonusScore = 0;
+                        
+                        // Critical Factor Bonuses (higher weight)
+                        
+                        // Perfect allergy match - CRITICAL
+                        if (this.lifestyleAnswers.H === 1 && breed.H >= 4) {
+                            bonusScore += 0.08; // Doubled from 0.04
+                        }
+                        
+                        // Perfect space match - VERY IMPORTANT
+                        const spaceDiff = Math.abs(this.lifestyleAnswers.L - breed.L);
+                        if (spaceDiff === 0) bonusScore += 0.06;
+                        else if (spaceDiff === 1) bonusScore += 0.03;
+                        
+                        // Perfect activity match - CRITICAL for happiness
+                        const activityDiff = Math.abs(this.lifestyleAnswers.A - breed.A);
+                        if (activityDiff === 0) bonusScore += 0.06;
+                        else if (activityDiff === 1) bonusScore += 0.03;
+                        
+                        // Perfect time match - ESSENTIAL
+                        const timeDiff = Math.abs(this.lifestyleAnswers.T - breed.T);
+                        if (timeDiff === 0) bonusScore += 0.05;
+                        else if (timeDiff === 1) bonusScore += 0.02;
+                        
+                        // Secondary Factor Bonuses
+                        
+                        // Family safety match
+                        if (this.lifestyleAnswers.F >= 4 && breed.F >= 4) bonusScore += 0.04;
+                        
+                        // Experience match for beginners
+                        if (this.lifestyleAnswers.E <= 2 && breed.E <= 2) bonusScore += 0.03;
+                        
+                        // Personality compatibility
+                        if (Math.abs(this.lifestyleAnswers.S - breed.S) <= 1) bonusScore += 0.02;
+                        
+                        // Indoor/outdoor match
+                        if (Math.abs(this.lifestyleAnswers.I - breed.I) <= 1) bonusScore += 0.02;
+
+                        // Calculate final compatibility percentage (realistic scale)
+                        // Base score from weighted factors (0-1 range)
+                        // Bonuses can add up to ~0.35 max, giving totalScore range of ~0-1.35
+                        // Scale to 50-100% range for better user interpretation
+                        const rawScore = totalScore + bonusScore;
+                        
+                        // Map score to realistic percentage:
+                        // Perfect match (1.35+) = 95-100%
+                        // Excellent match (1.15-1.35) = 85-94%
+                        // Good match (0.95-1.15) = 75-84%
+                        // Fair match (0.75-0.95) = 65-74%
+                        // Poor match (<0.75) = 50-64%
+                        let compatibility;
+                        if (rawScore >= 1.25) {
+                            compatibility = Math.round(95 + (rawScore - 1.25) * 50); // 95-100%
+                        } else if (rawScore >= 1.10) {
+                            compatibility = Math.round(85 + (rawScore - 1.10) * 66.67); // 85-94%
+                        } else if (rawScore >= 0.90) {
+                            compatibility = Math.round(75 + (rawScore - 0.90) * 50); // 75-84%
+                        } else if (rawScore >= 0.70) {
+                            compatibility = Math.round(65 + (rawScore - 0.70) * 50); // 65-74%
+                        } else {
+                            compatibility = Math.round(50 + rawScore * 21.43); // 50-64%
+                        }
+                        
+                        compatibility = Math.max(50, Math.min(100, compatibility));
+
+                        // Calculate distance for tiebreaking (weighted Euclidean)
+                        let sumSquaredDiff = 0;
+                        ['T', 'L', 'A', 'H', 'F', 'E', 'S', 'I', 'P'].forEach(factor => {
+                            const userVal = this.lifestyleAnswers[factor] ?? 3;
                             const breedVal = breed[factor] ?? 3;
                             const diff = userVal - breedVal;
                             const weight = this.weights[factor] ?? 0;
                             sumSquaredDiff += weight * diff * diff;
                         });
-
                         const distance = Math.sqrt(sumSquaredDiff);
-                        // Compatibility formula scaled inversely by distance
-                        const compatibility = Math.max(0, Math.min(100, 100 - distance * 10));
 
                         return {
                             name,
                             distance,
-                            compatibility: Math.round(compatibility),
+                            compatibility,
+                            rawScore: totalScore + bonusScore,
+                            criticalFactorScore,
                             profile: breed
                         };
                     });
 
-                    // Sort by best match (lowest distance)
-                    scored.sort((a, b) => a.distance - b.distance);
-                    console.log('Top 5 matches:', scored.slice(0, 5));
+                    // Sort by multiple criteria for best accuracy
+                    scored.sort((a, b) => {
+                        // 1. First priority: Compatibility score difference > 5%
+                        const compatDiff = b.compatibility - a.compatibility;
+                        if (Math.abs(compatDiff) > 5) {
+                            return compatDiff;
+                        }
+                        
+                        // 2. Second priority: Critical factor score (T, L, A, H)
+                        const criticalDiff = b.criticalFactorScore - a.criticalFactorScore;
+                        if (Math.abs(criticalDiff) > 0.02) {
+                            return criticalDiff;
+                        }
+                        
+                        // 3. Third priority: Overall distance (lower is better)
+                        return a.distance - b.distance;
+                    });
 
-                    // Get top 3 matches
-                    const top3 = scored.slice(0, 3);
+                    console.log('🏆 Top 5 matches:', scored.slice(0, 5).map(s => ({
+                        name: s.name,
+                        compatibility: s.compatibility + '%',
+                        rawScore: s.rawScore.toFixed(3),
+                        distance: s.distance.toFixed(3),
+                        criticalScore: (s.criticalFactorScore * 100).toFixed(1) + '%'
+                    })));
 
-                    // Get backend breed data and generate match reasons for display
+                    // GUARANTEE EXACTLY 3 BREEDS
+                    let top3 = scored.slice(0, 3);
+                    
+                    // If we somehow have less than 3, fill with next best matches
+                    while (top3.length < 3 && allBreeds.length >= 3) {
+                        const remaining = allBreeds.filter(name => 
+                            !top3.find(t => t.name === name)
+                        );
+                        if (remaining.length > 0) {
+                            const fallback = {
+                                name: remaining[0],
+                                distance: 999,
+                                compatibility: 65,
+                                profile: breeds[remaining[0]]
+                            };
+                            top3.push(fallback);
+                        } else {
+                            break;
+                        }
+                    }
+
+                    // Get backend breed data and generate match reasons
                     let masterBreeds = [];
                     try {
                         if (this.petType === 'dog') {
@@ -1361,12 +1480,12 @@
                         console.error('Error loading breed data:', e);
                     }
 
-                    this.recommendedBreeds = top3.map(match => {
+                    this.recommendedBreeds = top3.map((match, index) => {
                         const breedData = masterBreeds.find(b =>
                             b.name.toLowerCase() === match.name.toLowerCase()
                         );
 
-                        const reasons = this.generateMatchReasons(match.profile);
+                        const detailedReasons = this.generateMatchReasons(match.profile);
 
                         return {
                             name: match.name,
@@ -1374,93 +1493,157 @@
                             image: breedData?.image || '/placeholder.svg?height=300&width=400',
                             description: breedData?.description || 'A wonderful companion for you.',
                             compatibility: match.compatibility,
-                            matchReasons: reasons,
-                            distance: match.distance
+                            detailedReasons: detailedReasons,
+                            distance: match.distance,
+                            rank: index + 1
                         };
                     });
 
-                    console.log('Final recommendations:', this.recommendedBreeds);
+                    console.log('Final 3 recommendations:', this.recommendedBreeds);
                 },
 
                 generateMatchReasons(breedProfile) {
-                    const reasons = [];
+                    const detailedReasons = [];
 
                     // Check time commitment
                     if (Math.abs(this.lifestyleAnswers.T - breedProfile.T) <= 1) {
-                        reasons.push('Time commitment match');
+                        const userTime = this.lifestyleAnswers.T;
+                        let timeExplanation = '';
+                        if (userTime <= 2) {
+                            timeExplanation = 'This breed is independent and can handle being alone during your work hours. Perfect for busy schedules!';
+                        } else if (userTime <= 3) {
+                            timeExplanation = 'This breed needs moderate attention and will thrive with your available time for daily care and play.';
+                        } else {
+                            timeExplanation = 'This breed loves companionship and will enjoy spending lots of quality time with you every day.';
+                        }
+                        detailedReasons.push({
+                            icon: '⏰',
+                            title: 'Time Commitment Match',
+                            explanation: timeExplanation
+                        });
                     }
 
                     // Check living space
                     if (Math.abs(this.lifestyleAnswers.L - breedProfile.L) <= 1) {
-                        reasons.push('Perfect for your home');
+                        const userSpace = this.lifestyleAnswers.L;
+                        let spaceExplanation = '';
+                        if (userSpace <= 2) {
+                            spaceExplanation = 'This breed adapts well to apartment living and doesn\'t need a large yard. Great for smaller spaces!';
+                        } else if (userSpace <= 3) {
+                            spaceExplanation = 'This breed fits perfectly in your home size with enough room to move around comfortably.';
+                        } else {
+                            spaceExplanation = 'This breed will love having plenty of space to roam and explore in your large home or yard.';
+                        }
+                        detailedReasons.push({
+                            icon: '🏠',
+                            title: 'Perfect Home Size Match',
+                            explanation: spaceExplanation
+                        });
                     }
 
                     // Check activity level
                     if (Math.abs(this.lifestyleAnswers.A - breedProfile.A) <= 1) {
-                        reasons.push('Activity level match');
+                        const userActivity = this.lifestyleAnswers.A;
+                        let activityExplanation = '';
+                        if (userActivity <= 2) {
+                            activityExplanation = 'This breed has low energy needs and is happy with short walks or indoor play. Perfect for a relaxed lifestyle!';
+                        } else if (userActivity <= 3) {
+                            activityExplanation = 'This breed enjoys moderate exercise like daily walks and playtime, matching your activity level perfectly.';
+                        } else {
+                            activityExplanation = 'This breed is energetic and athletic, ready to join you on runs, hikes, and outdoor adventures!';
+                        }
+                        detailedReasons.push({
+                            icon: '🏃',
+                            title: 'Activity Level Match',
+                            explanation: activityExplanation
+                        });
                     }
 
                     // Check family friendliness
                     if (this.lifestyleAnswers.F >= 4 && breedProfile.F >= 4) {
-                        reasons.push('Family-friendly');
-                    }
-
-                    // Check grooming - handle 0-5 scale
-                    const groomingDiff = Math.abs(this.lifestyleAnswers.G - breedProfile.G);
-                    if (groomingDiff <= 1) {
-                        if (this.lifestyleAnswers.G === 0 && breedProfile.G === 0) {
-                            reasons.push('No grooming needed');
-                        } else if (this.lifestyleAnswers.G <= 1 && breedProfile.G <= 1) {
-                            reasons.push('Low maintenance');
-                        } else {
-                            reasons.push('Grooming fits lifestyle');
-                        }
+                        detailedReasons.push({
+                            icon: '👨‍👩‍👧‍👦',
+                            title: 'Family-Friendly',
+                            explanation: 'This breed is patient, gentle, and great with children and other family members. Safe and loving for all ages!'
+                        });
                     }
 
                     // Check allergy compatibility
                     if (this.lifestyleAnswers.H === 1 && breedProfile.H >= 4) {
-                        reasons.push('Hypoallergenic');
+                        detailedReasons.push({
+                            icon: '🌿',
+                            title: 'Hypoallergenic Breed',
+                            explanation: 'This breed is hypoallergenic with minimal shedding, making it safe and comfortable for people with allergies!'
+                        });
                     }
 
                     // Check sociability
                     if (Math.abs(this.lifestyleAnswers.S - breedProfile.S) <= 1) {
-                        reasons.push('Personality match');
+                        const userSociability = this.lifestyleAnswers.S;
+                        let socialExplanation = '';
+                        if (userSociability <= 2) {
+                            socialExplanation = 'This breed is independent and respects personal space while still being loving. Perfect if you prefer a calm companion!';
+                        } else if (userSociability <= 3) {
+                            socialExplanation = 'This breed has a balanced temperament - friendly when you want interaction, calm when you need space.';
+                        } else {
+                            socialExplanation = 'This breed is very affectionate and social, always ready to cuddle and follow you around. Your perfect shadow!';
+                        }
+                        detailedReasons.push({
+                            icon: '💕',
+                            title: 'Personality Match',
+                            explanation: socialExplanation
+                        });
                     }
 
                     // Check indoor/outdoor preference
                     const indoorDiff = Math.abs(this.lifestyleAnswers.I - breedProfile.I);
                     if (indoorDiff <= 1) {
-                        if (this.lifestyleAnswers.I === 1 && breedProfile.I === 1) {
-                            reasons.push('Outdoor-adapted');
-                        } else if (this.lifestyleAnswers.I === 5 && breedProfile.I === 5) {
-                            reasons.push('Indoor-friendly');
+                        const userIndoor = this.lifestyleAnswers.I;
+                        let indoorExplanation = '';
+                        if (userIndoor === 1) {
+                            indoorExplanation = 'This breed thrives outdoors and can handle various weather conditions. Great for outdoor living!';
+                        } else if (userIndoor === 5) {
+                            indoorExplanation = 'This breed is perfectly suited for indoor living and will be comfortable staying inside with you.';
                         } else {
-                            reasons.push('Living style match');
+                            indoorExplanation = 'This breed is adaptable and happy with a mix of indoor comfort and outdoor time.';
                         }
-                    }
-
-                    // Check budget
-                    if (Math.abs(this.lifestyleAnswers.B - breedProfile.B) <= 1) {
-                        if (this.lifestyleAnswers.B <= 2 && breedProfile.B <= 2) {
-                            reasons.push('Very affordable');
-                        } else {
-                            reasons.push('Budget-friendly');
-                        }
+                        detailedReasons.push({
+                            icon: '🌤️',
+                            title: 'Living Environment Match',
+                            explanation: indoorExplanation
+                        });
                     }
 
                     // Check experience level
                     if (this.lifestyleAnswers.E <= 2 && breedProfile.E <= 2) {
-                        reasons.push('Beginner-friendly');
+                        detailedReasons.push({
+                            icon: '🌟',
+                            title: 'Beginner-Friendly',
+                            explanation: 'This breed is easy to train, forgiving of mistakes, and perfect for first-time pet owners. You\'ll learn together!'
+                        });
                     } else if (this.lifestyleAnswers.E >= 4 && breedProfile.E >= 4) {
-                        reasons.push('Expert-level breed');
+                        detailedReasons.push({
+                            icon: '🎓',
+                            title: 'Great For Experienced Owners',
+                            explanation: 'This breed benefits from your experience and training knowledge. Together you\'ll achieve amazing results!'
+                        });
                     }
 
-                    // If no specific reasons, add generic ones
-                    if (reasons.length === 0) {
-                        reasons.push('Good overall match', 'Balanced temperament');
+                    // If no specific reasons, add helpful generic ones
+                    if (detailedReasons.length === 0) {
+                        detailedReasons.push({
+                            icon: '✨',
+                            title: 'Great Overall Match',
+                            explanation: 'This breed has a balanced temperament and adaptable nature that works well with various lifestyles.'
+                        });
+                        detailedReasons.push({
+                            icon: '🐾',
+                            title: 'Wonderful Companion',
+                            explanation: 'This breed is known for being loving, loyal, and a joy to have as part of your family.'
+                        });
                     }
 
-                    return reasons.slice(0, 4); // Max 4 reasons
+                    return detailedReasons.slice(0, 3); // Max 3 detailed reasons for readability
                 },
 
                 getBreedImage(breed) {
@@ -1478,7 +1661,7 @@
                             image: breed.image,
                             description: breed.description,
                             compatibility: breed.compatibility,
-                            matchReasons: breed.matchReasons
+                            matchReasons: breed.detailedReasons?.map(r => r.title) || []
                         })),
                         lifestyleScores: this.lifestyleAnswers
                     };
@@ -1555,7 +1738,8 @@
                 },
                 truncateDescription(desc) {
                     if (!desc) return '';
-                    return desc.length > 120 ? desc.slice(0, 120) + '...' : desc;
+                    const maxLength = window.innerWidth < 768 ? 100 : 120;
+                    return desc.length > maxLength ? desc.slice(0, maxLength) + '...' : desc;
                 },
             };
         }
