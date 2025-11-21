@@ -29,10 +29,13 @@
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 250, 251, 0.98));
             border-radius: 18px;
             box-shadow: var(--shadow-lg);
-            padding: 2rem;
+            padding: 1.5rem;
             overflow-x: hidden;
             width: 100%;
             max-width: 100%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .gradient-text {
@@ -152,34 +155,79 @@
         .radio-label {
             position: relative;
             cursor: pointer;
-            padding: 16px;
-            border-radius: 12px;
+            padding: 0.875rem;
+            border-radius: 10px;
             transition: all .18s ease;
             background: white;
             border: 2px solid #e5e7eb;
-        }
-
-        .radio-label:hover {
-            background: rgba(255, 99, 127, 0.05);
-            transform: translateY(-2px);
-            border-color: var(--pet-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 60px;
         }
 
         .radio-label input[type="radio"] {
-            accent-color: var(--pet-primary);
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .radio-label:not(.selected):hover {
+            background: rgba(139, 92, 246, 0.08);
+            transform: translateY(-2px);
+            border-color: #8b5cf6;
+        }
+
+        .radio-label.selected {
+            background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%) !important;
+            border-color: #8b5cf6 !important;
+            color: white !important;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3) !important;
+        }
+
+        .radio-label.selected span {
+            color: white !important;
+        }
+
+        .radio-label.selected:hover {
+            transform: scale(1.05) translateY(-2px) !important;
+            background: linear-gradient(135deg, #7c3aed 0%, #c026d3 100%) !important;
         }
 
         .question-card {
             background: linear-gradient(180deg, #fff 0%, #fffbfc 100%);
             border-radius: 14px;
-            padding: 24px;
-            margin-bottom: 24px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
             box-shadow: 0 6px 22px rgba(15, 23, 42, 0.04);
             width: 100%;
-            overflow: visible;
+            overflow-y: auto;
+            max-height: 45vh;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 640px) {
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .options-grid.has-5-options {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            
+            .options-grid.has-3-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         .question-card:hover {
@@ -187,10 +235,10 @@
         }
 
         .question-text {
-            font-size: 18px;
-            line-height: 1.6;
+            font-size: 1rem;
+            line-height: 1.5;
             color: #1f2937;
-            margin-bottom: 20px;
+            margin-bottom: 1rem;
             font-weight: 600;
             word-wrap: break-word;
             overflow-wrap: break-word;
@@ -325,9 +373,10 @@
             background: white;
             color: var(--pet-primary);
             border: 2px solid rgba(255, 99, 127, 0.08);
-            padding: 10px 18px;
+            padding: 0.625rem 1rem;
             border-radius: 10px;
             font-weight: 700;
+            font-size: 0.875rem;
         }
 
         .back-button:hover {
@@ -347,29 +396,51 @@
 
         @media (max-width: 768px) {
             .quiz-container {
-                padding: 1.25rem;
+                padding: 1rem;
                 margin: 0 0.5rem;
+                max-height: 90vh;
             }
 
             .gradient-text {
-                font-size: 2.2rem !important;
+                font-size: 1.75rem !important;
                 line-height: 1.1;
                 word-break: break-word;
                 white-space: normal;
             }
 
             .quiz-container h1 {
-                font-size: 2.2rem !important;
+                font-size: 1.75rem !important;
                 line-height: 1.1;
                 word-break: break-word;
                 white-space: normal;
             }
 
             .btn-gradient {
-                font-size: 1rem;
-                padding: 12px 0;
+                font-size: 0.9rem;
+                padding: 10px 0;
                 width: 100%;
                 min-width: 0;
+            }
+            
+            .question-card {
+                padding: 1rem;
+                max-height: 50vh;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .radio-label {
+                padding: 0.75rem;
+                min-height: 50px;
+                font-size: 0.875rem;
+            }
+            
+            .section-badge {
+                padding: 6px 12px;
+                font-size: 0.75rem;
             }
 
             .breed-result-card .image-container {
@@ -472,19 +543,19 @@
 
             <!-- Step 2: Lifestyle Questions -->
             <template x-if="currentStage === 'lifestyle'">
-                <div class="quiz-container p-8 md:p-12 animate-in">
-                    <div class="mb-8">
+                <div class="quiz-container animate-in">
+                    <div class="mb-4">
                         <span class="section-badge">Step 2 of 2</span>
-                        <h2 class="text-3xl md:text-4xl font-bold gradient-text mt-4">Lifestyle Assessment</h2>
-                        <p class="text-gray-600 mt-2">
+                        <h2 class="text-2xl md:text-3xl font-bold gradient-text mt-2">Lifestyle Assessment</h2>
+                        <p class="text-gray-600 mt-1 text-sm">
                             Question <span x-text="currentQuestion + 1"></span> of <span
                                 x-text="lifestyleQuestions.length"></span>
                         </p>
                     </div>
 
                     <!-- Progress Bar -->
-                    <div class="mb-8">
-                        <div class="flex justify-between text-sm text-gray-600 mb-2">
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-600 mb-1">
                             <span>Overall Progress</span>
                             <span
                                 x-text="Math.round(((currentQuestion + 1) / lifestyleQuestions.length) * 100) + '%'"></span>
@@ -497,35 +568,38 @@
                     </div>
 
                     <!-- Current Question -->
-                    <div class="question-card">
+                    <div class="question-card" style="flex: 1; overflow-y: auto;">
                         <h3 class="question-text" x-text="lifestyleQuestions[currentQuestion].question"></h3>
 
-                        <div class="space-y-3">
+                        <div class="options-grid" 
+                             :class="{
+                                 'has-5-options': lifestyleQuestions[currentQuestion].options.length === 5,
+                                 'has-3-options': lifestyleQuestions[currentQuestion].options.length === 3
+                             }">
                             <template x-for="option in lifestyleQuestions[currentQuestion].options" :key="option.value">
-                                <label class="radio-label cursor-pointer flex items-center transition-all"
-                                    :class="lifestyleAnswers[lifestyleQuestions[currentQuestion].code] === option.value ?
-                                        'border-purple-500 bg-purple-50 shadow-md' :
-                                        'border-gray-200 hover:border-purple-300'">
+                                <label class="radio-label cursor-pointer transition-all"
+                                    :class="{'selected': lifestyleAnswers[lifestyleQuestions[currentQuestion].code] === option.value}"
+                                    @click="lifestyleAnswers[lifestyleQuestions[currentQuestion].code] = option.value">
                                     <input type="radio" :name="'q' + currentQuestion" :value="option.value"
-                                        x-model="lifestyleAnswers[lifestyleQuestions[currentQuestion].code]" class="mr-3">
-                                    <span class="text-base font-medium" x-text="option.label"></span>
+                                        x-model="lifestyleAnswers[lifestyleQuestions[currentQuestion].code]">
+                                    <span class="text-sm font-medium" x-text="option.label"></span>
                                 </label>
                             </template>
                         </div>
                     </div>
 
                     <!-- Warning Message -->
-                    <div class="mt-6"
+                    <div class="mt-3"
                         x-show="attemptedNext && !lifestyleAnswers[lifestyleQuestions[currentQuestion].code]">
-                        <div class="bg-amber-100 border-l-4 border-amber-500 p-4 rounded-lg">
-                            <p class="text-amber-800 font-semibold">
+                        <div class="bg-amber-100 border-l-4 border-amber-500 p-3 rounded-lg">
+                            <p class="text-amber-800 font-semibold text-sm">
                                 ⚠️ Please select an answer before continuing.
                             </p>
                         </div>
                     </div>
 
                     <!-- Navigation -->
-                    <div class="mt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="mt-4 flex flex-col md:flex-row justify-between items-center gap-3" style="flex-shrink: 0;">
                         <div class="flex gap-3">
                             <button class="back-button" @click="prevQuestion()" x-show="currentQuestion > 0">
                                 ← Previous
