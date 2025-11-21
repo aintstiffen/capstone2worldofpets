@@ -112,6 +112,11 @@
 
             .hotspot-marker span {
                 background: transparent !important;
+                opacity: 0 !important;
+                border: none !important;
+                color: transparent !important;
+                width: 32px !important;
+                height: 32px !important;
             }
 
             .hotspot-marker::before {
@@ -119,8 +124,9 @@
                 position: absolute;
                 inset: -8px;
                 border-radius: 50%;
-                background: rgba(102, 126, 234, 0.2);
-                animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                background: transparent;
+                opacity: 0;
+                animation: none;
             }
 
             @keyframes pulse-ring {
@@ -138,7 +144,7 @@
             }
 
             .hotspot-marker:hover {
-                transform: scale(1.15);
+                transform: none;
             }
 
             .tooltip-enhanced {
@@ -660,10 +666,10 @@
                                                 @mouseenter="setActive('{{ $feature }}', $el)"
                                                 @mouseleave="clearActive()" @click="setActive('{{ $feature }}', $el)"
                                                 data-fact="{{ e($fact) }}">
-                                                <div class="hotspot-marker cursor-pointer rounded-full flex items-center justify-center backdrop-blur-sm bg-transparent border-2 border-[var(--color-primary)] shadow-lg"
-                                                    style="width: {{ $hotspot['width'] ?? 48 }}px; height: {{ $hotspot['height'] ?? 48 }}px;">
+                                                <div class="hotspot-marker cursor-pointer rounded-full flex items-center justify-center"
+                                                    style="width: {{ $hotspot['width'] ?? 48 }}px; height: {{ $hotspot['height'] ?? 48 }}px; background: transparent; border: none;">
                                                     <span
-                                                        class="text-xs font-bold text-[var(--color-primary)] bg-white/80 px-2 py-1 rounded-full">{{ ucfirst($feature) }}</span>
+                                                        class="text-xs font-bold px-2 py-1 rounded-full" style="opacity: 0; color: transparent; background: transparent;">{{ ucfirst($feature) }}</span>
                                                 </div>
                                             </div>
                                         @endforeach
@@ -688,7 +694,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
-                                                <span>Hover or tap circles to learn more</span>
+                                                <span>Hover or tap on body parts to learn more</span>
                                             </div>
                                         </div>
                                     </div>
