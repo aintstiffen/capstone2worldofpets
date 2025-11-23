@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breed Recommendation Algorithm Flowchart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .legend {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        .legend h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        .legend-item {
+            display: inline-block;
+            margin: 10px 20px 10px 0;
+            font-size: 14px;
+        }
+        .legend-color {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .weight-box {
+            background: #e8eaf6;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .weight-box h4 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .download-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐾 Breed Recommendation Algorithm</h1>
+        <p class="subtitle">Veterinary-Verified Compatibility Assessment System</p>
+
+        <div class="weight-box">
+            <h4>📊 Factor Weights (Total = 1.00)</h4>
+            <strong>Critical Factors:</strong><br>
+            Time (T): 22% | Living Space (L): 20% | Activity (A): 19% | Allergies (H): 15%<br><br>
+            <strong>Important Factors:</strong><br>
+            Family (F): 12% | Sociability (S): 10% | Indoor/Outdoor (I): 8%<br><br>
+            <strong>Secondary Factors:</strong><br>
+            Experience (E): 6% | Purpose (P): 3%
+        </div>
+
+        <div class="mermaid">
+graph TB
+    Start([👤 User Starts Assessment]) --> Step1[Step 1: Choose Pet Type]
+    Step1 --> Dog{🐶 Dog?}
+    Step1 --> Cat{🐱 Cat?}
+    
+    Dog --> Questions[Step 2: Answer 9 Lifestyle Questions]
+    Cat --> Questions
+    
+    Questions --> Q1[Q1: Time Available T]
+    Q1 --> Q2[Q2: Living Space L]
+    Q2 --> Q3[Q3: Activity Level A]
+    Q3 --> Q4[Q4: Family Members F]
+    Q4 --> Q5[Q5: Experience Level E]
+    Q5 --> Q6[Q6: Allergies? H]
+    Q6 --> Q7[Q7: Personality Type S]
+    Q7 --> Q8[Q8: Purpose P]
+    Q8 --> Q9[Q9: Indoor/Outdoor I]
+    
+    Q9 --> LoadBreeds[📚 Load Breed Profiles Database]
+    LoadBreeds --> InitCandidates[Initialize: All Breeds as Candidates]
+    
+    InitCandidates --> Filter1{Filter 1: Allergy Check<br/>H = 1 User has allergies?}
+    Filter1 -->|Yes| F1Apply[Filter breeds with H ≥ 4]
+    Filter1 -->|No| Filter2
+    F1Apply --> F1Check{Enough breeds?<br/>≥ 3 candidates?}
+    F1Check -->|Yes| Filter2
+    F1Check -->|No| F1Relax[Relax to H ≥ 3]
+    F1Relax --> Filter2
+    
+    Filter2{Filter 2: Small Space?<br/>L = 1?}
+    Filter2 -->|Yes| F2Apply[Filter breeds with L ≤ 2]
+    Filter2 -->|No| Filter3
+    F2Apply --> F2Check{Enough breeds?<br/>≥ 5 candidates?}
+    F2Check -->|Yes| Filter3
+    F2Check -->|No| Filter3
+    
+    Filter3{Filter 3: Low Time?<br/>T = 1?}
+    Filter3 -->|Yes| F3Apply[Filter breeds with T ≤ 2]
+    Filter3 -->|No| Filter4
+    F3Apply --> F3Check{Enough breeds?<br/>≥ 5 candidates?}
+    F3Check -->|Yes| Filter4
+    F3Check -->|No| Filter4
+    
+    Filter4{Filter 4: Beginner?<br/>E = 1?}
+    Filter4 -->|Yes| F4Apply[Filter breeds with E ≤ 2]
+    Filter4 -->|No| MinCheck
+    F4Apply --> F4Check{Enough breeds?<br/>≥ 5 candidates?}
+    F4Check -->|Yes| MinCheck
+    F4Check -->|No| MinCheck
+    
+    MinCheck{Final Check:<br/>Candidates < 3?}
+    MinCheck -->|Yes| ExpandPool[Expand to All Breeds]
+    MinCheck -->|No| ScoreCalc
+    ExpandPool --> ScoreCalc
+    
+    ScoreCalc[🧮 SCORING ALGORITHM]
+    ScoreCalc --> CalcBase[For Each Breed:<br/>Calculate Base Score]
+    
+    CalcBase --> BaseFormula["totalScore = Σ(1 - |userVal - breedVal|/5) × weight<br/>For factors: T, L, A, H, F, E, S, I, P"]
+    
+    BaseFormula --> BonusCalc[Calculate Bonus Scores]
+    BonusCalc --> Bonus1[Perfect Allergy Match: +0.08]
+    Bonus1 --> Bonus2[Perfect Space Match: +0.06]
+    Bonus2 --> Bonus3[Perfect Activity Match: +0.06]
+    Bonus3 --> Bonus4[Perfect Time Match: +0.05]
+    Bonus4 --> Bonus5[Family Safety: +0.04]
+    Bonus5 --> Bonus6[Beginner Match: +0.03]
+    Bonus6 --> Bonus7[Other Matches: +0.02 each]
+    
+    Bonus7 --> FinalScore[rawScore = totalScore + bonusScore]
+    
+    FinalScore --> MapScore[Map to Compatibility %]
+    MapScore --> Map1{rawScore ≥ 1.25?}
+    Map1 -->|Yes| Perfect[95-100% Perfect Match]
+    Map1 -->|No| Map2
+    Map2{rawScore ≥ 1.10?}
+    Map2 -->|Yes| Excellent[85-94% Excellent]
+    Map2 -->|No| Map3
+    Map3{rawScore ≥ 0.90?}
+    Map3 -->|Yes| Good[75-84% Good]
+    Map3 -->|No| Map4
+    Map4{rawScore ≥ 0.70?}
+    Map4 -->|Yes| Fair[65-74% Fair]
+    Map4 -->|No| Poor[50-64% Poor]
+    
+    Perfect --> Sort
+    Excellent --> Sort
+    Good --> Sort
+    Fair --> Sort
+    Poor --> Sort
+    
+    Sort[Sort All Breeds by:<br/>1. Compatibility %<br/>2. Critical Factor Score<br/>3. Distance]
+    
+    Sort --> Top3[Select Top 3 Breeds]
+    Top3 --> GenReasons[Generate Match Reasons<br/>for Each Breed]
+    
+    GenReasons --> Reason1[Time Commitment Match]
+    GenReasons --> Reason2[Living Space Match]
+    GenReasons --> Reason3[Activity Level Match]
+    GenReasons --> Reason4[Family Friendly]
+    GenReasons --> Reason5[Hypoallergenic]
+    GenReasons --> Reason6[Personality Match]
+    GenReasons --> Reason7[Environment Match]
+    
+    Reason1 --> DisplayResults
+    Reason2 --> DisplayResults
+    Reason3 --> DisplayResults
+    Reason4 --> DisplayResults
+    Reason5 --> DisplayResults
+    Reason6 --> DisplayResults
+    Reason7 --> DisplayResults
+    
+    DisplayResults[🎉 Display Top 3 Results]
+    DisplayResults --> Result1[🥇 Best Match]
+    DisplayResults --> Result2[🥈 Great Alternative]
+    DisplayResults --> Result3[🥉 Good Choice]
+    
+    Result1 --> Save{User Logged In?}
+    Result2 --> Save
+    Result3 --> Save
+    
+    Save -->|Yes| SaveDB[💾 Save to Database]
+    Save -->|No| PromptLogin[🔐 Prompt Login]
+    
+    SaveDB --> End([✅ Assessment Complete])
+    PromptLogin --> End
+    
+    style Start fill:#667eea,stroke:#333,stroke-width:3px,color:#fff
+    style End fill:#10b981,stroke:#333,stroke-width:3px,color:#fff
+    style ScoreCalc fill:#f59e0b,stroke:#333,stroke-width:3px,color:#fff
+    style DisplayResults fill:#8b5cf6,stroke:#333,stroke-width:3px,color:#fff
+    style Questions fill:#ec4899,stroke:#333,stroke-width:2px,color:#fff
+    style LoadBreeds fill:#06b6d4,stroke:#333,stroke-width:2px,color:#fff
+    style Filter1 fill:#fbbf24,stroke:#333,stroke-width:2px
+    style Filter2 fill:#fbbf24,stroke:#333,stroke-width:2px
+    style Filter3 fill:#fbbf24,stroke:#333,stroke-width:2px
+    style Filter4 fill:#fbbf24,stroke:#333,stroke-width:2px
+    style Perfect fill:#10b981,stroke:#333,stroke-width:2px,color:#fff
+    style Excellent fill:#3b82f6,stroke:#333,stroke-width:2px,color:#fff
+    style Good fill:#8b5cf6,stroke:#333,stroke-width:2px,color:#fff
+    style Fair fill:#f59e0b,stroke:#333,stroke-width:2px
+    style Poor fill:#ef4444,stroke:#333,stroke-width:2px,color:#fff
+        </div>
+
+        <div class="legend">
+            <h3>📖 Legend & Key Concepts</h3>
+            <div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #667eea;"></span>
+                    <strong>Start/User Action</strong>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #fbbf24;"></span>
+                    <strong>Filter Decision</strong>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #f59e0b;"></span>
+                    <strong>Calculation Process</strong>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #8b5cf6;"></span>
+                    <strong>Results Display</strong>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #10b981;"></span>
+                    <strong>Success/Completion</strong>
+                </div>
+            </div>
+            
+            <h4 style="margin-top: 20px; color: #667eea;">🎯 Algorithm Highlights:</h4>
+            <ul style="line-height: 1.8;">
+                <li><strong>Progressive Filtering:</strong> Smart filters with fallback mechanisms ensure at least 3 candidates</li>
+                <li><strong>Weighted Scoring:</strong> 9 factors weighted by importance (Time 22%, Living 20%, Activity 19%, etc.)</li>
+                <li><strong>Bonus System:</strong> Up to +0.35 bonus for perfect matches in critical areas</li>
+                <li><strong>Multi-Tier Sorting:</strong> Sorts by compatibility %, critical factors, then distance</li>
+                <li><strong>Realistic Percentages:</strong> Maps scores to 50-100% range for better interpretation</li>
+                <li><strong>Guaranteed 3 Results:</strong> Always returns exactly 3 breed recommendations</li>
+                <li><strong>Detailed Reasoning:</strong> Generates up to 3 personalized match reasons per breed</li>
+            </ul>
+        </div>
+
+        <div class="button-container">
+            <button class="download-btn" onclick="downloadAsPNG()">📥 Download Flowchart as PNG</button>
+            <button class="download-btn" onclick="window.print()" style="margin-left: 10px;">🖨️ Print Diagram</button>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        async function downloadAsPNG() {
+            // Get the SVG element
+            const svg = document.querySelector('.mermaid svg');
+            if (!svg) {
+                alert('Please wait for the diagram to load completely.');
+                return;
+            }
+
+            // Create a canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Get SVG dimensions
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+            const url = URL.createObjectURL(svgBlob);
+            
+            // Create an image
+            const img = new Image();
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                
+                // Download
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'breed-recommendation-algorithm-flowchart.png';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+                
+                URL.revokeObjectURL(url);
+            };
+            img.src = url;
+        }
+    </script>
+</body>
+</html>
