@@ -7,6 +7,7 @@ use App\Models\Pet;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -170,7 +171,7 @@ class PetResource extends Resource
                             ->label('Diet Name')
                             ->required()
                             ->placeholder('e.g., Dry Food, Wet Food, Raw')
-                            ->columnSpan(6),
+                            ->columnSpan(12),
 
                         FileUpload::make('image')
                             ->label('Image')
@@ -180,14 +181,21 @@ class PetResource extends Resource
                             ->directory('diet_images')
                             ->visibility('public')
                             ->preserveFilenames()
-                            ->columnSpan(6),
+                            ->columnSpan(12),
+
+                        Textarea::make('description')
+                            ->label('Description')
+                            ->placeholder('e.g., This is a general representation of this diet type. Consult your vet for specific brand recommendations.')
+                            ->rows(3)
+                            ->columnSpan(12)
+                            ->helperText('Add a neutral description to avoid brand bias'),
                     ])
                     ->createItemButtonLabel('Add diet item')
-                    ->columns(2)
+                    ->columns(12)
                     ->collapsible()
                     ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
                     ->reorderable()
-                    ->helperText('Upload an image for each common diet item; the frontend will show a hover preview.')
+                    ->helperText('Upload an image for each common diet item; the frontend will show a hover preview with description.')
                     ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
                         return $data;
                     })

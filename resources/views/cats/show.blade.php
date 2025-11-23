@@ -469,6 +469,8 @@
 
             .preview-card-enhanced .content {
                 padding: 16px;
+                max-height: 200px;
+                overflow-y: auto;
             }
 
             .preview-card-enhanced .title {
@@ -476,6 +478,23 @@
                 font-size: 16px;
                 color: #1a202c;
                 margin-bottom: 4px;
+                line-height: 1.4;
+            }
+            
+            .preview-card-enhanced .title strong {
+                display: block;
+                margin-bottom: 8px;
+                font-size: 18px;
+                color: #667eea;
+            }
+            
+            .preview-card-enhanced .title p {
+                margin: 0;
+                padding: 0;
+                font-weight: 400;
+                font-size: 13px;
+                color: #666;
+                line-height: 1.5;
             }
 
             @media (max-width: 768px) {
@@ -847,6 +866,7 @@
 
                             @php
                                 $dietImageUrls = $pet->diet_image_urls;
+                                $dietDescriptions = $pet->diet_descriptions;
                                 $dietNames = [];
                                 if (!empty($pet->diets) && is_array($pet->diets)) {
                                     $dietNames = array_merge($dietNames, $pet->diets);
@@ -867,12 +887,16 @@
                                         @foreach ($dietNames as $name)
                                             @php
                                                 $dietImageUrl = $dietImageUrls[$name] ?? null;
+                                                $dietDescription = $dietDescriptions[$name] ?? null;
                                                 $finalDietImage =
                                                     $dietImageUrl ?: '/placeholder.svg?height=160&width=280';
                                             @endphp
 
                                             <div class="tag-enhanced preview-trigger"
-                                                data-preview="{{ e($finalDietImage) }}" role="button" tabindex="0">
+                                                data-preview="{{ e($finalDietImage) }}"
+                                                data-description="{{ e($dietDescription) }}"
+                                                data-title="{{ e(ucfirst($name)) }}"
+                                                role="button" tabindex="0">
                                                 {{ ucfirst($name) }}
                                             </div>
                                         @endforeach
@@ -920,15 +944,12 @@
                                         class="gallery-grid-enhanced">
                                     </div>
                                 </div>
+                            @endif
 
                         </div>
                     </div>
                 </div>
             </div>
-            @endif
-
-
-
         </main>
 
         <script>
@@ -1047,9 +1068,31 @@
                         const img = el.querySelector('img');
                         const title = el.querySelector('.title');
                         img.setAttribute('src', url);
-                        title.textContent = '';
+                        
+                        const dataTitle = triggerEl.getAttribute('data-title') || '';
+                        const description = triggerEl.getAttribute('data-description') || '';
+                        
+                        // Build the content
+                        let content = '';
+                        if (dataTitle) {
+                            const titleDiv = document.createElement('strong');
+                            titleDiv.textContent = dataTitle;
+                            content = titleDiv.outerHTML;
+                        }
+                        if (description) {
+                            const descDiv = document.createElement('p');
+                            descDiv.style.marginTop = '8px';
+                            descDiv.style.fontSize = '13px';
+                            descDiv.style.color = '#666';
+                            descDiv.style.lineHeight = '1.5';
+                            descDiv.textContent = description;
+                            content += descDiv.outerHTML;
+                        }
+                        
+                        title.innerHTML = content;
+                        
                         if (el._contentEl) {
-                            el._contentEl.style.display = title.textContent.trim() ? 'block' : 'none';
+                            el._contentEl.style.display = content ? 'block' : 'none';
                         }
                         el.style.display = 'block';
 
@@ -1095,6 +1138,17 @@
                         if (!url) return;
                         showAnchored(url, trigger);
                     }, false);
+
+                    // Hide modal on scroll
+                    let scrollTimeout;
+                    window.addEventListener('scroll', function() {
+                        if (anchoredEl && anchoredEl.style.display === 'block') {
+                            clearTimeout(scrollTimeout);
+                            scrollTimeout = setTimeout(() => {
+                                hideAnchored();
+                            }, 100);
+                        }
+                    }, true);
                 })();
             });
         </script>

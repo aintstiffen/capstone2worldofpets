@@ -83,6 +83,26 @@ class Pet extends Model
         }
         return $result;
     }
+
+    /**
+     * Return an associative mapping of diet name => description
+     */
+    public function getDietDescriptionsAttribute()
+    {
+        $items = $this->diet_images;
+        if (!$items || !is_array($items)) return [];
+
+        $result = [];
+        foreach ($items as $item) {
+            if (!is_array($item)) continue;
+            $name = $item['name'] ?? null;
+            $description = $item['description'] ?? null;
+            if (!$name) continue;
+
+            $result[$name] = $description;
+        }
+        return $result;
+    }
     public function getGalleryImageUrlsAttribute()
 {
     $items = $this->gallery;
