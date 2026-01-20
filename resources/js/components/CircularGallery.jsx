@@ -196,11 +196,34 @@ class Media {
       transparent: true
     });
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    // Only set crossOrigin for external URLs, not for same-origin
+    if (this.image && (this.image.startsWith('http://') || this.image.startsWith('https://'))) {
+      const imageUrl = new URL(this.image);
+      const currentUrl = new URL(window.location.href);
+      // Only set crossOrigin if it's a different domain
+      if (imageUrl.origin !== currentUrl.origin) {
+        img.crossOrigin = 'anonymous';
+      }
+    }
     img.src = this.image;
     img.onload = () => {
       texture.image = img;
       this.program.uniforms.uImageSizes.value = [img.naturalWidth, img.naturalHeight];
+    };
+    img.onerror = () => {
+      console.warn('Failed to load image:', this.image);
+      // Create a fallback colored canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = 800;
+      canvas.height = 600;
+      const ctx = canvas.getContext('2d');
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, '#667eea');
+      gradient.addColorStop(1, '#764ba2');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      texture.image = canvas;
+      this.program.uniforms.uImageSizes.value = [canvas.width, canvas.height];
     };
   }
   createMesh() {

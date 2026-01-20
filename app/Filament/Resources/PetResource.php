@@ -173,14 +173,31 @@ class PetResource extends Resource
                             ->placeholder('e.g., Dry Food, Wet Food, Raw')
                             ->columnSpan(12),
 
-                        FileUpload::make('image')
-                            ->label('Image')
-                            ->required()
-                            ->image()
-                            ->disk(env('FILESYSTEM_DISK', 's3'))
-                            ->directory('diet_images')
-                            ->visibility('public')
-                            ->preserveFilenames()
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                FileUpload::make('image')
+                                    ->label('Upload Image')
+                                    ->image()
+                                    ->disk(env('FILESYSTEM_DISK', 's3'))
+                                    ->directory('diet_images')
+                                    ->visibility('public')
+                                    ->preserveFilenames()
+                                    ->helperText('Upload from your computer')
+                                    ->columnSpan(1),
+
+                                TextInput::make('image_url')
+                                    ->label('Or Use Image URL')
+                                    ->url()
+                                    ->placeholder('https://example.com/image.jpg')
+                                    ->helperText('Paste an online image URL')
+                                    ->columnSpan(1)
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        // If URL is provided, clear the upload field
+                                        if ($state) {
+                                            $set('image', $state);
+                                        }
+                                    }),
+                            ])
                             ->columnSpan(12),
 
                         Textarea::make('description')
@@ -195,11 +212,28 @@ class PetResource extends Resource
                     ->collapsible()
                     ->itemLabel(fn (array $state): ?string => $state['name'] ?? null)
                     ->reorderable()
-                    ->helperText('Upload an image for each common diet item; the frontend will show a hover preview with description.')
+                    ->helperText('Upload an image for each common diet item OR paste an online image URL. The frontend will show a hover preview with description.')
                     ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                        // If image_url is provided, use it as the image value
+                        if (!empty($data['image_url'])) {
+                            $data['image'] = $data['image_url'];
+                            unset($data['image_url']);
+                        }
                         return $data;
                     })
                     ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                        // If image_url is provided, use it as the image value
+                        if (!empty($data['image_url'])) {
+                            $data['image'] = $data['image_url'];
+                            unset($data['image_url']);
+                        }
+                        return $data;
+                    })
+                    ->mutateRelationshipDataBeforeFillUsing(function (array $data): array {
+                        // When editing, if image is a URL, populate image_url field
+                        if (!empty($data['image']) && filter_var($data['image'], FILTER_VALIDATE_URL)) {
+                            $data['image_url'] = $data['image'];
+                        }
                         return $data;
                     }),
 
